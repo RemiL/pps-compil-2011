@@ -1,0 +1,259 @@
+/* MOMENTS DE DOUTE MARQUES PAR ????? */
+
+/*
+Validité : valide()
+Un environnement contient un objet : bool contains(env,obj)
+*/
+
+/* Declarations et validités : 
+decl() = déclarations synthétisées
+declh() = déclarations héritées
+type() = type d'une variable ou d'une entité
+*/
+
+/* signatures de chaque classe et validité : 
+methodes() = méthodes appartenant à une classe
+*/
+
+
+----- S : LDefClass Bloc
+valide(S) = valide(LDefClass) && valide(Bloc)
+decl(S) = [Entier, Chaine]
+declh(LDefClass) = decl(S)
+declh(Bloc) = decl(S) + decl(LDefClass) + declh(LDefClass)
+
+
+----- LDefClass0 : LDefClass1 DefClass
+valide(LDefClass0) = valide(LDefClass1) && valide(DefClass)
+decl(LDefClass0) = decl(LDefClass1) + decl(DefClass)
+declh(LDefClass1) = declh(LDefClass0) //+declh(DefClass) ?
+declh(DefClass) = declh(LDefClass1)
+
+
+----- LDefClass : DefClass
+valide(LDefClass) = valide(DefClass)
+declh(DefClass) = declh(LDefClass)
+decl(LDefClass) = decl(DefClass)
+
+----- DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps
+valide(DefClass) = !contains(declh(DefClass), ID_CLASS.lexval) && valide(LParamOpt) && valide(ExtendsOpt) && valide(InitBlocOpt) && valide(Corps)
+decl(DefClass) = ID_CLASS.lexval //TODO verier
+declh(LParamOpt) = declh(DefClass) + ID_CLASS.lexval
+declh(ExtendsOpt) = declh(DefClass)
+declh(InitBlocOpt) = declh(DefClass)
+declh(Corps) = declh(DefClass)
+
+----- LParam0 : Param ',' LParam1
+valide(LParam0) = valide(Param) && valide(LParam1)
+declh(LParam1) = declh(LParam0)
+declh(Param) = declh(LParam0)
+
+----- LParam : Param
+valide(LParam) = valide(Param)
+declh(Param) = declh(LParam)
+
+----- LParam : LParamInit
+valide(LParam) = valide(LParamInit)
+declh(LParamInit) = declh(LParam)
+
+----- LParamInit0 : LParamInit1 ',' ParamInit
+valide(LParamInit0) = valide(ParamInit) && valide(LParamInit1)
+declh(LParamInit1) = declh(LParamInit0)
+declh(ParamInit) = declh(LParamInit0)
+
+----- LParamInit : ParamInit
+valide(LParamInit) = valide(ParamInit)
+declh(ParamInit) = declh(LParamInit)
+
+----- Param : ID0 ':' ID1
+valide(Param) = contains(declh(Param, ID0))
+//type(Param) = ID0.lexval
+
+----- ParamInit : ID0 ':' ID1 AFF E
+valide(ParamInit) = contains(declh(Paraminit, ID0))
+declh(E) = declh(ParamInit)
+//type(ParamInit) = ID0.lexval
+
+----- ExtendsOpt : EXTENDS AppelConstr
+valide(ExtendsIpt) = valide(AppelConstr) //&& contains(declh(ExtendsOpt),type(AppelConstr)) ?????
+declh(AppelConstr) = declh(ExtendsOpt)
+
+----- AppelConstr : ID_CLASS '(' LArgOpt ')'
+valide(AppelConstr) = valide(LArgOpt) && contains(declh(AppelConstr), ID_CLASS)
+//type(AppalConstr) = ID_CLASS.lexval
+
+----- InitBlocOpt : '{' LAffectOpt '}'
+valide(InitBlocOpt) = valide(LAffectOpt)
+declh(LAffectOpt) = declh(InitBlocOpt)
+
+
+----- LAffectOpt : LAffect    // liste d"affectation optionnelle
+valide(LAffectOpt) = valide(LAffect)
+declh(LAffect) = declh(LAffect)
+
+----- LAffect0 : LAffect1 ';' Affect
+valide(LAffect0) = valide(LAffect1) && valide(Affect)
+declh(LAffect1) = declh(LAffect0)
+declh(Affect) = declh(LAffect0)
+
+----- LAffect : Affect
+valide(LAffect) = valide(Affect)
+declh(Affect) = declh(LAffect)
+
+----- Affect : Selection AFF Expr
+
+
+
+----- Selection : Expr '.' ID
+
+
+----- Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
+
+
+----- LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
+
+
+----- LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
+
+
+----- LDeclAttr : LDeclAttr ';' DeclAttr    // liste de déclaration d'un attribut
+
+
+----- LDeclAttr : DeclAttr
+
+
+----- DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique
+
+
+----- DeclAttr : DeclA
+
+
+----- DeclA : VARIABLE ID ':' ID InitOpt   // déclaration d'un attribut 
+
+
+----- DeclA : VAL ID ':' ID InitOpt
+
+
+----- InitOpt : AFF E
+
+
+----- LDeclMeth : LDeclMeth DeclMeth
+
+
+----- LDeclMeth : DeclMeth
+
+
+----- DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID IS Bloc
+
+
+----- Def : DEF STATIC
+
+
+----- Def : DEF
+
+
+----- Def : DEF OVERRIDE
+
+
+----- Bloc : '{' Lexpr '}'
+
+
+----- Bloc : '{' LDeclA IS Lexpr '}'
+
+
+----- LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
+
+
+----- LDeclA : DeclA
+
+
+----- Lexpr : Lexpr ';' E            // liste d'expression d'un bloc
+
+
+----- Lexpr : E
+
+
+----- E : Expr
+
+
+----- E : ExprComp
+
+
+----- Expr : IfThenElse
+
+
+----- Expr : ID
+
+
+----- Expr : Selection
+
+
+----- Expr : CSTE
+
+
+----- Expr : '(' E ')'
+
+
+----- Expr : NOUVEAU ID '(' LArgOpt ')'
+
+
+----- Expr : EnvoiMsg
+
+
+----- Expr : ExprArithm
+
+
+----- IfThenElse : IF E THEN Bloc ELSE Bloc
+
+
+----- IfThenElse : IF E THEN E ELSE E
+
+
+----- LArgOpt : LArg    // liste d'arguments optionnelle
+
+
+----- LArg : LArg ',' E    // liste d'arguments
+
+
+----- LArg : E
+
+
+----- ExprArithm : E '+' E
+
+
+----- ExprArithm : E '-' E
+
+
+----- ExprArithm : E '*' E
+
+
+----- ExprArithm : E '/' E
+
+
+----- ExprArithm : '+' E
+
+
+----- ExprArithm : '-' E
+
+
+----- ExprComp : Expr RELOP Expr
+
+
+----- EnvoiMsg : EnvoiMsgStatic     // envoi d'un message simple ou appel à une fonction statique
+
+
+----- EnvoiMsg : EnvoiMsgNonStatic
+
+
+----- EnvoiMsgStatic : ID_CLASS '.' EnvoiMsgNonStatic
+
+
+----- EnvoiMsgStatic ID_CLASS '.' ID '(' LArgOpt ')'
+
+
+----- EnvoiMsgNonStatic : ID '.' EnvoiMsgNonStatic
+
+
+----- EnvoiMsgNonStatic : ID '.' ID '(' LArgOpt ')'
+
+
