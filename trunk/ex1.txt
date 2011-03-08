@@ -1,6 +1,6 @@
 class Point(xc: Entier, yc: Entier, n: Chaine := "?")
            { x := xc; y := yc; name := n; 
-             iname = Point.newId() /* Point est obligatoire */
+             iname := Point.newId() /* Point est obligatoire */
            }
 is {
   static var number : Entier := 1;
@@ -9,10 +9,10 @@ is {
   var name: Chaine;  /* le nom est modifiable */
   val iname : Entier /* l'index de creation est non modifiable */
 
-  def static newId() returns Entier is {
+  /*def static newId() returns Entier is {
       val tmp : Entier := number
       is number := number + 1; tmp
-  }
+  }*/
   
   def static alloues() returns Entier is { number -1 }
 
