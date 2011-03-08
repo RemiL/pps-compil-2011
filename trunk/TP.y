@@ -256,7 +256,7 @@ Expr : IfThenElse
      | CSTE
      | STRING
      | '(' E ')'
-     | NOUVEAU ID '(' LArgOpt ')'
+     | NOUVEAU ID_CLASS '(' LArgOpt ')'
      | EnvoiMsg
      | ExprArithm
      | Affect
@@ -297,20 +297,17 @@ ExprComp : Expr RELOP Expr
   }
 ;
 
-EnvoiMsg : EnvoiMsgStatic     // envoi d'un message simple ou appel à une fonction statique
-         | EnvoiMsgNonStatic
+// A améliorer ...
+EnvoiMsg : ID_CLASS '.' EnvoiMsg2     // envoi d'un message simple ou appel à une fonction statique
+         | ID '.' EnvoiMsg2
+         | STRING '.' EnvoiMsg2
+         | CSTE '.' EnvoiMsg2
   {
   }
 ;
 
-EnvoiMsgStatic : ID_CLASS '.' EnvoiMsgNonStatic
-               | ID_CLASS '.' ID '(' LArgOpt ')'
-  {
-  }
-;
-
-EnvoiMsgNonStatic : ID '.' EnvoiMsgNonStatic
-                  | ID '.' ID '(' LArgOpt ')'
+EnvoiMsg2 : ID '(' LArgOpt ')' '.' EnvoiMsg2
+          | ID '(' LArgOpt ')'
   {
   }
 ;
