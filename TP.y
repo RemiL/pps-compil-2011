@@ -117,12 +117,12 @@ LParamInit : LParamInit ',' ParamInit
   }
 ;
 
-Param : ID ':' ID
+Param : ID ':' ID_CLASS
   {
   }
 ;
 
-ParamInit : ID ':' ID AFF E
+ParamInit : ID ':' ID_CLASS AFF E
   {
   }
 ;
@@ -139,6 +139,7 @@ AppelConstr : ID_CLASS '(' LArgOpt ')'
 ;
 
 InitBlocOpt : '{' LAffectOpt '}'
+            | 
   {
   }
 ;
@@ -194,8 +195,8 @@ DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statiqu
   }
 ;
 
-DeclA : VARIABLE ID ':' ID InitOpt   // déclaration d'un attribut 
-      | VAL ID ':' ID InitOpt
+DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
+      | VAL ID ':' ID_CLASS InitOpt
   {
   }
 ;
@@ -212,7 +213,7 @@ LDeclMeth : LDeclMeth DeclMeth
   }
 ;
 
-DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID IS Bloc
+DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
   {
   }
 ;
@@ -252,6 +253,7 @@ Expr : IfThenElse
      | ID
      | Selection
      | CSTE
+     | STRING
      | '(' E ')'
      | NOUVEAU ID '(' LArgOpt ')'
      | EnvoiMsg

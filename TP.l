@@ -7,7 +7,7 @@ LC 	   ({Lettre}|{Chiffre})
 Ident      {LettreMin}{LC}*
 IdentClass {LettreMaj}{LC}*
 Delim	   [ \n\t\r]
-Symbole    [+\-*/();,]
+Symbole    [+\-*/();,:{}]
 Guill	   "\""
 Star  	   "*"
 NotStar	   [^*]
