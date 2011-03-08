@@ -156,7 +156,8 @@ LAffect : LAffect ';' Affect
   }
 ;
 
-Affect : Selection AFF Expr
+Affect : ID AFF E
+       | Selection AFF E
   {
   }
 ;
@@ -258,6 +259,7 @@ Expr : IfThenElse
      | NOUVEAU ID '(' LArgOpt ')'
      | EnvoiMsg
      | ExprArithm
+     | Affect
   {
   }
 ;
