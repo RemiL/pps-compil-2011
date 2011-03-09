@@ -15,86 +15,128 @@ declh() = déclarations héritées
 Déclarations de variables
 decv() = déclarations synthétisées
 decvh() = déclarations héritées
+
+Valeur
+value() = valeur d'un variable ou d'un objet
+value() = NIL si non initialisé (warning?????)
 */
 
 /* signatures de chaque classe et validité : 
 methodes() = méthodes appartenant à une classe
 */
 
-
+/***** liste de definition des classes ******/
 ----- S : LDefClass Bloc
 valide(S) = valide(LDefClass) && valide(Bloc)
-decl(S) = [Entier, Chaine]
+decl(S) = [Entier, Chaine, Boolean]//????? Ajout du type Boolean. Pas de float, pas de char ?
 declh(LDefClass) = decl(S)
 declh(Bloc) = decl(S) + decl(LDefClass)
-
 
 ----- LDefClass0 : LDefClass1 DefClass
 valide(LDefClass0) = valide(LDefClass1) && valide(DefClass)
 decl(LDefClass0) = decl(LDefClass1) + decl(DefClass)
-declh(LDefClass1) = declh(LDefClass0) //+declh(DefClass) ?????
+declh(LDefClass1) = declh(LDefClass0) //+ decl(DefClass) ?????
 declh(DefClass) = declh(LDefClass1)
 
 
------ LDefClass : DefClass
+----- LDefClass : DefClass //liste de definition de classes
 valide(LDefClass) = valide(DefClass)
 declh(DefClass) = declh(LDefClass)
 decl(LDefClass) = decl(DefClass)
 
+
 ----- DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps
-valide(DefClass) = !contains(declh(DefClass), ID_CLASS.lexval) && valide(LParamOpt) && valide(ExtendsOpt) && valide(InitBlocOpt) && valide(Corps)
-decl(DefClass) = ID_CLASS.lexval //TODO verier
+//le nom de la classe n'existe pas encore, la liste des parametres du constructeur est valide, le reste aussi, et la classe mère existe (s'il y a heritage).
+valide(DefClass) = !contains(declh(DefClass), ID_CLASS.lexval) && valide(LParamOpt) && valide(ExtendsOpt) && valide(InitBlocOpt) && valide(Corps) && if(type(ExtendsOpt) != EPS) then contains(declh(DefClass),type(ExtendsOpt))
+decl(DefClass) = ID_CLASS.lexval
 declh(LParamOpt) = declh(DefClass) + ID_CLASS.lexval
-declh(ExtendsOpt) = declh(DefClass)
-declh(InitBlocOpt) = declh(DefClass)
-declh(Corps) = declh(DefClass)
+declh(ExtendsOpt) = declh(DefClass) //sans l'ID_CLASS pour ne pas heriter de soi meme
+declh(InitBlocOpt) = declh(DefClass) + ID_CLASS.lexval
+declh(Corps) = declh(DefClass) + ID_CLASS.lexval
+//TODO attributs de la classe utiles dans InitBloc
+//TODO heritage
+
+/****** liste de parametres du constructeur ******/
+----- LParamOpt : LParam
+//valide, declh, decv TODO
+
+----- LParamOpt :
+
 
 ----- LParam0 : Param ',' LParam1
 valide(LParam0) = valide(Param) && valide(LParam1)
 declh(LParam1) = declh(LParam0)
 declh(Param) = declh(LParam0)
+decv(LParam0) = decv(Param) + decv(LParam1)
+
+//????? peut-on faire class A(Entier i := 3, Entier j := x){... ? Et class A(Entier j := x, Entier x := 3){... ? si oui, voir decvh.
 
 ----- LParam : Param
 valide(LParam) = valide(Param)
 declh(Param) = declh(LParam)
+decv(LParam) = decv(Param)
 
 ----- LParam : LParamInit
 valide(LParam) = valide(LParamInit)
 declh(LParamInit) = declh(LParam)
+decv(LParamInit) = declv(LParam)
 
 ----- LParamInit0 : LParamInit1 ',' ParamInit
 valide(LParamInit0) = valide(ParamInit) && valide(LParamInit1)
 declh(LParamInit1) = declh(LParamInit0)
 declh(ParamInit) = declh(LParamInit0)
+decv(LParamInit0) = decv(LParamInit1) + decv(ParamInit)
 
 ----- LParamInit : ParamInit
 valide(LParamInit) = valide(ParamInit)
 declh(ParamInit) = declh(LParamInit)
+decv(LParamInit) = decv(ParamInit)
 
------ Param : ID0 ':' ID1
+----- Param : ID ':' ID_CLASS
 valide(Param) = contains(declh(Param, ID0))
-type(Param) = ID0.lexval
+type(Param) = ID_CLASS.lexval
+decv(Param) = ID.lexval
+value(ID1) = NIL
 
------ ParamInit : ID0 ':' ID1 AFF E
-valide(ParamInit) = contains(declh(Paraminit, ID0)) && type(E) == ID0.lexval
+----- ParamInit : ID ':' ID_CLASS AFF ExprSansAffect //exemple: Entier : reponse := 42
+//REVOIR
+valide(ParamInit) = contains(declh(Paraminit, ID0)) && type(E) == ID0.lexval && value(E) != NIL
 declh(E) = declh(ParamInit)
 type(ParamInit) = ID0.lexval
+decv(ParamInit) = ID1.lexval
+value(ID1) = value(E)
 
+/******** Heritage **********/
 ----- ExtendsOpt : EXTENDS AppelConstr
-valide(ExtendsIpt) = valide(AppelConstr) //&& contains(declh(ExtendsOpt), type(AppelConstr)) ?????
+valide(ExtendsOpt) = valide(AppelConstr) && contains(declh(ExtendsOpt), type(AppelConstr)) ?????
 declh(AppelConstr) = declh(ExtendsOpt)
+type(ExtendsOpt) = type(AppelConstr)
+//TODO appeler super() dans le constructeur de la classe fille quoi qu'il arrive (ne fait rien s'il n'y a pas d'heritage)
+//TODO heriter des attributs et des methodes
 
+----- ExtendsOpt :
+valide(ExtendsOpt) = true
+type(ExtendsOpt) = EPS
+
+/******** Constructeur *********/
 ----- AppelConstr : ID_CLASS '(' LArgOpt ')'
 valide(AppelConstr) = valide(LArgOpt) && contains(declh(AppelConstr), ID_CLASS)
-//type(AppalConstr) = ID_CLASS.lexval
+type(AppelConstr) = ID_CLASS.lexval
+//TODO surement plein de choses en rapport avec l'heritage, comme passer les valeurs des attributs
 
------ InitBlocOpt : '{' LAffectOpt '}'
+----- InitBlocOpt : '{' LAffectOpt '}' //instructions dans le constructeur
 valide(InitBlocOpt) = valide(LAffectOpt)
 declh(LAffectOpt) = declh(InitBlocOpt)
+//TODO methode constructeur qui appelle un super sur rien ou sur la classe mere, initialiser les attributs initalises, et ensuite InitBloc
 
------ LAffectOpt : LAffect    // liste d"affectation optionnelle
+----- InitBlocOpt :
+
+----- LAffectOpt : LAffect    // liste d'affectation optionnelle
 valide(LAffectOpt) = valide(LAffect)
 declh(LAffect) = declh(LAffect)
+// ????? impossible de déclarer une variable locale pour des calculs dans le constructeur...
+
+----- LAffectOpt :
 
 ----- LAffect0 : LAffect1 ';' Affect
 valide(LAffect0) = valide(LAffect1) && valide(Affect)
@@ -105,85 +147,81 @@ declh(Affect) = declh(LAffect0)
 valide(LAffect) = valide(Affect)
 declh(Affect) = declh(LAffect)
 
------ Affect : Selection AFF Expr
-valide(LAffect) = valide(Selection) && valide(Expr) && type(Selection) == type(Expr)
+----- Affect : ID AFF ExprSansAffect
+//REVOIR
+valide(LAffect) = valide(ID) && valide(Expr) && type(Selection) == type(Expr)
 declh(Expr) = declh(Affect)
 
------ ExprSelec : '(' Expr ')'
-valide(ExprSelec) = valide(Expr)
-//TODO blablabla
-
------ ExprSelec : CSTE
+----- Affect : Selection AFF ExprSansAffect
 
 
------ ExprSelec : STRING
------ ExprSelec : ID
------ ExprSelec : Selection
------ ExprSelec : EnvoiMsg
-
------ Selection : ExprSelec '.' ID
-
------ ExprEnvoiMsg : ExprSelec
------ ExprEnvoiMsg : ID_CLASS
-
------ EnvoiMsg : ExprEnvoiMsg '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
-//A AMELIORER
-
-
+/******* corps de la classe ***************/
 ----- Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
 valide(Corps) = valide(LDeclAttrOpt) && valide(LDeclMethOpt)
 declh(LDeclAttrOpt) = declh(Corps)
 declh(LDeclMethOpt) = declh(Corps)
-
+decv(Corps) = decv(LDeclAttrOpt)//TODO etendre au dessus et aux methodes
 
 ----- LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
 valide(LDeclAttrOpt) = valide(LDeclAttr)
 declh(LDeclAttr) = declh(LDeclAttrOpt)
+decv(LDeclAttrOpt) = decv(LDeclAttr)
 
+----- LDeclAttrOpt : 
 
 
 ----- LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
 valide(LDeclMethOpt) = valide(LDeclMeth)
 declh(LDeclMeth) = declh(LDeclMethOpt)
+//TODO methodes comme les attributs, un peu
+
+----- LDeclMethOpt :
+
 
 ----- LDeclAttr0 : LDeclAttr1 ';' DeclAttr    // liste de déclaration d'un attribut de classe
 valide(LDeclAttr0) = valide(LDeclAttr1) && valide(DeclAttr)
 declh(LDeclAttr1) = declh(LDeclAttr1)
 declh(DeclAttr) = declh(LDeclAttr0)
-
+decv(LDeclAttr0) = decv(LDecAttr1) + decv(DeclAttr)
 
 ----- LDeclAttr : DeclAttr
 valide(LDeclAttr) = valide(DeclAttr)
 declh(LDeclAttr) = declh(DeclAttr)
-
-
+decv(LDeclAttr) = decv(DeclAttr)
 
 ----- DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique (de classe)
-
-
+valide(DeclAttr) = valide(DeclA)
+declh(DeclA) = declh(DeclAttr)
+decv(DeclAttr) = decv(DeclA)
+//TODO ne pas oublier de gerer les attributs statiques et override, comme les methodes d'ailleurs
 
 ----- DeclAttr : DeclA
+valide(DeclAttr) = valide(DeclA)
+declh(DeclA) = declh(DeclAttr)
+decv(DeclAttr) = decv(DeclA)
 
-
------ DeclA : VARIABLE ID0 ':' ID1 InitOpt   // déclaration d'un attribut variable
-valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID1.lexval)
-type(ID0) = ID1.lexval
-value(ID0) = value(InitOpt) 
-
------ DeclA : VAL ID0 ':' ID1 InitOpt // déclaration d'un attribut constant
-valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID1.lexval) && value(InitOpt) = (EPS || ID0.lexval)
-type(ID0) = ID1.lexval
+----- DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut variable
+valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID_CLASS.lexval)
+type(ID0) = ID_CLASS.lexval
 value(ID0) = value(InitOpt)
+decv(DeclA) = ID.lexval
 
------ InitOpt : AFF E
-valide(InitOpt) = valide(E)
-type(InitOpt) = type(E)
-value(InitOpt) = value(E)
+----- DeclA : VAL ID ':' ID_CLASS InitOpt // déclaration d'un attribut constant
+valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID_CLASS.lexval) && value(InitOpt) = (EPS || ID0.lexval)
+type(ID) = ID_CLASS.lexval
+value(ID) = value(InitOpt)
+decv(DeclA) = ID.lexval
+//TODO constant
+
+----- InitOpt : AFF ExprSansAffect
+valide(InitOpt) = valide(ExprSansAffect)
+type(InitOpt) = type(ExprSansAffect)
+value(InitOpt) = value(ExprSansAffect)
 
 ----- InitOpt : 
 valide(InitOpt) = true
 type(InitOpt) = EPS
-//TODO value
+value(InitOpt) = NIL
 
 ----- LDeclMeth0 : LDeclMeth1 DeclMeth
 valide(LDeclMeth0) = valide(LDeclMeth1) && valide(DeclMeth)
@@ -195,62 +233,19 @@ declh(DeclMeth) = declh(LDeclMeth0)
 valide(LDeclMeth) = valide (DeclMeth)
 declh(DeclMeth) = decl(LDeclMeth0)
 
------ DeclMeth : Def ID0 '(' LParamOpt ')' RETURNS ID1 IS Bloc
-valide(DeclMeth)  = valide(LParamOpt) && valide(Bloc) && contains(declh(DeclMeth), ID1.lexval) && (type(Bloc) == ID1.lexval) 
+----- DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
+valide(DeclMeth)  = valide(LParamOpt) && valide(Bloc) && contains(declh(DeclMeth), ID_CLASS.lexval) && (type(Bloc) == ID_CLASS.lexval)
 
 ----- Def : DEF STATIC
 valide(Def) = true;
+//TODO ne contient pas de this
 
 ----- Def : DEF
 valide(Def) = true;
 
 ----- Def : DEF OVERRIDE
-valide(Def) = true;
------ Lexpr0 : Lexpr1 ';' E            // liste d'expression d'un bloc
-valide(Lexpr0) = valide(Lexpr1) && valide(E)
-declh(Lexpr1) = declh(Lexpr0)
-declh(E) = declh(Lexpr0)
-type(Lexpr0) = type(E)
+valide(Def) = //TODO existe dans les methodes de la classe mere
 
------ Lexpr : E
-valide(Lexpr) = valide(E)
-type(Lexpr) = type(E)
-declh(E) = declh(Lexpr)
-
-
------ E : Expr
-valide(E) = valide(Expr)
-type(E) = type(Expr)
-declh(Expr)= declh(E)
-
------ E : ExprComp
-valide(E) = valide(ExprComp)
-type(E) = type(ExprComp)
-declh(ExprComp)= declh(E)
-
------ Expr : IfThenElse
-valide(Expr) = valide(IfThenElse)
-type(Expr) = type(IfThenElse)
-declh(IfThenElse)= declh(Expr)
-
------ Expr : ID
-// decvh = declh mais pour les variables
-valide(Expr) = contains(decvh(Expr),ID)
-type(Expr) = type(ID)
-// mettre les value()
-
------ Expr : Selection
-
-
------ Expr : CSTE
-valide(Expr) = true
-//value
-
-
------ Expr : '(' E ')'
-valide(Expr) = valide (E)
-declh(E) = decl(Expr)
-type(Expr) = type (E)
 ----- Bloc : '{' Lexpr '}'
 valide(Bloc) = valide(Lexpr)
 type(Bloc) = type(Lexpr)
@@ -267,144 +262,114 @@ declh(LDeclA) = declh(Bloc)
 ----- LDeclA : DeclA
 
 
------ Lexpr0 : Lexpr1 ';' E            // liste d'expression d'un bloc
-valide(Lexpr0) = valide(Lexpr1) && valide(E)
-declh(Lexpr1) = declh(Lexpr0)
-declh(E) = declh(Lexpr0)
-type(Lexpr0) = type(E)
+----- LExpr0 : LExpr1 ';' Expr        // liste d'expression d'un bloc
+valide(LExpr0) = valide(LExpr1) && valide(Expr)
+declh(LExpr1) = declh(LExpr0)
+declh(Expr) = declh(Lexpr0)
+type(LExpr0) = type(Expr)
 
------ Lexpr : E
+----- LExpr : Expr
 valide(Lexpr) = valide(E)
 type(Lexpr) = type(E)
 declh(E) = declh(Lexpr)
 
-
------ E : Expr
-valide(E) = valide(Expr)
-type(E) = type(Expr)
-declh(Expr)= declh(E)
-
------ E : ExprComp
-valide(E) = valide(ExprComp)
-type(E) = type(ExprComp)
-declh(ExprComp)= declh(E)
-
------ Expr : IfThenElse
-valide(Expr) = valide(IfThenElse)
-type(Expr) = type(IfThenElse)
-declh(IfThenElse)= declh(Expr)
-
------ Expr : ID
-// decvh = declh mais pour les variables
-valide(Expr) = contains(decvh(Expr),ID)
-type(Expr) = type(ID)
-// mettre les value()
-
------ Expr : Selection
+----- BlocExpr : Expr
 
 
------ Expr : CSTE
-valide(Expr) = true
-//value
+----- BlocExpr : Bloc
+
+----- Expr : ExprSansAffect
+
+----- Expr : Affect
+
+----- ExprSansAffect : IfThenElse
+
+----- ExprSansAffect : Selection
+
+----- ExprSansAffect : STRING
+
+----- ExprSansAffect : CSTE
+
+----- ExprSansAffect : NOUVEAU ID_CLASS '(' LArgOpt ')'
+
+----- ExprSansAffect : EnvoiMsg
+
+----- ExprSansAffect : ExprSansAffect '+' ExprSansAffect
+
+----- ExprSansAffect : ExprSansAffect '-' ExprSansAffect
+
+----- ExprSansAffect : ExprSansAffect '*' ExprSansAffect
+
+----- ExprSansAffect : ExprSansAffect '/' ExprSansAffect
+
+----- ExprSansAffect : '+' ExprSansAffect %prec PREC_UNAIRE
+
+----- ExprSansAffect : '-' ExprSansAffect %prec PREC_UNAIRE
+
+----- ExprSansAffect : ExprSansAffect RELOP ExprSansAffect
+
+----- ExprSansAffect : '(' Expr ')'
+
+----- ExprSelec : '(' Expr ')'
+valide(ExprSelec) = valide(Expr)
+//TODO blablabla
+
+----- ExprSelec : CSTE
+type(ExprSelec) = Entier
+value(ExprSelec) = CSTE.lexval
+valide(ExprSelec) = true
 
 
------ Expr : '(' E ')'
-valide(Expr) = valide (E)
-declh(E) = decl(Expr)
-type(Expr) = type (E)
+----- ExprSelec : STRING
+type(ExprSelec) = Chaine
+value(ExprSelec) = STRING.lexval
+valide(ExprSelec) = true
 
------ Expr : NOUVEAU ID '(' LArgOpt ')'
-valide(Expr) = valide(LArgOpt) && contains(decvh(Expr),ID)
-declh(LArgOpt) = declh(Expr)
-type(Expr) = type (ID)
+----- ExprSelec : ID
+valide(ExprSelec) = contains(decv(ExprSelec), ID)//decvh ?????
+type(ExprSelec) = type(ID)
+value(ExprSelec) = value(ID)
 
------ Expr : EnvoiMsg
-valide(expr) = valide(EnvoiMsg)
-declh(EnvoiMsg) = declh(Expr)
+----- ExprSelec : Selection
+valide(ExprSelec) = valide(Selection)
+type(ExprSelec) = type(Selection)
+value(ExprSelec) = value(Selection)
 
------ Expr : ExprArithm
-valide(expr) = valide(ExprArithm)
-declh(ExprArithm) = declh(Expr)
+----- ExprSelec : EnvoiMsg
+valide(ExprSelec) = valide(EnvoiMsg)
+type(ExprSelec) = type(EnvoiMsg)
+value(ExprSelec) = value(EnvoiMsg)
 
------ IfThenElse : IF E THEN Bloc0 ELSE Bloc1
-valide(IfThenElse) = valide(E) && valide (Bloc0) && valide(Bloc1) && type(E)== boolean
-declh(E) = declh(IfThenElse)
-declh(Bloc0) = declh(IfThenElse)
-declh(Bloc1) = declh(IfThenElse)
+----- Selection : ExprSelec '.' ID
+valide(ExprSelec) = //TODO
+type(ExprSelec) = type(ID)
+value(ExprSelec) = value(ID)
 
------ IfThenElse : IF E0 THEN E1 ELSE E2
-valide(IfThenElse) = valide(E0) && valide (E1) && valide(E2) && type(E0)== boolean
-declh(E0) = declh(IfThenElse)
-declh(E1) = declh(IfThenElse)
-declh(E2) = declh(IfThenElse)
+----- EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
+
+----- EnvoiMsg : ID_CLASS '.' ID '(' LArgOpt ')'
+
+----- IfThenElse : IF Expr THEN BlocExpr0 ELSE BlocExpr1
+valide(IfThenElse) = valide(Expr) && valide (BlocExpr0) && valide(BlocExpr1) && type(Expr) == boolean
+declh(Expr) = declh(IfThenElse)
+declh(BlocExpr0) = declh(IfThenElse)
+declh(BlocExpr1) = declh(IfThenElse)
 
 ----- LArgOpt : LArg    // liste d'arguments optionnelle
 valide(LArgOpt) = valide(LArg)
 declh(LArg) = declh(LArgOpt)
 
------ LArg0 : LArg1 ',' E    // liste d'arguments
+----- LArgOpt :
+
+
+----- LArg0 : LArg1 ',' Expr    // liste d'arguments
 valide(LArg0) = valide(LArg1) && valide(E)
 declh(LArg1) = declh(LArg0)
 declh(E) = declh(LArg0)
 
------ LArg : E
-valide(LArg) = valide(Eg)
-declh(E) = declh(LArg)
-
------ ExprArithm : E0 '+' E1
-valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
-declh(E0) = declh(ExprArithm)
-declh(E1) = declh(ExprArithm)
-type(ExprArithm) = type(E0)
-
------ ExprArithm : E0 '-' E1
-valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
-declh(E0) = declh(ExprArithm)
-declh(E1) = declh(ExprArithm)
-type(ExprArithm) = type(E0)
-
------ ExprArithm : E0 '*' E1
-valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
-declh(E0) = declh(ExprArithm)
-declh(E1) = declh(ExprArithm)
-type(ExprArithm) = type(E0)
-
------ ExprArithm : E0 '/' E1
-valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
-declh(E0) = declh(ExprArithm)
-declh(E1) = declh(ExprArithm)
-type(ExprArithm) = type(E0)
+----- LArg : Expr
+valide(LArg) = valide(Expr)
+declh(Expr) = declh(LArg)
 
 
------ ExprArithm : '+' E
-valide(ExprArithm) = valide(E)
-declh(E) = declh(ExprArithm)
-type(ExprArithm) = type(E)
-
------ ExprArithm : '-' E
-valide(ExprArithm) = valide(E)
-declh(E) = declh(ExprArithm)
-type(ExprArithm) = type(E)
-
------ ExprComp : Expr0 RELOP Expr1
-valide(ExprArithm) = valide(Expr0) + valide(Expr1)
-declh(Expr0) = declh(ExprComp)
-declh(Expr1) = declh(ExprComp)
-type(ExprComp) = boolean
-
------ EnvoiMsgStatic : ID_CLASS '.' EnvoiMsgNonStatic
-
-
------ EnvoiMsgStatic ID_CLASS '.' ID '(' LArgOpt ')'
-
-
------ EnvoiMsgNonStatic : ID '.' EnvoiMsgNonStatic
-
-
------ EnvoiMsgNonStatic : ID '.' ID '(' LArgOpt ')'
-
-
------ EnvoiMsg : EnvoiMsgStatic     // envoi d'un message simple ou appel à une fonction statique
-
-
------ EnvoiMsg : EnvoiMsgNonStatic
+/* ******* THE END ******* EOF ****** */
