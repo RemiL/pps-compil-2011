@@ -5,7 +5,7 @@
  * de la ligne suivante. Donc c'est cette ligne qu'il faut mettre a jour, si elle
  * ne correspond pas a ce que vous avez fait, pas TP.h !
  */
-%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VARIABLE VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN
+%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VARIABLE VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN PREC_UNAIRE
 
  /* indications de precedence et d'associativite. Les precedences sont
   * donnees en ordre croissant. Les operateurs sur une meme ligne (separes par
@@ -17,6 +17,7 @@
 %nonassoc RELOP
 %left '+' '-'
 %left '*' '/'
+%right PREC_UNAIRE
 
 /* voir la definition de YYSTYPE dans main.h 
  * Les indications ci-dessous servent a indiquer a Bison que les "valeurs" $i
@@ -75,195 +76,131 @@ extern void imprime();
   */
 
 S : LDefClass Bloc
-   { 
-     /* on evalue EXPR (i.e. $3) dans le contexte forme par l'ensemble des
-      * declaration qui constituent LOptDec (i.e. $1).
-      * Ici, a titre d'exemple, on imprime d'abord la liste de toutes les
-      * variables, puis la valeur de l'expression finale.
-      
-     int res = evalue($3, $1);
-     imprime($1);
-     fprintf(stdout, "Expression finale: %d\n", res); 
-     */
-   }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
           | DefClass
-  {
-  }
 ;
 
 DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps    // une declaration de classe
-  {
-  }
 ;
 
 LParamOpt : LParam
           | 
-  {
-  }
 ;
 
 LParam : Param ',' LParam
        | Param
        | LParamInit
-  {
-  }
 ;
 
 LParamInit : LParamInit ',' ParamInit
            | ParamInit
-  {
-  }
 ;
 
 Param : ID ':' ID_CLASS
-  {
-  }
 ;
 
-ParamInit : ID ':' ID_CLASS AFF Expr
-  {
-  }
+ParamInit : ID ':' ID_CLASS AFF ExprSansAffect
 ;
 
 ExtendsOpt : EXTENDS AppelConstr
            | 
-  {
-  }
 ;
 
 AppelConstr : ID_CLASS '(' LArgOpt ')'
-  {
-  }
 ;
 
 InitBlocOpt : '{' LAffectOpt '}'
             | 
-  {
-  }
 ;
 
 LAffectOpt : LAffect    // liste d"affectation optionnelle
            | 
-  {
-  }
 ;
 
 LAffect : LAffect ';' Affect
         | Affect
-  {
-  }
 ;
 
-Affect : ID AFF Expr
-       | Selection AFF Expr
-  {
-  }
+Affect : ID AFF ExprSansAffect
+       | Selection AFF ExprSansAffect
 ;
 
 Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
-  {
-  }
 ;
 
 LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
              |
-  {
-  }
 ;
 
 LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
              |
-  {
-  }
 ;
 
 LDeclAttr : LDeclAttr ';' DeclAttr    // liste de déclaration d'un attribut
           | DeclAttr
-  {
-  }
 ;
 
 DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique
          | DeclA
-  {
-  }
 ;
 
 DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
       | VAL ID ':' ID_CLASS InitOpt
-  {
-  }
 ;
 
-InitOpt : AFF Expr
+InitOpt : AFF ExprSansAffect
         | 
-  {
-  }
 ;
 
 LDeclMeth : LDeclMeth DeclMeth
           | DeclMeth
-  {
-  }
 ;
 
 DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
-  {
-  }
 ;
 
 Def : DEF STATIC
     | DEF
     | DEF OVERRIDE
-  {
-  }
 ;
 
 Bloc : '{' LExpr '}'
      | '{' LDeclA IS LExpr '}'
-  {
-  }
 ;
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
        | DeclA
-  {
-  }
 ;
 
 LExpr : LExpr ';' Expr            // liste d'expression d'un bloc
       | Expr
-  {
-  }
 ;
 
-BlocExpr : Expr %prec PREC_MIN
+BlocExpr : Expr
          | Bloc
-  {
-  }
 ;
 
-Expr : IfThenElse
-     | ID
-     | Selection
-     | CSTE
-     | STRING
+Expr : ExprSansAffect %prec PREC_MIN
      | Affect
-     | NOUVEAU ID_CLASS '(' LArgOpt ')'
-     | EnvoiMsg
-     | Expr '+' Expr
-     | Expr '-' Expr
-     | Expr '*' Expr
-     | Expr '/' Expr
-     | '+' Expr
-     | '-' Expr
-     | Expr RELOP Expr
-     | '(' Expr ')'
-  {
-  }
+;
+
+ExprSansAffect : IfThenElse
+               | ID
+               | Selection
+               | CSTE
+               | STRING
+               | NOUVEAU ID_CLASS '(' LArgOpt ')'
+               | EnvoiMsg
+               | ExprSansAffect '+' ExprSansAffect
+               | ExprSansAffect '-' ExprSansAffect
+               | ExprSansAffect '*' ExprSansAffect
+               | ExprSansAffect '/' ExprSansAffect
+               | '+' ExprSansAffect %prec PREC_UNAIRE
+               | '-' ExprSansAffect %prec PREC_UNAIRE
+               | ExprSansAffect RELOP ExprSansAffect
+               | '(' Expr ')'
 ;
 
 ExprSelec : '(' Expr ')'
@@ -275,29 +212,19 @@ ExprSelec : '(' Expr ')'
 ;
 
 Selection : ExprSelec '.' ID
-  {
-  }
 ;
 
 EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
          | ID_CLASS '.' ID '(' LArgOpt ')'
-  {
-  }
 ;
 
 IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr
-  {
-  }
 ;
 
 LArgOpt : LArg    // liste d'arguments optionnelle
         | 
-  {
-  }
 ;
 
 LArg : LArg ',' Expr    // liste d'arguments
      | Expr
-  {
-  }
 ;
