@@ -6,9 +6,15 @@ Un environnement contient un objet : bool contains(env,obj)
 */
 
 /* Declarations et validités : 
+type() = type d'une variable ou d'une entité
+
+Déclarations de types
 decl() = déclarations synthétisées
 declh() = déclarations héritées
-type() = type d'une variable ou d'une entité
+
+Déclarations de variables
+decv() = déclarations synthétisées
+decvh() = déclarations héritées
 */
 
 /* signatures de chaque classe et validité : 
@@ -20,13 +26,13 @@ methodes() = méthodes appartenant à une classe
 valide(S) = valide(LDefClass) && valide(Bloc)
 decl(S) = [Entier, Chaine]
 declh(LDefClass) = decl(S)
-declh(Bloc) = decl(S) + decl(LDefClass) + declh(LDefClass)
+declh(Bloc) = decl(S) + decl(LDefClass)
 
 
 ----- LDefClass0 : LDefClass1 DefClass
 valide(LDefClass0) = valide(LDefClass1) && valide(DefClass)
 decl(LDefClass0) = decl(LDefClass1) + decl(DefClass)
-declh(LDefClass1) = declh(LDefClass0) //+declh(DefClass) ?
+declh(LDefClass1) = declh(LDefClass0) //+declh(DefClass) ?????
 declh(DefClass) = declh(LDefClass1)
 
 
@@ -67,15 +73,15 @@ declh(ParamInit) = declh(LParamInit)
 
 ----- Param : ID0 ':' ID1
 valide(Param) = contains(declh(Param, ID0))
-//type(Param) = ID0.lexval
+type(Param) = ID0.lexval
 
 ----- ParamInit : ID0 ':' ID1 AFF E
-valide(ParamInit) = contains(declh(Paraminit, ID0))
+valide(ParamInit) = contains(declh(Paraminit, ID0)) && type(E) == ID0.lexval
 declh(E) = declh(ParamInit)
-//type(ParamInit) = ID0.lexval
+type(ParamInit) = ID0.lexval
 
 ----- ExtendsOpt : EXTENDS AppelConstr
-valide(ExtendsIpt) = valide(AppelConstr) //&& contains(declh(ExtendsOpt),type(AppelConstr)) ?????
+valide(ExtendsIpt) = valide(AppelConstr) //&& contains(declh(ExtendsOpt), type(AppelConstr)) ?????
 declh(AppelConstr) = declh(ExtendsOpt)
 
 ----- AppelConstr : ID_CLASS '(' LArgOpt ')'
@@ -85,7 +91,6 @@ valide(AppelConstr) = valide(LArgOpt) && contains(declh(AppelConstr), ID_CLASS)
 ----- InitBlocOpt : '{' LAffectOpt '}'
 valide(InitBlocOpt) = valide(LAffectOpt)
 declh(LAffectOpt) = declh(InitBlocOpt)
-
 
 ----- LAffectOpt : LAffect    // liste d"affectation optionnelle
 valide(LAffectOpt) = valide(LAffect)
@@ -101,149 +106,291 @@ valide(LAffect) = valide(Affect)
 declh(Affect) = declh(LAffect)
 
 ----- Affect : Selection AFF Expr
+valide(LAffect) = valide(Selection) && valide(Expr) && type(Selection) == type(Expr)
+declh(Expr) = declh(Affect)
+
+----- ExprSelec : '(' Expr ')'
+valide(ExprSelec) = valide(Expr)
+//TODO blablabla
+
+----- ExprSelec : CSTE
 
 
+----- ExprSelec : STRING
+----- ExprSelec : ID
+----- ExprSelec : Selection
+----- ExprSelec : EnvoiMsg
 
------ Selection : Expr '.' ID
+----- Selection : ExprSelec '.' ID
+
+----- ExprEnvoiMsg : ExprSelec
+----- ExprEnvoiMsg : ID_CLASS
+
+----- EnvoiMsg : ExprEnvoiMsg '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
+//A AMELIORER
 
 
 ----- Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
+valide(Corps) = valide(LDeclAttrOpt) && valide(LDeclMethOpt)
+declh(LDeclAttrOpt) = declh(Corps)
+declh(LDeclMethOpt) = declh(Corps)
 
 
 ----- LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
+valide(LDeclAttrOpt) = valide(LDeclAttr)
+declh(LDeclAttr) = declh(LDeclAttrOpt)
+
 
 
 ----- LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
+valide(LDeclMethOpt) = valide(LDeclMeth)
+declh(LDeclMeth) = declh(LDeclMethOpt)
 
-
------ LDeclAttr : LDeclAttr ';' DeclAttr    // liste de déclaration d'un attribut
+----- LDeclAttr0 : LDeclAttr1 ';' DeclAttr    // liste de déclaration d'un attribut de classe
+valide(LDeclAttr0) = valide(LDeclAttr1) && valide(DeclAttr)
+declh(LDeclAttr1) = declh(LDeclAttr1)
+declh(DeclAttr) = declh(LDeclAttr0)
 
 
 ----- LDeclAttr : DeclAttr
+valide(LDeclAttr) = valide(DeclAttr)
+declh(LDeclAttr) = declh(DeclAttr)
 
 
------ DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique
+
+----- DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique (de classe)
+
 
 
 ----- DeclAttr : DeclA
 
 
------ DeclA : VARIABLE ID ':' ID InitOpt   // déclaration d'un attribut 
+----- DeclA : VARIABLE ID0 ':' ID1 InitOpt   // déclaration d'un attribut variable
+valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID1.lexval)
+type(ID0) = ID1.lexval
+value(ID0) = value(InitOpt) 
 
-
------ DeclA : VAL ID ':' ID InitOpt
-
+----- DeclA : VAL ID0 ':' ID1 InitOpt // déclaration d'un attribut constant
+valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID1.lexval) && value(InitOpt) = (EPS || ID0.lexval)
+type(ID0) = ID1.lexval
+value(ID0) = value(InitOpt)
 
 ----- InitOpt : AFF E
+valide(InitOpt) = valide(E)
+type(InitOpt) = type(E)
+value(InitOpt) = value(E)
 
+----- InitOpt : 
+valide(InitOpt) = true
+type(InitOpt) = EPS
+//TODO value
 
------ LDeclMeth : LDeclMeth DeclMeth
-
+----- LDeclMeth0 : LDeclMeth1 DeclMeth
+valide(LDeclMeth0) = valide(LDeclMeth1) && valide(DeclMeth)
+methodes(LDeclMeth0) = methodes(LDeclMeth1) + methodes(DeclMeth)
+declh(LDeclMeth1) = declh(LDeclMeth0)
+declh(DeclMeth) = declh(LDeclMeth0)
 
 ----- LDeclMeth : DeclMeth
+valide(LDeclMeth) = valide (DeclMeth)
+declh(DeclMeth) = decl(LDeclMeth0)
 
-
------ DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID IS Bloc
-
+----- DeclMeth : Def ID0 '(' LParamOpt ')' RETURNS ID1 IS Bloc
+valide(DeclMeth)  = valide(LParamOpt) && valide(Bloc) && contains(declh(DeclMeth), ID1.lexval) && (type(Bloc) == ID1.lexval) 
 
 ----- Def : DEF STATIC
-
+valide(Def) = true;
 
 ----- Def : DEF
-
+valide(Def) = true;
 
 ----- Def : DEF OVERRIDE
-
-
------ Bloc : '{' Lexpr '}'
-
-
------ Bloc : '{' LDeclA IS Lexpr '}'
-
-
------ LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
-
-
------ LDeclA : DeclA
-
-
------ Lexpr : Lexpr ';' E            // liste d'expression d'un bloc
-
+valide(Def) = true;
+----- Lexpr0 : Lexpr1 ';' E            // liste d'expression d'un bloc
+valide(Lexpr0) = valide(Lexpr1) && valide(E)
+declh(Lexpr1) = declh(Lexpr0)
+declh(E) = declh(Lexpr0)
+type(Lexpr0) = type(E)
 
 ----- Lexpr : E
+valide(Lexpr) = valide(E)
+type(Lexpr) = type(E)
+declh(E) = declh(Lexpr)
 
 
 ----- E : Expr
-
+valide(E) = valide(Expr)
+type(E) = type(Expr)
+declh(Expr)= declh(E)
 
 ----- E : ExprComp
-
+valide(E) = valide(ExprComp)
+type(E) = type(ExprComp)
+declh(ExprComp)= declh(E)
 
 ----- Expr : IfThenElse
-
+valide(Expr) = valide(IfThenElse)
+type(Expr) = type(IfThenElse)
+declh(IfThenElse)= declh(Expr)
 
 ----- Expr : ID
-
+// decvh = declh mais pour les variables
+valide(Expr) = contains(decvh(Expr),ID)
+type(Expr) = type(ID)
+// mettre les value()
 
 ----- Expr : Selection
 
 
 ----- Expr : CSTE
+valide(Expr) = true
+//value
 
 
 ----- Expr : '(' E ')'
+valide(Expr) = valide (E)
+declh(E) = decl(Expr)
+type(Expr) = type (E)
+----- Bloc : '{' Lexpr '}'
+valide(Bloc) = valide(Lexpr)
+type(Bloc) = type(Lexpr)
+declh(Lexpr) = declh(Bloc)
 
+----- Bloc : '{' LDeclA IS Lexpr '}'
+valide(Bloc) = valide(LDeclA ) && valide(Lexpr)
+type(Bloc) = type(Lexpr)
+declh(Lexpr) = declh(Bloc)
+declh(LDeclA) = declh(Bloc)
+
+----- LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
+
+----- LDeclA : DeclA
+
+
+----- Lexpr0 : Lexpr1 ';' E            // liste d'expression d'un bloc
+valide(Lexpr0) = valide(Lexpr1) && valide(E)
+declh(Lexpr1) = declh(Lexpr0)
+declh(E) = declh(Lexpr0)
+type(Lexpr0) = type(E)
+
+----- Lexpr : E
+valide(Lexpr) = valide(E)
+type(Lexpr) = type(E)
+declh(E) = declh(Lexpr)
+
+
+----- E : Expr
+valide(E) = valide(Expr)
+type(E) = type(Expr)
+declh(Expr)= declh(E)
+
+----- E : ExprComp
+valide(E) = valide(ExprComp)
+type(E) = type(ExprComp)
+declh(ExprComp)= declh(E)
+
+----- Expr : IfThenElse
+valide(Expr) = valide(IfThenElse)
+type(Expr) = type(IfThenElse)
+declh(IfThenElse)= declh(Expr)
+
+----- Expr : ID
+// decvh = declh mais pour les variables
+valide(Expr) = contains(decvh(Expr),ID)
+type(Expr) = type(ID)
+// mettre les value()
+
+----- Expr : Selection
+
+
+----- Expr : CSTE
+valide(Expr) = true
+//value
+
+
+----- Expr : '(' E ')'
+valide(Expr) = valide (E)
+declh(E) = decl(Expr)
+type(Expr) = type (E)
 
 ----- Expr : NOUVEAU ID '(' LArgOpt ')'
-
+valide(Expr) = valide(LArgOpt) && contains(decvh(Expr),ID)
+declh(LArgOpt) = declh(Expr)
+type(Expr) = type (ID)
 
 ----- Expr : EnvoiMsg
-
+valide(expr) = valide(EnvoiMsg)
+declh(EnvoiMsg) = declh(Expr)
 
 ----- Expr : ExprArithm
+valide(expr) = valide(ExprArithm)
+declh(ExprArithm) = declh(Expr)
 
+----- IfThenElse : IF E THEN Bloc0 ELSE Bloc1
+valide(IfThenElse) = valide(E) && valide (Bloc0) && valide(Bloc1) && type(E)== boolean
+declh(E) = declh(IfThenElse)
+declh(Bloc0) = declh(IfThenElse)
+declh(Bloc1) = declh(IfThenElse)
 
------ IfThenElse : IF E THEN Bloc ELSE Bloc
-
-
------ IfThenElse : IF E THEN E ELSE E
-
+----- IfThenElse : IF E0 THEN E1 ELSE E2
+valide(IfThenElse) = valide(E0) && valide (E1) && valide(E2) && type(E0)== boolean
+declh(E0) = declh(IfThenElse)
+declh(E1) = declh(IfThenElse)
+declh(E2) = declh(IfThenElse)
 
 ----- LArgOpt : LArg    // liste d'arguments optionnelle
+valide(LArgOpt) = valide(LArg)
+declh(LArg) = declh(LArgOpt)
 
-
------ LArg : LArg ',' E    // liste d'arguments
-
+----- LArg0 : LArg1 ',' E    // liste d'arguments
+valide(LArg0) = valide(LArg1) && valide(E)
+declh(LArg1) = declh(LArg0)
+declh(E) = declh(LArg0)
 
 ----- LArg : E
+valide(LArg) = valide(Eg)
+declh(E) = declh(LArg)
 
+----- ExprArithm : E0 '+' E1
+valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
+declh(E0) = declh(ExprArithm)
+declh(E1) = declh(ExprArithm)
+type(ExprArithm) = type(E0)
 
------ ExprArithm : E '+' E
+----- ExprArithm : E0 '-' E1
+valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
+declh(E0) = declh(ExprArithm)
+declh(E1) = declh(ExprArithm)
+type(ExprArithm) = type(E0)
 
+----- ExprArithm : E0 '*' E1
+valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
+declh(E0) = declh(ExprArithm)
+declh(E1) = declh(ExprArithm)
+type(ExprArithm) = type(E0)
 
------ ExprArithm : E '-' E
-
-
------ ExprArithm : E '*' E
-
-
------ ExprArithm : E '/' E
+----- ExprArithm : E0 '/' E1
+valide(ExprArithm) = valide(E0) && valide(E1) && type(E0) == type(E1) && type(E0)==int
+declh(E0) = declh(ExprArithm)
+declh(E1) = declh(ExprArithm)
+type(ExprArithm) = type(E0)
 
 
 ----- ExprArithm : '+' E
-
+valide(ExprArithm) = valide(E)
+declh(E) = declh(ExprArithm)
+type(ExprArithm) = type(E)
 
 ----- ExprArithm : '-' E
+valide(ExprArithm) = valide(E)
+declh(E) = declh(ExprArithm)
+type(ExprArithm) = type(E)
 
-
------ ExprComp : Expr RELOP Expr
-
-
------ EnvoiMsg : EnvoiMsgStatic     // envoi d'un message simple ou appel à une fonction statique
-
-
------ EnvoiMsg : EnvoiMsgNonStatic
-
+----- ExprComp : Expr0 RELOP Expr1
+valide(ExprArithm) = valide(Expr0) + valide(Expr1)
+declh(Expr0) = declh(ExprComp)
+declh(Expr1) = declh(ExprComp)
+type(ExprComp) = boolean
 
 ----- EnvoiMsgStatic : ID_CLASS '.' EnvoiMsgNonStatic
 
@@ -257,3 +404,7 @@ declh(Affect) = declh(LAffect)
 ----- EnvoiMsgNonStatic : ID '.' ID '(' LArgOpt ')'
 
 
+----- EnvoiMsg : EnvoiMsgStatic     // envoi d'un message simple ou appel à une fonction statique
+
+
+----- EnvoiMsg : EnvoiMsgNonStatic
