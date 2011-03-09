@@ -52,6 +52,39 @@ int TesteMotClef(char *s)
   yylval.S = strdup(s); return(ID);
 }
 
+/* en toute rigueur faudrait un jour desallouer ces chaines ! */
+char* traiteChaine(char *s)
+{
+  /* interprete les caracteres speciaux pour qu'ils soient bien imprimes
+   * C'est juste un exemple, on n'essaye pas de traiter tous les caracteres
+   * speciaux de C.
+   */
+  char *res = strdup(s);
+  char *p = res;
+  s++; /* saute le " initial */
+  while (*s) {
+    if (*s == '\\') {
+      switch(*++s) {
+      case 'n':
+      case 'r':
+	*p++ = '\n';
+	break;
+      case 't':
+	*p++ = '\t';
+	break;
+      case 'f':
+      case 'b':
+	*p++ = ' '; /* on met un espace a la place, pour faire joli :-) */
+	break;
+      default: *p++ = *s;
+      }
+    } else *p++ = *s;
+    s++;
+  }
+  *--p = '\0';   /* ecrase le " final */   
+  return res;
+}
+
 %}
 
 %%
@@ -66,7 +99,7 @@ int TesteMotClef(char *s)
 >=		{ yylval.C = GE; return(RELOP); }
 >		{ yylval.C = GT; return(RELOP); }
 \<		{ yylval.C = LT; return(RELOP); }
-\"{IntString}\" { yylval.S = strdup(yytext); return STRING; }
+\"{IntString}\" { yylval.S = traiteChaine(yytext); return STRING; }
 {Delim}+	{ /* l'option --yylineno permet de gerer directement le
                    * decompte des sauts de lignes via la variable yylineno.
                    * Il n'y a donc rien de special a faire.
