@@ -5,17 +5,18 @@
  * de la ligne suivante. Donc c'est cette ligne qu'il faut mettre a jour, si elle
  * ne correspond pas a ce que vous avez fait, pas TP.h !
  */
-%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VARIABLE VAL OVERRIDE EXTENDS NOUVEAU
+%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VARIABLE VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN
 
  /* indications de precedence et d'associativite. Les precedences sont
   * donnees en ordre croissant. Les operateurs sur une meme ligne (separes par
   * un espace) auront la meme priorite.
   */
+%nonassoc PREC_MIN
 %nonassoc ELSE
+%nonassoc AFF
 %nonassoc RELOP
 %left '+' '-'
 %left '*' '/'
-%left '.'
 
 /* voir la definition de YYSTYPE dans main.h 
  * Les indications ci-dessous servent a indiquer a Bison que les "valeurs" $i
@@ -122,7 +123,7 @@ Param : ID ':' ID_CLASS
   }
 ;
 
-ParamInit : ID ':' ID_CLASS AFF E
+ParamInit : ID ':' ID_CLASS AFF Expr
   {
   }
 ;
@@ -156,13 +157,8 @@ LAffect : LAffect ';' Affect
   }
 ;
 
-Affect : ID AFF E
-       | Selection AFF E
-  {
-  }
-;
-
-Selection : Expr '.' ID
+Affect : ID AFF Expr
+       | Selection AFF Expr
   {
   }
 ;
@@ -202,7 +198,7 @@ DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut
   }
 ;
 
-InitOpt : AFF E
+InitOpt : AFF Expr
         | 
   {
   }
@@ -226,8 +222,8 @@ Def : DEF STATIC
   }
 ;
 
-Bloc : '{' Lexpr '}'
-     | '{' LDeclA IS Lexpr '}'
+Bloc : '{' LExpr '}'
+     | '{' LDeclA IS LExpr '}'
   {
   }
 ;
@@ -238,14 +234,14 @@ LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statiqu
   }
 ;
 
-Lexpr : Lexpr ';' E            // liste d'expression d'un bloc
-      | E
+LExpr : LExpr ';' Expr            // liste d'expression d'un bloc
+      | Expr
   {
   }
 ;
 
-E : Expr
-  | ExprComp
+BlocExpr : Expr %prec PREC_MIN
+         | Bloc
   {
   }
 ;
@@ -255,17 +251,41 @@ Expr : IfThenElse
      | Selection
      | CSTE
      | STRING
-     | '(' E ')'
+     | Affect
      | NOUVEAU ID_CLASS '(' LArgOpt ')'
      | EnvoiMsg
-     | ExprArithm
-     | Affect
+     | Expr '+' Expr
+     | Expr '-' Expr
+     | Expr '*' Expr
+     | Expr '/' Expr
+     | '+' Expr
+     | '-' Expr
+     | Expr RELOP Expr
+     | '(' Expr ')'
   {
   }
 ;
 
-IfThenElse : IF E THEN Bloc ELSE Bloc
-           | IF E THEN E ELSE E
+ExprSelec : '(' Expr ')'
+          | CSTE
+          | STRING
+          | ID
+          | Selection
+          | EnvoiMsg
+;
+
+Selection : ExprSelec '.' ID
+  {
+  }
+;
+
+EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
+         | ID_CLASS '.' ID '(' LArgOpt ')'
+  {
+  }
+;
+
+IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr
   {
   }
 ;
@@ -276,38 +296,8 @@ LArgOpt : LArg    // liste d'arguments optionnelle
   }
 ;
 
-LArg : LArg ',' E    // liste d'arguments
-     | E
-  {
-  }
-;
-
-ExprArithm : E '+' E
-           | E '-' E
-           | E '*' E
-           | E '/' E
-           | '+' E
-           | '-' E
-  {
-  }
-;
-
-ExprComp : Expr RELOP Expr
-  {
-  }
-;
-
-// A améliorer ...
-EnvoiMsg : ID_CLASS '.' EnvoiMsg2     // envoi d'un message simple ou appel à une fonction statique
-         | ID '.' EnvoiMsg2
-         | STRING '.' EnvoiMsg2
-         | CSTE '.' EnvoiMsg2
-  {
-  }
-;
-
-EnvoiMsg2 : ID '(' LArgOpt ')' '.' EnvoiMsg2
-          | ID '(' LArgOpt ')'
+LArg : LArg ',' Expr    // liste d'arguments
+     | Expr
   {
   }
 ;
