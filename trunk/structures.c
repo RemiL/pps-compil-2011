@@ -1,5 +1,10 @@
 /* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
 
+/*
+QUESTION (TODO ?)
+Pourquoi ne pas gerer la staticite et la constance des attributs avec un enum du meme style que celui des methodes ?
+*/
+
 /* Structure représentant une classe */
 typedef struct
 {
@@ -26,7 +31,7 @@ typedef struct
   attribut_t* suiv;
 } attribut_t;
 
-/* Enum permettant de caractériser le "type" d'une méthode */
+/* Enum permettant de caractériser le "type" d'une méthode ou d'un attribut */
 typedef enum
 {
   NORMALE,
@@ -58,3 +63,4 @@ typedef struct
   /* On utilise une liste chainée */
   param_t* suiv;
 } param_t;
+

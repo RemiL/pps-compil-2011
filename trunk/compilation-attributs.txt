@@ -6,23 +6,24 @@ Un environnement contient un objet : bool contains(env,obj)
 */
 
 /* Declarations et validités : 
-type() = type d'une variable ou d'une entité
+classe_t type() = type d'une variable ou d'une entité
 
 Déclarations de types
-decl() = déclarations synthétisées
+decl() = déclarations synthétisées (liste chainée de classe_t ?????)
 declh() = déclarations héritées
 
 Déclarations de variables
-decv() = déclarations synthétisées
+decv() = déclarations synthétisées (liste chainée de attribut_t ou variable_t)
 decvh() = déclarations héritées
 
 Valeur
 value() = valeur d'un variable ou d'un objet
-value() = NIL si non initialisé (warning?????)
+value() = NIL si non initialisé (warning ????? TODO)
 */
 
 /* signatures de chaque classe et validité : 
 methodes() = méthodes appartenant à une classe
+attributs() = attributs ---
 */
 
 /***** liste de definition des classes ******/
@@ -54,14 +55,17 @@ declh(ExtendsOpt) = declh(DefClass) //sans l'ID_CLASS pour ne pas heriter de soi
 declh(InitBlocOpt) = declh(DefClass) + ID_CLASS.lexval
 declh(Corps) = declh(DefClass) + ID_CLASS.lexval
 //TODO attributs de la classe utiles dans InitBloc
-//TODO heritage
+attributs(ID_CLASS) = attributs(Corps) + attributs(ExtendsOpt)
+methodes(ID_CLASS) = methodes(Corps) + methodes(ExtendsOpt)
+mere(ID_CLASS) = type(ExtendsOpt) // parfois = EPS
+
 
 /****** liste de parametres du constructeur ******/
 ----- LParamOpt : LParam
 //valide, declh, decv TODO
 
 ----- LParamOpt :
-
+valide(LParamOpt) = true
 
 ----- LParam0 : Param ',' LParam1
 valide(LParam0) = valide(Param) && valide(LParam1)
@@ -69,7 +73,7 @@ declh(LParam1) = declh(LParam0)
 declh(Param) = declh(LParam0)
 decv(LParam0) = decv(Param) + decv(LParam1)
 
-//????? peut-on faire class A(Entier i := 3, Entier j := x){... ? Et class A(Entier j := x, Entier x := 3){... ? si oui, voir decvh.
+//????? peut-on faire class A(Entier i := 3, Entier j := i){... ? Et class A(Entier j := x, Entier x := 3){... ? si oui, voir decvh. Mais ça parait louche.
 
 ----- LParam : Param
 valide(LParam) = valide(Param)
@@ -99,29 +103,31 @@ decv(Param) = ID.lexval
 value(ID1) = NIL
 
 ----- ParamInit : ID ':' ID_CLASS AFF ExprSansAffect //exemple: Entier : reponse := 42
-//REVOIR
-valide(ParamInit) = contains(declh(Paraminit, ID0)) && type(E) == ID0.lexval && value(E) != NIL
-declh(E) = declh(ParamInit)
-type(ParamInit) = ID0.lexval
-decv(ParamInit) = ID1.lexval
-value(ID1) = value(E)
+valide(ParamInit) = valide(ExprSansAffect) && contains(declh(Paraminit), ID_CLASS)) && type(E) == ID_CLASS.lexval && value(ExprSansAffect) != NIL
+declh(ExprSansAffect) = declh(ParamInit)
+type(ParamInit) = ID_CLASS.lexval
+decv(ParamInit) = ID.lexval
+value(ID) = value(ExprSansAffect)
 
-/******** Heritage **********/
+/******** Heritage et construction **********/
 ----- ExtendsOpt : EXTENDS AppelConstr
 valide(ExtendsOpt) = valide(AppelConstr) && contains(declh(ExtendsOpt), type(AppelConstr)) ?????
 declh(AppelConstr) = declh(ExtendsOpt)
 type(ExtendsOpt) = type(AppelConstr)
-//TODO appeler super() dans le constructeur de la classe fille quoi qu'il arrive (ne fait rien s'il n'y a pas d'heritage)
+attributs(ExtendsOpt) = attributs(AppelConstr)
+methodes(ExtendsOpt) = methodes(AppelConstr)
+//TODO appeler super() dans le constructeur de la classe fille quoi qu'il arrive (ne fait rien s'il n'y a pas d'heritage), creer la variable this.
 //TODO heriter des attributs et des methodes
 
 ----- ExtendsOpt :
 valide(ExtendsOpt) = true
 type(ExtendsOpt) = EPS
 
-/******** Constructeur *********/
 ----- AppelConstr : ID_CLASS '(' LArgOpt ')'
 valide(AppelConstr) = valide(LArgOpt) && contains(declh(AppelConstr), ID_CLASS)
 type(AppelConstr) = ID_CLASS.lexval
+attributs(AppelConstr) = attributs(ID_CLASS)
+methodes(AppelConstr) = methodes(ID_CLASS)
 //TODO surement plein de choses en rapport avec l'heritage, comme passer les valeurs des attributs
 
 ----- InitBlocOpt : '{' LAffectOpt '}' //instructions dans le constructeur
@@ -130,6 +136,7 @@ declh(LAffectOpt) = declh(InitBlocOpt)
 //TODO methode constructeur qui appelle un super sur rien ou sur la classe mere, initialiser les attributs initalises, et ensuite InitBloc
 
 ----- InitBlocOpt :
+valide(InitBlocOpt) = true
 
 ----- LAffectOpt : LAffect    // liste d'affectation optionnelle
 valide(LAffectOpt) = valide(LAffect)
@@ -137,6 +144,7 @@ declh(LAffect) = declh(LAffect)
 // ????? impossible de déclarer une variable locale pour des calculs dans le constructeur...
 
 ----- LAffectOpt :
+valide(LAffectOpt) = true
 
 ----- LAffect0 : LAffect1 ';' Affect
 valide(LAffect0) = valide(LAffect1) && valide(Affect)
@@ -148,12 +156,12 @@ valide(LAffect) = valide(Affect)
 declh(Affect) = declh(LAffect)
 
 ----- Affect : ID AFF ExprSansAffect
-//REVOIR
-valide(LAffect) = valide(ID) && valide(Expr) && type(Selection) == type(Expr)
+valide(LAffect) = valide(ExprSansAffect) && type(ID) == type(ExprSansAffect) && (contains(decv(Affect), ID.lexval) || contains(attributsh(Affect), ID.lexval)
 declh(Expr) = declh(Affect)
+//TODO faire descendre decv avec declh
 
 ----- Affect : Selection AFF ExprSansAffect
-
+valide(LAffect) = valide(Selection) && valide(ExprSansAffect) && type(Selection) == type(ExprSansAffect)
 
 /******* corps de la classe ***************/
 ----- Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
@@ -161,57 +169,64 @@ valide(Corps) = valide(LDeclAttrOpt) && valide(LDeclMethOpt)
 declh(LDeclAttrOpt) = declh(Corps)
 declh(LDeclMethOpt) = declh(Corps)
 decv(Corps) = decv(LDeclAttrOpt)//TODO etendre au dessus et aux methodes
+attributs(Corps) = attributs(LDeclAttrOpt)
+methodes(Corps) = methodes(LDeclAttrOpt)
 
 ----- LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
 valide(LDeclAttrOpt) = valide(LDeclAttr)
 declh(LDeclAttr) = declh(LDeclAttrOpt)
 decv(LDeclAttrOpt) = decv(LDeclAttr)
+attributs(LDeclAttrOpt) = attributs(LDeclAttr)
 
 ----- LDeclAttrOpt : 
+valide(LDeclAttrOpt) = true
 
 
 ----- LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
 valide(LDeclMethOpt) = valide(LDeclMeth)
 declh(LDeclMeth) = declh(LDeclMethOpt)
+methodes(LDeclMethOpt) = methodes(LDeclMeth)
 //TODO methodes comme les attributs, un peu
 
 ----- LDeclMethOpt :
-
+valide(LDeclMethOpt) = true
 
 ----- LDeclAttr0 : LDeclAttr1 ';' DeclAttr    // liste de déclaration d'un attribut de classe
 valide(LDeclAttr0) = valide(LDeclAttr1) && valide(DeclAttr)
 declh(LDeclAttr1) = declh(LDeclAttr1)
 declh(DeclAttr) = declh(LDeclAttr0)
-decv(LDeclAttr0) = decv(LDecAttr1) + decv(DeclAttr)
+attributs(LDeclAttr0) = attributs(LDecAttr1) + attributs(DeclAttr)
 
 ----- LDeclAttr : DeclAttr
 valide(LDeclAttr) = valide(DeclAttr)
 declh(LDeclAttr) = declh(DeclAttr)
-decv(LDeclAttr) = decv(DeclAttr)
+attributs(LDeclAttr) = attributs(DeclAttr)
 
 ----- DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique (de classe)
 valide(DeclAttr) = valide(DeclA)
 declh(DeclA) = declh(DeclAttr)
-decv(DeclAttr) = decv(DeclA)
-//TODO ne pas oublier de gerer les attributs statiques et override, comme les methodes d'ailleurs
+attributs(DeclAttr) = attributs(DeclA)
+DeclA.statique = 1
 
 ----- DeclAttr : DeclA
 valide(DeclAttr) = valide(DeclA)
 declh(DeclA) = declh(DeclAttr)
-decv(DeclAttr) = decv(DeclA)
+attributs(DeclAttr) = attributs(DeclA)
+DeclA.statique = 0
 
 ----- DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut variable
 valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID_CLASS.lexval)
 type(ID0) = ID_CLASS.lexval
 value(ID0) = value(InitOpt)
-decv(DeclA) = ID.lexval
+attributs(DeclA) = ID.lexval
+DeclA.constant = 0
 
 ----- DeclA : VAL ID ':' ID_CLASS InitOpt // déclaration d'un attribut constant
 valide(DeclA) = valide(InitOpt) && contains(declh(DeclA), ID_CLASS.lexval) && value(InitOpt) = (EPS || ID0.lexval)
 type(ID) = ID_CLASS.lexval
 value(ID) = value(InitOpt)
-decv(DeclA) = ID.lexval
-//TODO constant
+attributs(DeclA) = ID.lexval
+DeclA.constant = 1
 
 ----- InitOpt : AFF ExprSansAffect
 valide(InitOpt) = valide(ExprSansAffect)
@@ -238,7 +253,7 @@ valide(DeclMeth)  = valide(LParamOpt) && valide(Bloc) && contains(declh(DeclMeth
 
 ----- Def : DEF STATIC
 valide(Def) = true;
-//TODO ne contient pas de this
+//TODO verifier : ne contient pas de this
 
 ----- Def : DEF
 valide(Def) = true;
