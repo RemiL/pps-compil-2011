@@ -212,6 +212,7 @@ ExprSelec : '(' Expr ')'
 ;
 
 Selection : ExprSelec '.' ID
+          | ID_CLASS '.' ID
 ;
 
 EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
