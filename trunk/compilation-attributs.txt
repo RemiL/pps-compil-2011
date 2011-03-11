@@ -29,7 +29,7 @@ attributs() = attributs ---
 /***** liste de definition des classes ******/
 ----- S : LDefClass Bloc
 valide(S) = valide(LDefClass) && valide(Bloc)
-decl(S) = [Entier, Chaine, Boolean]//????? Ajout du type Boolean. Pas de float, pas de char ?
+decl(S) = [Entier, Chaine]
 declh(LDefClass) = decl(S)
 declh(Bloc) = decl(S) + decl(LDefClass)
 
@@ -156,12 +156,14 @@ valide(LAffect) = valide(Affect)
 declh(Affect) = declh(LAffect)
 
 ----- Affect : ID AFF ExprSansAffect
-valide(LAffect) = valide(ExprSansAffect) && type(ID) == type(ExprSansAffect) && (contains(decv(Affect), ID.lexval) || contains(attributsh(Affect), ID.lexval)
+valide(LAffect) = valide(ExprSansAffect) && type(ID) == type(ExprSansAffect) && (contains(decv(Affect), ID.lexval) || contains(attributsh(Affect), ID.lexval) && ID.constante = 0
 declh(Expr) = declh(Affect)
+value(ID) = value(ExprSansAffect)
 //TODO faire descendre decv avec declh
 
 ----- Affect : Selection AFF ExprSansAffect
-valide(LAffect) = valide(Selection) && valide(ExprSansAffect) && type(Selection) == type(ExprSansAffect)
+valide(LAffect) = valide(Selection) && valide(ExprSansAffect) && type(Selection) == type(ExprSansAffect) && Selection.constante = 0
+value(Selection) = value(ExprSansAffect)
 
 /******* corps de la classe ***************/
 ----- Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
@@ -274,6 +276,7 @@ declh(LDeclA) = declh(Bloc)
 
 ----- LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
 
+
 ----- LDeclA : DeclA
 
 
@@ -289,41 +292,67 @@ type(Lexpr) = type(E)
 declh(E) = declh(Lexpr)
 
 ----- BlocExpr : Expr
-
+valide(BlocExpr) = valide(Expr)
+type(BlocExpr) = type(Expr)
+value(BlocExpr) = value(Expr)
 
 ----- BlocExpr : Bloc
 
+
 ----- Expr : ExprSansAffect
+//type, value, valide, declh, var...
 
 ----- Expr : Affect
+//type, value, valide, declh, var...
 
 ----- ExprSansAffect : IfThenElse
 
+
 ----- ExprSansAffect : Selection
 
+
 ----- ExprSansAffect : STRING
+valide(ExprSansAffect) = true
+value(ExprSansAffect) = STRING.lexval
+type(ExprSansAffect) = Chaine
 
 ----- ExprSansAffect : CSTE
+valide(ExprSansAffect) = true
+value(ExprSansAffect) = CSTE.lexval
+type(ExprSansAffect) = Entier
 
 ----- ExprSansAffect : NOUVEAU ID_CLASS '(' LArgOpt ')'
+//TODO appel du constructeur : value = construction(ID_CLASS, attribut_t*)
+
+
 
 ----- ExprSansAffect : EnvoiMsg
+//TODO appel de fonction
 
 ----- ExprSansAffect : ExprSansAffect '+' ExprSansAffect
 
+
 ----- ExprSansAffect : ExprSansAffect '-' ExprSansAffect
+//LOIC
 
 ----- ExprSansAffect : ExprSansAffect '*' ExprSansAffect
+//LOIC
 
 ----- ExprSansAffect : ExprSansAffect '/' ExprSansAffect
+//LOIC
 
 ----- ExprSansAffect : '+' ExprSansAffect %prec PREC_UNAIRE
+//LOIC
 
 ----- ExprSansAffect : '-' ExprSansAffect %prec PREC_UNAIRE
+valide(ExprSansAffect0) = valide(ExprSansAffect1) && type(ExprSansAffect1) = Entier
 
------ ExprSansAffect : ExprSansAffect RELOP ExprSansAffect
+----- ExprSansAffect0 : ExprSansAffect1 RELOP ExprSansAffect2
+valide(ExprSansAffect0) = valide(ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = Entier (????? - idem le 2)
+type(ExprSansAffect0) = bool //????? je suppose qu'en fait c'est un entier...
 
 ----- ExprSansAffect : '(' Expr ')'
+valide(ExprSansAffect)
 
 ----- ExprSelec : '(' Expr ')'
 valide(ExprSelec) = valide(Expr)
@@ -333,7 +362,6 @@ valide(ExprSelec) = valide(Expr)
 type(ExprSelec) = Entier
 value(ExprSelec) = CSTE.lexval
 valide(ExprSelec) = true
-
 
 ----- ExprSelec : STRING
 type(ExprSelec) = Chaine
@@ -356,26 +384,39 @@ type(ExprSelec) = type(EnvoiMsg)
 value(ExprSelec) = value(EnvoiMsg)
 
 ----- Selection : ExprSelec '.' ID
-valide(ExprSelec) = //TODO
-type(ExprSelec) = type(ID)
-value(ExprSelec) = value(ID)
+valide(Selection) = //TODO
+type(Selection) = type(ID)
+value(Selection) = value(ID)
+
+----- Selection : ID_CLASS '.' ID //attribut statique
+valide(ExprSelec) = contains(attributs(ID_CLASS), ID)
+type(Selection) = type(ID)//dans ID_CLASS (cas d'une variable locale qui a le même nom qu'un variable de classe
+value(Selection) = value(ID)
 
 ----- EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
+valide // TODO LArgOpt + ID existe dans ExprSelec
+type(EnvoiMsg) = type(ID)
+value(EnvoiMsg) = ?????
 
------ EnvoiMsg : ID_CLASS '.' ID '(' LArgOpt ')'
+----- EnvoiMsg : ID_CLASS '.' ID '(' LArgOpt ')' //appel d'une fonction statique
+valide // TODO LArgOpt + ID existe dans ID_CLASS
+type(EnvoiMsg) = type(ID)
+value(EnvoiMsg) = ?????
 
 ----- IfThenElse : IF Expr THEN BlocExpr0 ELSE BlocExpr1
 valide(IfThenElse) = valide(Expr) && valide (BlocExpr0) && valide(BlocExpr1) && type(Expr) == boolean
 declh(Expr) = declh(IfThenElse)
 declh(BlocExpr0) = declh(IfThenElse)
 declh(BlocExpr1) = declh(IfThenElse)
+if(Expr) then value(IfThenElse) = value(BlocExpr0) else value(IfThenElse) = value(BlocExpr1)//?????
 
 ----- LArgOpt : LArg    // liste d'arguments optionnelle
 valide(LArgOpt) = valide(LArg)
 declh(LArg) = declh(LArgOpt)
+//globalement, TODO passages d'arguments
 
 ----- LArgOpt :
-
+valide(LArgOpt) = true
 
 ----- LArg0 : LArg1 ',' Expr    // liste d'arguments
 valide(LArg0) = valide(LArg1) && valide(E)
@@ -385,6 +426,7 @@ declh(E) = declh(LArg0)
 ----- LArg : Expr
 valide(LArg) = valide(Expr)
 declh(Expr) = declh(LArg)
-
+value(LArg) = value(Expr)
+type(LArg) = type(Expr)
 
 /* ******* THE END ******* EOF ****** */
