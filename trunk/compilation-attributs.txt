@@ -73,8 +73,6 @@ declh(LParam1) = declh(LParam0)
 declh(Param) = declh(LParam0)
 decv(LParam0) = decv(Param) + decv(LParam1)
 
-//????? peut-on faire class A(Entier i := 3, Entier j := i){... ? Et class A(Entier j := x, Entier x := 3){... ? si oui, voir decvh. Mais ça parait louche.
-
 ----- LParam : Param
 valide(LParam) = valide(Param)
 declh(Param) = declh(LParam)
@@ -130,30 +128,13 @@ attributs(AppelConstr) = attributs(ID_CLASS)
 methodes(AppelConstr) = methodes(ID_CLASS)
 //TODO surement plein de choses en rapport avec l'heritage, comme passer les valeurs des attributs
 
------ InitBlocOpt : '{' LAffectOpt '}' //instructions dans le constructeur
-valide(InitBlocOpt) = valide(LAffectOpt)
-declh(LAffectOpt) = declh(InitBlocOpt)
+----- InitBlocOpt : Bloc //instructions dans le constructeur
+valide(InitBlocOpt) = valide(Bloc)
+declh(Bloc) = declh(InitBlocOpt)
 //TODO methode constructeur qui appelle un super sur rien ou sur la classe mere, initialiser les attributs initalises, et ensuite InitBloc
 
 ----- InitBlocOpt :
 valide(InitBlocOpt) = true
-
------ LAffectOpt : LAffect    // liste d'affectation optionnelle
-valide(LAffectOpt) = valide(LAffect)
-declh(LAffect) = declh(LAffect)
-// ????? impossible de déclarer une variable locale pour des calculs dans le constructeur...
-
------ LAffectOpt :
-valide(LAffectOpt) = true
-
------ LAffect0 : LAffect1 ';' Affect
-valide(LAffect0) = valide(LAffect1) && valide(Affect)
-declh(LAffect1) = declh(LAffect0)
-declh(Affect) = declh(LAffect0)
-
------ LAffect : Affect
-valide(LAffect) = valide(Affect)
-declh(Affect) = declh(LAffect)
 
 ----- Affect : ID AFF ExprSansAffect
 valide(LAffect) = valide(ExprSansAffect) && type(ID) == type(ExprSansAffect) && (contains(decv(Affect), ID.lexval) || contains(attributsh(Affect), ID.lexval) && ID.constante = 0
@@ -348,8 +329,8 @@ type(ExprSansAffect) = Entier
 valide(ExprSansAffect0) = valide(ExprSansAffect1) && type(ExprSansAffect1) = Entier
 
 ----- ExprSansAffect0 : ExprSansAffect1 RELOP ExprSansAffect2
-valide(ExprSansAffect0) = valide(ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = Entier (????? - idem le 2)
-type(ExprSansAffect0) = bool //????? je suppose qu'en fait c'est un entier...
+valide(ExprSansAffect0) = valide(ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = Entier && type(ExprSansAffect2) = Entier
+type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : '(' Expr ')'
 valide(ExprSansAffect)

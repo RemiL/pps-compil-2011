@@ -111,16 +111,8 @@ ExtendsOpt : EXTENDS AppelConstr
 AppelConstr : ID_CLASS '(' LArgOpt ')'
 ;
 
-InitBlocOpt : '{' LAffectOpt '}'
+InitBlocOpt : Bloc
             | 
-;
-
-LAffectOpt : LAffect    // liste d"affectation optionnelle
-           | 
-;
-
-LAffect : LAffect ';' Affect
-        | Affect
 ;
 
 Affect : ID AFF ExprSansAffect
