@@ -1,10 +1,5 @@
 /* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
 
-/*
-QUESTION (TODO ?)
-Pourquoi ne pas gerer la staticite et la constance des attributs avec un enum du meme style que celui des methodes ?
-*/
-
 /* Structure représentant une classe */
 typedef struct
 {
@@ -22,6 +17,8 @@ typedef struct
 {
   char* nom;
   classe_t* type;
+  /* On peut avoir un attribut statique et constant dans le même temps,
+     d'où l'utilisation de deux booléens plutôt q'un enum. */
   int constante;
   int statique;
   /* TBD : un pointeur sur l'arbre correspondant à 
