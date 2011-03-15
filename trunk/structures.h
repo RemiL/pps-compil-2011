@@ -1,0 +1,115 @@
+/* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
+
+/* Déclaration des types */
+typedef struct attribut_t attribut_t;
+typedef struct param_t param_t;
+typedef struct methode_t methode_t;
+typedef struct classe_t classe_t;
+
+/* Structure représentant un attribut */
+struct attribut_t
+{
+  char* nom;
+  classe_t* type;
+  /* On peut avoir un attribut statique et constant dans le même temps,
+     d'où l'utilisation de deux booléens plutôt qu'un enum. */
+  int constante;
+  int statique;
+  /* TBD : un pointeur sur l'arbre correspondant à 
+           l'expression donnant la valeur par défaut ? */
+
+  /* On utilise une liste chainée */
+  attribut_t* suiv;
+};
+
+/* Structure représentant une file chainée d'attributs */
+typedef struct
+{
+  attribut_t* tete;
+  attribut_t* queue;
+} liste_attributs_t;
+
+/* Enum permettant de caractériser le "type" d'une méthode ou d'un attribut */
+typedef enum
+{
+  NORMALE,
+  STATIQUE,
+  SURCHARGEE
+} type_methode_t;
+
+/* Structure représentant un paramètre de méthode (ou de constructeur puisque 
+   le constructeur n'est qu'une méthode particulière d'après le prof */
+struct param_t
+{
+  char* nom;
+  classe_t* type;
+  /* TBD : un pointeur sur l'arbre correspondant à 
+           l'expression donnant la valeur par défaut ? */
+
+  /* On utilise une liste chainée */
+  param_t* suiv;
+};
+
+/* Structure représentant une file chainée de paramètres */
+typedef struct
+{
+  param_t* tete;
+  param_t* queue;
+} liste_params_t;
+
+/* Structure représentant une méthode */
+struct methode_t
+{
+  char* nom;
+  type_methode_t type_methode;
+  liste_params_t params;
+  classe_t* type_retour;
+
+  /* On utilise une liste chainée */
+  methode_t* suiv;
+};
+
+/* Structure représentant une file chainée de méthodes */
+typedef struct
+{
+  methode_t* tete;
+  methode_t* queue;
+} liste_methodes_t;
+
+/* Structure représentant une classe */
+struct classe_t
+{
+  char* nom;
+  classe_t* classe_mere;
+  liste_attributs_t attributs;
+  liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
+
+  /* On utilise une liste chainée */
+  classe_t* suiv;
+};
+
+typedef struct
+{
+  classe_t* tete;
+  classe_t* queue;
+} liste_classes_t;
+
+/* Déclaration des fonctions permettant de manipuler les structures */
+
+attribut_t* nouvel_attribut(char* nom, classe_t* type, int constante, int statique);
+void ajouter_attribut(liste_attributs_t* liste_attributs, attribut_t* attribut);
+attribut_t* chercher_attribut(liste_attributs_t* liste_attributs, char* nom);
+
+param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */);
+void ajouter_param(liste_params_t* liste_params, param_t* param);
+param_t* chercher_param(liste_params_t* liste_params, char* nom);
+
+methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, classe_t* type_retour);
+void ajouter_methode(liste_methodes_t* liste_methodes, methode_t* methode);
+void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
+methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom);
+
+classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_attributs_t attributs, liste_methodes_t methodes);
+void ajouter_classe(liste_classes_t* liste_classes, classe_t* classe);
+classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
+
