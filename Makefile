@@ -1,4 +1,4 @@
-OBJ=TP.o lex.o main.o
+OBJ=TP.o lex.o main.o structures.o
 CC=gcc
 CFLAGS=-Wall -I./ -g 
 LDFLAGS= -g -lfl
@@ -16,6 +16,9 @@ main.o: main.h main.c TP.h
 
 lex.o: TP.h main.h lex.c
 	$(CC) $(CFLAGS) -c lex.c
+
+structures.o: structures.h structures.c
+	$(CC) $(CFLAGS) -c structures.c
 
 lex.c : TP.l
 	flex --yylineno -olex.c TP.l
