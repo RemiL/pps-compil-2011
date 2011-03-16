@@ -95,6 +95,12 @@ typedef struct
   classe_t* queue;
 } liste_classes_t;
 
+typedef struct
+{
+  liste_vars_t vars;
+  liste_methodes_t meths;
+} corps_t;
+
 /* Déclaration des fonctions permettant de manipuler les structures */
 
 var_t* nouvelle_variable(char* nom, char* type, int constante, int statique);

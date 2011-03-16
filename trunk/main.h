@@ -50,12 +50,16 @@ typedef struct arbre
 
 
 typedef union
-{ char C;		/* necessaire pour flex */
-  PVAR V;		/* les autres correspondent aux variantes utilisees */
-  PARBRE A;		/* dans les actions associees aux productions de    */
-  int E;		/* la grammaire. 				    */
+{ char C;        /* necessaire pour flex */
+  PVAR V;        /* les autres correspondent aux variantes utilisees */
+  PARBRE A;        /* dans les actions associees aux productions de    */
+  int E;        /* la grammaire.                     */
   char *S;
+  liste_params_t LParam;
+  liste_classes_t LClasse;
+  classe_t Classe;
+  corps_t Cor;
+  type_methode_t TypeMethode;
 } YYSTYPE;
-
 
 #define YYSTYPE YYSTYPE
