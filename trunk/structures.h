@@ -63,6 +63,7 @@ struct methode_t
   char* nom;
   type_methode_t type_methode;
   liste_params_t params;
+  liste_vars_t vars; /* Variables locales */
   classe_t* type_retour;
 
   /* On utilise une liste chainée */
@@ -97,19 +98,22 @@ typedef struct
 /* Déclaration des fonctions permettant de manipuler les structures */
 
 var_t* nouvelle_variable(char* nom, classe_t* type, int constante, int statique);
-void ajouter_variable(liste_vars_t* liste_vars, var_t* var);
+liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var);
 var_t* chercher_variable(liste_vars_t* liste_vars, char* nom);
+liste_vars_t nouvelle_liste_variables(var_t* var);
 
 param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */);
-void ajouter_param(liste_params_t* liste_params, param_t* param);
+liste_params_t ajouter_param(liste_params_t liste_params, param_t* param);
 param_t* chercher_param(liste_params_t* liste_params, char* nom);
+liste_params_t nouvelle_liste_params(param_t* param);
 
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, classe_t* type_retour);
-void ajouter_methode(liste_methodes_t* liste_methodes, methode_t* methode);
+liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode);
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
 methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom);
+liste_methodes_t nouvelle_liste_methodes(methode_t* methode);
 
 classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
-void ajouter_classe(liste_classes_t* liste_classes, classe_t* classe);
+liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
-
+liste_classes_t nouvelle_liste_classes(classe_t* var);

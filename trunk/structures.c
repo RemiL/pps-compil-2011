@@ -20,18 +20,21 @@ var_t* nouvelle_variable(char* nom, classe_t* type, int constante, int statique)
   return var;
 }
 
-void ajouter_variable(liste_vars_t* liste_vars, var_t* var)
+liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var)
 {
-  if (liste_vars->tete == NULL) /* Liste vide */
-  {
-    liste_vars->tete = var;
-    liste_vars->queue = var;
-  }
+  liste_vars_t l;
+  
+  if (liste_vars.tete == NULL) /* Liste vide */
+    l.tete = var;
   else
   {
-    liste_vars->queue->suiv = var;
-    liste_vars->queue = var;
+    l.queue->suiv = var;
+    l.tete = liste_vars.tete;
   }
+  
+  l.queue = var;
+  
+  return l;
 }
 
 var_t* chercher_variable(liste_vars_t* liste_vars, char* nom)
@@ -42,6 +45,16 @@ var_t* chercher_variable(liste_vars_t* liste_vars, char* nom)
     var = var->suiv;
   
   return var;
+}
+
+liste_vars_t nouvelle_liste_variables(var_t* var)
+{
+  liste_vars_t liste_vars;
+  
+  liste_vars.tete = var;
+  liste_vars.queue = var;
+  
+  return liste_vars;
 }
 
 param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */)
@@ -55,18 +68,21 @@ param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut 
   return param;
 }
 
-void ajouter_param(liste_params_t* liste_params, param_t* param)
+liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
 {
-  if (liste_params->tete == NULL) /* Liste vide */
-  {
-    liste_params->tete = param;
-    liste_params->queue = param;
-  }
+  liste_params_t l;
+  
+  if (liste_params.tete == NULL) /* Liste vide */
+    l.tete = param;
   else
   {
-    liste_params->queue->suiv = param;
-    liste_params->queue = param;
+    l.queue->suiv = param;
+    l.tete = liste_params.tete;
   }
+  
+  l.queue = param;
+  
+  return l;
 }
 
 param_t* chercher_param(liste_params_t* liste_params, char* nom)
@@ -77,6 +93,16 @@ param_t* chercher_param(liste_params_t* liste_params, char* nom)
     param = param->suiv;
   
   return param;
+}
+
+liste_params_t nouvelle_liste_params(param_t* param)
+{
+  liste_params_t liste_params;
+  
+  liste_params.tete = param;
+  liste_params.queue = param;
+  
+  return liste_params;
 }
 
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, classe_t* type_retour)
@@ -92,18 +118,21 @@ methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params
   return methode;
 }
 
-void ajouter_methode(liste_methodes_t* liste_methodes, methode_t* methode)
+liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode)
 {
-  if (liste_methodes->tete == NULL) /* Liste vide */
-  {
-    liste_methodes->tete = methode;
-    liste_methodes->queue = methode;
-  }
+  liste_methodes_t l;
+  
+  if (liste_methodes.tete == NULL) /* Liste vide */
+    l.tete = methode;
   else
   {
-    liste_methodes->queue->suiv = methode;
-    liste_methodes->queue = methode;
+    l.queue->suiv = methode;
+    l.tete = liste_methodes.tete;
   }
+  
+  l.queue = methode;
+  
+  return l;
 }
 
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode)
@@ -130,6 +159,16 @@ methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom)
   return methode;
 }
 
+liste_methodes_t nouvelle_liste_methodes(methode_t* methode)
+{
+  liste_methodes_t liste_methodes;
+  
+  liste_methodes.tete = methode;
+  liste_methodes.queue = methode;
+  
+  return liste_methodes;
+}
+
 classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
 {
   classe_t* classe = (classe_t*) malloc(sizeof(classe_t));
@@ -146,18 +185,21 @@ classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t param
   return classe;
 }
 
-void ajouter_classe(liste_classes_t* liste_classes, classe_t* classe)
+liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe)
 {
-  if (liste_classes->tete == NULL) /* Liste vide */
-  {
-    liste_classes->tete = classe;
-    liste_classes->queue = classe;
-  }
+  liste_classes_t l;
+  
+  if (liste_classes.tete == NULL) /* Liste vide */
+    l.tete = classe;
   else
   {
-    liste_classes->queue->suiv = classe;
-    liste_classes->queue = classe;
+    l.queue->suiv = classe;
+    l.tete = liste_classes.tete;
   }
+  
+  l.queue = classe;
+  
+  return l;
 }
 
 classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom)
@@ -170,3 +212,12 @@ classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom)
   return classe;
 }
 
+liste_classes_t nouvelle_liste_classes(classe_t* classe)
+{
+  liste_classes_t liste_classes;
+  
+  liste_classes.tete = classe;
+  liste_classes.queue = classe;
+  
+  return liste_classes;
+}
