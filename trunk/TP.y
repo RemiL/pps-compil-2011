@@ -130,6 +130,13 @@ ExtendsOpt : EXTENDS AppelConstr
 	{ $$ = null}
 ;
 
+AppelConstr : ID_CLASS '(' LArgOpt ')'
+;
+
+InitBlocOpt : Bloc
+            | 
+;
+
 Affect : ID AFF ExprSansAffect { /* TODO */ }
        | Selection AFF ExprSansAffect { /* TODO */ }
 ;
