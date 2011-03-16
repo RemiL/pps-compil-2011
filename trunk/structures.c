@@ -7,41 +7,41 @@
 #define VRAI 1
 #define FAUX 0
 
-attribut_t* nouvel_attribut(char* nom, classe_t* type, int constante, int statique)
+var_t* nouvelle_variable(char* nom, classe_t* type, int constante, int statique)
 {
-  attribut_t* attribut = (attribut_t*) malloc(sizeof(attribut_t));
+  var_t* var = (var_t*) malloc(sizeof(var_t));
   
-  attribut->nom = strdup(nom);
-  attribut->type = type;
-  attribut->constante = constante;
-  attribut->statique = statique;
-  attribut->suiv = NULL;
+  var->nom = strdup(nom);
+  var->type = type;
+  var->constante = constante;
+  var->statique = statique;
+  var->suiv = NULL;
   
-  return attribut;
+  return var;
 }
 
-void ajouter_attribut(liste_attributs_t* liste_attributs, attribut_t* attribut)
+void ajouter_variable(liste_vars_t* liste_vars, var_t* var)
 {
-  if (liste_attributs->tete == NULL) /* Liste vide */
+  if (liste_vars->tete == NULL) /* Liste vide */
   {
-    liste_attributs->tete = attribut;
-    liste_attributs->queue = attribut;
+    liste_vars->tete = var;
+    liste_vars->queue = var;
   }
   else
   {
-    liste_attributs->queue->suiv = attribut;
-    liste_attributs->queue = attribut;
+    liste_vars->queue->suiv = var;
+    liste_vars->queue = var;
   }
 }
 
-attribut_t* chercher_attribut(liste_attributs_t* liste_attributs, char* nom)
+var_t* chercher_variable(liste_vars_t* liste_vars, char* nom)
 {
-  attribut_t* attribut = liste_attributs->tete;
+  var_t* var = liste_vars->tete;
   
-  while (attribut != NULL && (strcmp(nom, attribut->nom) != 0))
-    attribut = attribut->suiv;
+  while (var != NULL && (strcmp(nom, var->nom) != 0))
+    var = var->suiv;
   
-  return attribut;
+  return var;
 }
 
 param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */)
@@ -130,7 +130,7 @@ methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom)
   return methode;
 }
 
-classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_attributs_t attributs, liste_methodes_t methodes)
+classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
 {
   classe_t* classe = (classe_t*) malloc(sizeof(classe_t));
   

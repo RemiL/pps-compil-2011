@@ -1,13 +1,13 @@
 /* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
 
 /* Déclaration des types */
-typedef struct attribut_t attribut_t;
+typedef struct var_t var_t;
 typedef struct param_t param_t;
 typedef struct methode_t methode_t;
 typedef struct classe_t classe_t;
 
-/* Structure représentant un attribut */
-struct attribut_t
+/* Structure représentant une variable */
+struct var_t
 {
   char* nom;
   classe_t* type;
@@ -19,15 +19,15 @@ struct attribut_t
            l'expression donnant la valeur par défaut ? */
 
   /* On utilise une liste chainée */
-  attribut_t* suiv;
+  var_t* suiv;
 };
 
-/* Structure représentant une file chainée d'attributs */
+/* Structure représentant une file chainée de variables */
 typedef struct
 {
-  attribut_t* tete;
-  attribut_t* queue;
-} liste_attributs_t;
+  var_t* tete;
+  var_t* queue;
+} liste_vars_t;
 
 /* Enum permettant de caractériser le "type" d'une méthode ou d'un attribut */
 typedef enum
@@ -81,7 +81,7 @@ struct classe_t
 {
   char* nom;
   classe_t* classe_mere;
-  liste_attributs_t attributs;
+  liste_vars_t attributs;
   liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
 
   /* On utilise une liste chainée */
@@ -96,9 +96,9 @@ typedef struct
 
 /* Déclaration des fonctions permettant de manipuler les structures */
 
-attribut_t* nouvel_attribut(char* nom, classe_t* type, int constante, int statique);
-void ajouter_attribut(liste_attributs_t* liste_attributs, attribut_t* attribut);
-attribut_t* chercher_attribut(liste_attributs_t* liste_attributs, char* nom);
+var_t* nouvelle_variable(char* nom, classe_t* type, int constante, int statique);
+void ajouter_variable(liste_vars_t* liste_vars, var_t* var);
+var_t* chercher_variable(liste_vars_t* liste_vars, char* nom);
 
 param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */);
 void ajouter_param(liste_params_t* liste_params, param_t* param);
@@ -109,7 +109,7 @@ void ajouter_methode(liste_methodes_t* liste_methodes, methode_t* methode);
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
 methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom);
 
-classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_attributs_t attributs, liste_methodes_t methodes);
+classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
 void ajouter_classe(liste_classes_t* liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
 
