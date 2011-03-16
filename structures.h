@@ -10,7 +10,7 @@ typedef struct classe_t classe_t;
 struct var_t
 {
   char* nom;
-  classe_t* type;
+  char* type;
   /* On peut avoir un attribut statique et constant dans le même temps,
      d'où l'utilisation de deux booléens plutôt qu'un enum. */
   int constante;
@@ -42,7 +42,7 @@ typedef enum
 struct param_t
 {
   char* nom;
-  classe_t* type;
+  char* type;
   /* TBD : un pointeur sur l'arbre correspondant à 
            l'expression donnant la valeur par défaut ? */
 
@@ -64,7 +64,7 @@ struct methode_t
   type_methode_t type_methode;
   liste_params_t params;
   liste_vars_t vars; /* Variables locales */
-  classe_t* type_retour;
+  char* type_retour;
 
   /* On utilise une liste chainée */
   methode_t* suiv;
@@ -81,7 +81,7 @@ typedef struct
 struct classe_t
 {
   char* nom;
-  classe_t* classe_mere;
+  char* classe_mere;
   liste_vars_t attributs;
   liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
 
@@ -97,23 +97,23 @@ typedef struct
 
 /* Déclaration des fonctions permettant de manipuler les structures */
 
-var_t* nouvelle_variable(char* nom, classe_t* type, int constante, int statique);
+var_t* nouvelle_variable(char* nom, char* type, int constante, int statique);
 liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var);
 var_t* chercher_variable(liste_vars_t* liste_vars, char* nom);
 liste_vars_t nouvelle_liste_variables(var_t* var);
 
-param_t* nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */);
+param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */);
 liste_params_t ajouter_param(liste_params_t liste_params, param_t* param);
 param_t* chercher_param(liste_params_t* liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
 
-methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, classe_t* type_retour);
+methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, char* type_retour);
 liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode);
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
 methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom);
 liste_methodes_t nouvelle_liste_methodes(methode_t* methode);
 
-classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
+classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
 liste_classes_t nouvelle_liste_classes(classe_t* var);
