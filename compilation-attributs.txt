@@ -282,15 +282,33 @@ value(BlocExpr) = value(Expr)
 
 ----- Expr : ExprSansAffect
 //type, value, valide, declh, var...
+valide(Expr) = valide(ExprSansAffect)
+type(Expr) = type(ExprSansAffect)
+declh(ExprSansAffect) = declh(Expr)
+value(Expr) = value(ExprSansAffect)
+//decv(Expr) = decv(ExprSansAffect)
 
 ----- Expr : Affect
 //type, value, valide, declh, var...
+valide(Expr) = valide(Affect)
+type(Expr) = type(ExprSansAffect)
+declh(Affect) = declh(Expr)
+value(Expr) = value(Affect)
+//decv(Expr) = decv(Affect)
 
 ----- ExprSansAffect : IfThenElse
-
+valide(ExprSansAffect) = valide(IfThenElse)
+type(ExprSansAffect) = type(IfThenElse)
+declh(IfThenElse) = declh(ExprSansAffect)
+value(ExprSansAffect) = value(IfThenElse)
+//decv(ExprSansAffect) = decv(IfThenElse)
 
 ----- ExprSansAffect : Selection
-
+valide(ExprSansAffect) = valide(Selection)
+type(ExprSansAffect) = type(Selection)
+declh(Selection) = declh(ExprSansAffect)
+value(ExprSansAffect) = value(Selection)
+//decv(ExprSansAffect) = decv(IfThenElse)
 
 ----- ExprSansAffect : STRING
 valide(ExprSansAffect) = true
@@ -311,19 +329,24 @@ type(ExprSansAffect) = Entier
 //TODO appel de fonction
 
 ----- ExprSansAffect : ExprSansAffect '+' ExprSansAffect
-
+valide (ExprSansAffect0) = valide (ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = type(ExprSansAffect2) && type(ExprSansAffect1) = Entier
+type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : ExprSansAffect '-' ExprSansAffect
-//LOIC
+valide (ExprSansAffect0) = valide (ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = type(ExprSansAffect2) && type(ExprSansAffect1) = Entier
+type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : ExprSansAffect '*' ExprSansAffect
-//LOIC
+valide (ExprSansAffect0) = valide (ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = type(ExprSansAffect2) && type(ExprSansAffect1) = Entier
+type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : ExprSansAffect '/' ExprSansAffect
-//LOIC
+valide (ExprSansAffect0) = valide (ExprSansAffect1) && valide(ExprSansAffect2) && type(ExprSansAffect1) = type(ExprSansAffect2) && type(ExprSansAffect1) = Entier
+type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : '+' ExprSansAffect %prec PREC_UNAIRE
-//LOIC
+valide(ExprSansAffect0) = valide(ExprSansAffect1) && type(ExprSansAffect1) = Entier
+type(ExprSansAffect1) = Entier
 
 ----- ExprSansAffect : '-' ExprSansAffect %prec PREC_UNAIRE
 valide(ExprSansAffect0) = valide(ExprSansAffect1) && type(ExprSansAffect1) = Entier
@@ -333,7 +356,8 @@ valide(ExprSansAffect0) = valide(ExprSansAffect1) && valide(ExprSansAffect2) && 
 type(ExprSansAffect0) = Entier
 
 ----- ExprSansAffect : '(' Expr ')'
-valide(ExprSansAffect)
+valide(ExprSansAffect) = valide(Expr)
+
 
 ----- ExprSelec : '(' Expr ')'
 valide(ExprSelec) = valide(Expr)
