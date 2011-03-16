@@ -240,55 +240,6 @@ Selection : ExprSelec '.' ID   	{ /*TODO $$ = ; */ }
           | ID_CLASS '.' ID   	{ /*TODO $$ = ; */ }S : LDefClass Bloc { }
 ;
 
-LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
-	{$$ = ajouter_classe($0, $1);	}
-          | DefClass
-	{$$ = nouvelle_liste_classes($0);}
-;
-
-DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps    // une declaration de classe
-{
-	//classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
-
-	$$ = nouvelle_classe($1, $6, $3, $9.vars, $9.meths)
-}
-;
-
-LParamOpt : LParam
-	{$$ = $1;}
-          | 
-	{$$ = nouvelle_liste_params(null);}
-;
-
-LParam : Param ',' LParam
-	{$$ = ajouter_param($1, $0);}
-       | Param
-	{ $$ = nouvelle_liste_params($0); }
-       | LParamInit
-	{ $$ = $1; }
-;
-
-LParamInit : LParamInit ',' ParamInit
-	{ $$ = ajouter_params($0, $3); }
-           | ParamInit
-	{ $$ = nouveau_param(char* nom, classe_t* type /* TODO expression par défaut */); }
-;
-
-Param : ID ':' ID_CLASS
-	{ $$ = nouveau_param($0, $2 /* TODO expression par défaut */); }
-;
-
-ParamInit : ID ':' ID_CLASS AFF ExprSansAffect
-	{ $$ = nouveau_param($0, $2 /* TODO expression par défaut */); }
-;
-
-ExtendsOpt : EXTENDS AppelConstr
-	{ $$ = $1;}
-           | 
-	{ $$ = null}
-;
-;
-
 EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
    	{ /*TODO $$ = ; */ }
          | ID_CLASS '.' ID '(' LArgOpt ')'   	{ /*TODO $$ = ; */ }
