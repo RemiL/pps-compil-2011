@@ -52,7 +52,7 @@ void yyerror(char *s) {
 
 
 
-FILE *fd = nil(FILE);
+FILE *fd = NIL(FILE);
 char *fname;
 
 /* appel:
@@ -201,7 +201,7 @@ PVAR MakeVar(char *nom, int val, PVAR lv) {
  */
 PARBRE MakeId(char *var) {
   PARBRE res = NEW(1, ARBRE);
-  res->op = Id; res->gauche.S = var; res->droit.A = nil(ARBRE);
+  res->op = Id; res->gauche.S = var; res->droit.A = NIL(ARBRE);
   return(res);
 }
 
@@ -209,7 +209,7 @@ PARBRE MakeId(char *var) {
 /* Idem pour une feuille de type CSTE: on stocke la valeur */
 PARBRE MakeCste(int val) {
   PARBRE res = NEW(1, ARBRE);
-  res->op = Cste; res->gauche.E = val; res->droit.A = nil(ARBRE);
+  res->op = Cste; res->gauche.E = val; res->droit.A = NIL(ARBRE);
   return(res);
 }
 
@@ -242,7 +242,7 @@ PARBRE MakeITE(PARBRE pCond, PARBRE pThen, PARBRE pElse) {
 int lire() {
   char buf[50]; int res;
 
-  if (fd == nil(FILE)) {
+  if (fd == NIL(FILE)) {
     fprintf(stderr, "Fichier de donnees manquant\n");
     exit(1);
   }
