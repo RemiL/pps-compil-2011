@@ -28,7 +28,7 @@ liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var)
     l.tete = var;
   else
   {
-    l.queue->suiv = var;
+    liste_vars.queue->suiv = var;
     l.tete = liste_vars.tete;
   }
   
@@ -76,7 +76,7 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
     l.tete = param;
   else
   {
-    l.queue->suiv = param;
+    liste_params.queue->suiv = param;
     l.tete = liste_params.tete;
   }
   
@@ -126,7 +126,7 @@ liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* met
     l.tete = methode;
   else
   {
-    l.queue->suiv = methode;
+    liste_methodes.queue->suiv = methode;
     l.tete = liste_methodes.tete;
   }
   
@@ -193,7 +193,7 @@ liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe)
     l.tete = classe;
   else
   {
-    l.queue->suiv = classe;
+    liste_classes.queue->suiv = classe;
     l.tete = liste_classes.tete;
   }
   
@@ -220,4 +220,14 @@ liste_classes_t nouvelle_liste_classes(classe_t* classe)
   liste_classes.queue = classe;
   
   return liste_classes;
+}
+
+corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes)
+{
+  corps_t corps;
+  
+  corps.variables = variables;
+  corps.methodes = methodes;
+  
+  return corps;
 }
