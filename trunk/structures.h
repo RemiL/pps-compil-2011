@@ -97,8 +97,8 @@ typedef struct
 
 typedef struct
 {
-  liste_vars_t vars;
-  liste_methodes_t meths;
+  liste_vars_t variables;
+  liste_methodes_t methodes;
 } corps_t;
 
 /* Déclaration des fonctions permettant de manipuler les structures */
@@ -123,3 +123,5 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_co
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
 liste_classes_t nouvelle_liste_classes(classe_t* var);
+
+corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);
