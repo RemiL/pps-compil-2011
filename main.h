@@ -1,8 +1,10 @@
 #include <stdlib.h>
 
+#include "structures.h"
+
 /* deux macros pratiques, utilisées dans les allocations */
 #define NEW(howmany, type) (type *) calloc((unsigned) howmany, sizeof(type))
-#define nil(type) (type *) 0
+#define NIL(type) (type *) 0
 
 
 /* Etiquettes pour les noeuds de l'arbre de syntaxe abstraite representant une
@@ -51,15 +53,19 @@ typedef struct arbre
 
 typedef union
 { char C;        /* necessaire pour flex */
-  PVAR V;        /* les autres correspondent aux variantes utilisees */
+  char *S;        /* les autres correspondent aux variantes utilisees */
   PARBRE A;        /* dans les actions associees aux productions de    */
   int E;        /* la grammaire.                     */
-  char *S;
-  liste_params_t LParam;
-  liste_classes_t LClasse;
-  classe_t Classe;
-  corps_t Cor;
+  liste_classes_t LClasses;
+  classe_t* Classe;
+  corps_t Corps;
+  liste_methodes_t LMethodes;
+  methode_t* Methode;
   type_methode_t TypeMethode;
+  liste_params_t LParams;
+  param_t* Param;
+  liste_vars_t LVars;
+  var_t* Var;
 } YYSTYPE;
 
 #define YYSTYPE YYSTYPE
