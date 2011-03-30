@@ -1,6 +1,10 @@
+#ifndef MAIN_H
+#define MAIN_H
+
 #include <stdlib.h>
 
 #include "structures.h"
+#include "verif_contextuelles.h"
 
 /* deux macros pratiques, utilisées dans les allocations */
 #define NEW(howmany, type) (type *) calloc((unsigned) howmany, sizeof(type))
@@ -69,3 +73,5 @@ typedef union
 } YYSTYPE;
 
 #define YYSTYPE YYSTYPE
+
+#endif

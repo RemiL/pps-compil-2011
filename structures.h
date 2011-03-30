@@ -1,3 +1,6 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
 /* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
 
 /* Déclaration des types */
@@ -105,23 +108,26 @@ typedef struct
 
 var_t* nouvelle_variable(char* nom, char* type, int constante, int statique);
 liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var);
-var_t* chercher_variable(liste_vars_t* liste_vars, char* nom);
+var_t* chercher_variable(liste_vars_t liste_vars, char* nom);
 liste_vars_t nouvelle_liste_variables(var_t* var);
 
 param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */);
 liste_params_t ajouter_param(liste_params_t liste_params, param_t* param);
-param_t* chercher_param(liste_params_t* liste_params, char* nom);
+param_t* chercher_param(liste_params_t liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
 
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, char* type_retour);
 liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode);
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
-methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom);
+methode_t* chercher_methode(liste_methodes_t liste_methodes, char* nom);
 liste_methodes_t nouvelle_liste_methodes(methode_t* methode);
 
 classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
-classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom);
+classe_t* chercher_classe(liste_classes_t liste_classes, char* nom);
 liste_classes_t nouvelle_liste_classes(classe_t* var);
+liste_classes_t nouvelle_liste_classes_preinitialisee();
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);
+
+#endif
