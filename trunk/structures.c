@@ -37,9 +37,9 @@ liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var)
   return l;
 }
 
-var_t* chercher_variable(liste_vars_t* liste_vars, char* nom)
+var_t* chercher_variable(liste_vars_t liste_vars, char* nom)
 {
-  var_t* var = liste_vars->tete;
+  var_t* var = (nom == NULL) ? NULL : liste_vars.tete;
   
   while (var != NULL && (strcmp(nom, var->nom) != 0))
     var = var->suiv;
@@ -85,9 +85,9 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
   return l;
 }
 
-param_t* chercher_param(liste_params_t* liste_params, char* nom)
+param_t* chercher_param(liste_params_t liste_params, char* nom)
 {
-  param_t* param = liste_params->tete;
+  param_t* param = (nom == NULL) ? NULL : liste_params.tete;
   
   while (param != NULL && (strcmp(nom, param->nom) != 0))
     param = param->suiv;
@@ -149,9 +149,9 @@ void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode)
   }
 }
 
-methode_t* chercher_methode(liste_methodes_t* liste_methodes, char* nom)
+methode_t* chercher_methode(liste_methodes_t liste_methodes, char* nom)
 {
-  methode_t* methode = liste_methodes->tete;
+  methode_t* methode = (nom == NULL) ? NULL : liste_methodes.tete;
   
   while (methode != NULL && (strcmp(nom, methode->nom) != 0))
     methode = methode->suiv;
@@ -202,9 +202,9 @@ liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe)
   return l;
 }
 
-classe_t* chercher_classe(liste_classes_t* liste_classes, char* nom)
+classe_t* chercher_classe(liste_classes_t liste_classes, char* nom)
 {
-  classe_t* classe = liste_classes->tete;
+  classe_t* classe = (nom == NULL) ? NULL : liste_classes.tete;
   
   while (classe != NULL && (strcmp(nom, classe->nom) != 0))
     classe = classe->suiv;
@@ -218,6 +218,18 @@ liste_classes_t nouvelle_liste_classes(classe_t* classe)
   
   liste_classes.tete = classe;
   liste_classes.queue = classe;
+  
+  return liste_classes;
+}
+
+
+liste_classes_t nouvelle_liste_classes_preinitialisee()
+{
+  liste_classes_t liste_classes;
+  
+  /* TODO à compléter ? */
+  liste_classes = nouvelle_liste_classes(nouvelle_classe("Entier", NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
+  liste_classes = ajouter_classe(liste_classes, nouvelle_classe("Chaine", NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
   
   return liste_classes;
 }
