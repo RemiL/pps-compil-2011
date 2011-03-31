@@ -66,6 +66,7 @@ typedef union
   liste_methodes_t LMethodes;
   methode_t* Methode;
   type_methode_t TypeMethode;
+  bloc_t Bloc;
   liste_params_t LParams;
   param_t* Param;
   liste_vars_t LVars;
