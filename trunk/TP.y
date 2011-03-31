@@ -88,9 +88,13 @@ S : LDefClass Bloc { }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
-	{$$ = ajouter_classe($1, $2);	}
+	{est_valide_classe($1, $2); $$ = ajouter_classe($1, $2);	}
           | DefClass
-	{$$ = nouvelle_liste_classes($1);}
+  {
+    liste_classes_t l = nouvelle_liste_classes_preinitialisee();
+    est_valide_classe(l, $1);
+    $$ = ajouter_classe(l, $1);
+  }
 ;
 
 DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps    // une declaration de classe
