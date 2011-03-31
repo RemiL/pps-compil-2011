@@ -36,6 +36,7 @@
 %type <LMethodes> LDeclMethOpt LDeclMeth
 %type <Methode> DeclMeth
 %type <TypeMethode> Def
+%type <Bloc> Bloc
 %type <LParams> LParam LParamOpt LParamInit
 %type <Param> Param ParamInit
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
@@ -84,7 +85,7 @@ extern void imprime();
   *
   */
 
-S : LDefClass Bloc { }
+S : LDefClass Bloc { liberer_liste_classes($1); liberer_liste_variables($2.variables); }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
@@ -190,7 +191,7 @@ LDeclMeth : LDeclMeth DeclMeth   	{ $$ = ajouter_methode($1, $2); }
 
 DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
 {
-	$$ = nouvelle_methode($2, $1, $4, $7);
+	$$ = nouvelle_methode($2, $1, $4, $9.variables, $7);
 }
 ;
 
@@ -199,8 +200,8 @@ Def : DEF STATIC   	{ $$ = STATIQUE; }
     | DEF OVERRIDE   	{ $$ = OVERRIDE; }
 ;
 
-Bloc : '{' LExpr '}'   	{ /*TODO $$ = ; */}
-     | '{' LDeclA IS LExpr '}'   	{ /*TODO $$ = ; */ }
+Bloc : '{' LExpr '}'   	{ $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
+     | '{' LDeclA IS LExpr '}'   	{ $$ = nouveau_bloc($2); }
 ;
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique

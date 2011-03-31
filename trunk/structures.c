@@ -57,6 +57,23 @@ liste_vars_t nouvelle_liste_variables(var_t* var)
   return liste_vars;
 }
 
+void liberer_liste_variables(liste_vars_t liste_variables)
+{
+  var_t* variable = liste_variables.tete;
+  var_t* tmp;
+  
+  while (variable != NULL)
+  {
+    free(variable->nom);
+    free(variable->nom_type);
+    
+    tmp = variable;
+    variable = variable->suiv;
+    
+    free(tmp);
+  }
+}
+
 param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */)
 {
   param_t* param = (param_t*) malloc(sizeof(param_t));
@@ -105,13 +122,31 @@ liste_params_t nouvelle_liste_params(param_t* param)
   return liste_params;
 }
 
-methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, char* type_retour)
+void liberer_liste_params(liste_params_t liste_params)
+{
+  param_t* param = liste_params.tete;
+  param_t* tmp;
+  
+  while (param != NULL)
+  {
+    free(param->nom);
+    free(param->nom_type);
+    
+    tmp = param;
+    param = param->suiv;
+    
+    free(tmp);
+  }
+}
+
+methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, liste_vars_t vars, char* type_retour)
 {
   methode_t* methode = (methode_t*) malloc(sizeof(methode_t));
   
   methode->nom = nom;
   methode->type_methode = type_methode;
   methode->params = params;
+  methode->vars = vars;
   methode->nom_type_retour = type_retour;
   methode->suiv = NULL;
   
@@ -169,6 +204,27 @@ liste_methodes_t nouvelle_liste_methodes(methode_t* methode)
   return liste_methodes;
 }
 
+void liberer_liste_methodes(liste_methodes_t liste_methodes)
+{
+  methode_t* methode = liste_methodes.tete;
+  methode_t* tmp;
+  
+  while (methode != NULL)
+  {
+    liberer_liste_params(methode->params);
+    liberer_liste_variables(methode->vars);
+    
+    free(methode->nom);
+    if (methode->nom_type_retour)
+      free(methode->nom_type_retour);
+    
+    tmp = methode;
+    methode = methode->suiv;
+    
+    free(tmp);
+  }
+}
+
 classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
 {
   classe_t* classe = (classe_t*) malloc(sizeof(classe_t));
@@ -180,7 +236,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_co
   classe->suiv = NULL;
   
   /* Ajout constructeur (p-e à revoir ?) */
-  ajouter_methode_tete(&classe->methodes, nouvelle_methode(nom, NORMALE, params_constructeur, NULL));
+  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, nouvelle_liste_variables(NULL), NULL));
   
   return classe;
 }
@@ -225,13 +281,43 @@ liste_classes_t nouvelle_liste_classes(classe_t* classe)
 
 liste_classes_t nouvelle_liste_classes_preinitialisee()
 {
-  liste_classes_t liste_classes;
+  liste_classes_t liste_classes; 
   
   /* TODO à compléter ? */
-  liste_classes = nouvelle_liste_classes(nouvelle_classe("Entier", NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
-  liste_classes = ajouter_classe(liste_classes, nouvelle_classe("Chaine", NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
+  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
+  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
   
   return liste_classes;
+}
+
+void liberer_liste_classes(liste_classes_t liste_classes)
+{
+  classe_t* classe = liste_classes.tete;
+  classe_t* tmp;
+  
+  while (classe != NULL)
+  {
+    liberer_liste_variables(classe->attributs);
+    liberer_liste_methodes(classe->methodes);
+    
+    free(classe->nom);
+    if (classe->nom_classe_mere)
+      free(classe->nom_classe_mere);
+    
+    tmp = classe;
+    classe = classe->suiv;
+    
+    free(tmp);
+  }
+}
+
+bloc_t nouveau_bloc(liste_vars_t variables)
+{
+  bloc_t bloc;
+  
+  bloc.variables = variables;
+  
+  return bloc;
 }
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes)
