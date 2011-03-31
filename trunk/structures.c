@@ -12,7 +12,7 @@ var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
   var_t* var = (var_t*) malloc(sizeof(var_t));
   
   var->nom = nom;
-  var->type = type;
+  var->nom_type = type;
   var->constante = constante;
   var->statique = statique;
   var->suiv = NULL;
@@ -62,7 +62,7 @@ param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */)
   param_t* param = (param_t*) malloc(sizeof(param_t));
   
   param->nom = nom;
-  param->type = type;
+  param->nom_type = type;
   param->suiv = NULL;
   
   return param;
@@ -112,7 +112,7 @@ methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params
   methode->nom = nom;
   methode->type_methode = type_methode;
   methode->params = params;
-  methode->type_retour = type_retour;
+  methode->nom_type_retour = type_retour;
   methode->suiv = NULL;
   
   return methode;
@@ -174,7 +174,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_co
   classe_t* classe = (classe_t*) malloc(sizeof(classe_t));
   
   classe->nom = nom;
-  classe->classe_mere = classe_mere;
+  classe->nom_classe_mere = classe_mere;
   classe->attributs = attributs;
   classe->methodes = methodes;
   classe->suiv = NULL;

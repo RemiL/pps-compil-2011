@@ -13,7 +13,8 @@ typedef struct classe_t classe_t;
 struct var_t
 {
   char* nom;
-  char* type;
+  char* nom_type;
+  classe_t* type;
   /* On peut avoir un attribut statique et constant dans le même temps,
      d'où l'utilisation de deux booléens plutôt qu'un enum. */
   int constante;
@@ -45,7 +46,8 @@ typedef enum
 struct param_t
 {
   char* nom;
-  char* type;
+  char* nom_type;
+  classe_t* type;
   /* TBD : un pointeur sur l'arbre correspondant à 
            l'expression donnant la valeur par défaut ? */
 
@@ -67,7 +69,8 @@ struct methode_t
   type_methode_t type_methode;
   liste_params_t params;
   liste_vars_t vars; /* Variables locales */
-  char* type_retour;
+  char* nom_type_retour;
+  classe_t* type_retour;
 
   /* On utilise une liste chainée */
   methode_t* suiv;
@@ -84,7 +87,8 @@ typedef struct
 struct classe_t
 {
   char* nom;
-  char* classe_mere;
+  char* nom_classe_mere;
+  classe_t* classe_mere;
   liste_vars_t attributs;
   liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
 
