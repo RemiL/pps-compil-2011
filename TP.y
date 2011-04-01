@@ -212,7 +212,7 @@ DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
 
 Def : DEF STATIC     { $$ = STATIQUE; }
     | DEF     { $$ = NORMALE; }
-    | DEF OVERRIDE     { $$ = OVERRIDE; }
+    | DEF OVERRIDE     { $$ = REDEFINIE; }
 ;
 
 Bloc : '{' LExpr '}'     { $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }

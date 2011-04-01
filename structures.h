@@ -38,7 +38,7 @@ typedef enum
 {
   NORMALE,
   STATIQUE,
-  SURCHARGEE
+  REDEFINIE
 } type_methode_t;
 
 /* Structure représentant un paramètre de méthode (ou de constructeur puisque 
