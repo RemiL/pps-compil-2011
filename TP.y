@@ -90,8 +90,8 @@ S : LDefClass Bloc { liberer_liste_classes($1); liberer_liste_variables($2.varia
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
   {
-   	est_valide_classe($1, $2); 
-    $$ = ajouter_classe($1, $2);	
+     est_valide_classe($1, $2); 
+    $$ = ajouter_classe($1, $2);  
   }
           | DefClass
   {
@@ -103,50 +103,50 @@ LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de
 
 DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps    // une declaration de classe
 {
-	//classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
+  //classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
 
-	$$ = nouvelle_classe($2, $6, $4, $9.variables, $9.methodes);
+  $$ = nouvelle_classe($2, $6, $4, $9.variables, $9.methodes);
 }
 ;
 
 LParamOpt : LParam
-	{$$ = $1;}
+  {$$ = $1;}
           | 
-	{$$ = nouvelle_liste_params(NIL(param_t));}
+  {$$ = nouvelle_liste_params(NIL(param_t));}
 ;
 
 LParam : Param ',' LParam
-	{
-    est_valide_nom_param($3, $1);
+  {
+    est_valide_param($3, $1);
     $$ = ajouter_param($3, $1);
   }
        | Param
-	{ $$ = nouvelle_liste_params($1); }
+  { $$ = nouvelle_liste_params($1); }
        | LParamInit
-	{ $$ = $1; }
+  { $$ = $1; }
 ;
 
 LParamInit : LParamInit ',' ParamInit
-	{ 
-    est_valide_nom_param($3, $1);
+  { 
+    est_valide_param($1, $3);
     $$ = ajouter_param($1, $3);
- }
+  }
            | ParamInit
-	{ $$ = nouvelle_liste_params($1); }
+  { $$ = nouvelle_liste_params($1); }
 ;
 
 Param : ID ':' ID_CLASS
-	{ $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
+  { $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
 ;
 
 ParamInit : ID ':' ID_CLASS AFF ExprSansAffect
-	{ $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
+  { $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
 ;
 
 ExtendsOpt : EXTENDS AppelConstr
-	{ $$ = $2;}
+  { $$ = $2;}
            | 
-	{ $$ = NULL;}
+  { $$ = NULL;}
 ;
 
 AppelConstr : ID_CLASS '(' LArgOpt ')'
@@ -162,123 +162,123 @@ Affect : ID AFF ExprSansAffect { /* TODO */ }
 ;
 
 Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
-	{ $$ = nouveau_corps($2, $3); }
+  { $$ = nouveau_corps($2, $3); }
 ;
 
 LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
-   	{ $$ = $1; }
-             |   	{ $$ = nouvelle_liste_variables(NIL(var_t)); }
+     { $$ = $1; }
+             |     { $$ = nouvelle_liste_variables(NIL(var_t)); }
 ;
 
 
 LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
-   	{ $$ = $1; }
-     |   	{ $$ = nouvelle_liste_methodes(NIL(methode_t)); }
+     { $$ = $1; }
+     |     { $$ = nouvelle_liste_methodes(NIL(methode_t)); }
 ;
 
 LDeclAttr : LDeclAttr ';' DeclAttr    // liste de déclaration d'un attribut
-   	{ $$ = ajouter_variable($1, $3); }
-          | DeclAttr   	{ $$ = nouvelle_liste_variables($1); }
+     { $$ = ajouter_variable($1, $3); }
+          | DeclAttr     { $$ = nouvelle_liste_variables($1); }
 ;
 
 DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statique
-   	{ $2->statique = 1; $$ = $2; /* TODO améliorer ça ? */ }
-         | DeclA   	{ $$ = $1;}
+     { $2->statique = 1; $$ = $2; /* TODO améliorer ça ? */ }
+         | DeclA     { $$ = $1;}
 ;
 
 DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
-   	{ $$ = nouvelle_variable($2, $4, 0, 0); }
-      | VAL ID ':' ID_CLASS InitOpt   	{ $$ = nouvelle_variable($2, $4, 1, 0); }
+     { $$ = nouvelle_variable($2, $4, 0, 0); }
+      | VAL ID ':' ID_CLASS InitOpt     { $$ = nouvelle_variable($2, $4, 1, 0); }
 ;
 
-InitOpt : AFF ExprSansAffect   	{ /*TODO $$ = $1;*/ }
-        |    	{ /*TODO $$ = ; */}
+InitOpt : AFF ExprSansAffect     { /*TODO $$ = $1;*/ }
+        |      { /*TODO $$ = ; */}
 ;
 
 LDeclMeth : LDeclMeth DeclMeth
-   	{
-   	  
-   	  est_valide_nom_methode($1, $2);
-   	  $$ = ajouter_methode($1, $2);
-   	}
-          | DeclMeth   	{ $$ = nouvelle_liste_methodes($1); }
+     {
+       
+       est_valide_methode($1, $2);
+       $$ = ajouter_methode($1, $2);
+     }
+          | DeclMeth     { $$ = nouvelle_liste_methodes($1); }
 ;
 
 DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
 {
-	$$ = nouvelle_methode($2, $1, $4, $9.variables, $7);
+  $$ = nouvelle_methode($2, $1, $4, $9.variables, $7);
 }
 ;
 
-Def : DEF STATIC   	{ $$ = STATIQUE; }
-    | DEF   	{ $$ = NORMALE; }
-    | DEF OVERRIDE   	{ $$ = OVERRIDE; }
+Def : DEF STATIC     { $$ = STATIQUE; }
+    | DEF     { $$ = NORMALE; }
+    | DEF OVERRIDE     { $$ = OVERRIDE; }
 ;
 
-Bloc : '{' LExpr '}'   	{ $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
-     | '{' LDeclA IS LExpr '}'   	{ $$ = nouveau_bloc($2); }
+Bloc : '{' LExpr '}'     { $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
+     | '{' LDeclA IS LExpr '}'     { $$ = nouveau_bloc($2); }
 ;
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
-   	{ $$ = ajouter_variable($1, $3); }
-       | DeclA   	{ $$ = nouvelle_liste_variables($1); }
+     { $$ = ajouter_variable($1, $3); }
+       | DeclA     { $$ = nouvelle_liste_variables($1); }
 ;
 
 LExpr : LExpr ';' Expr            // liste d'expression d'un bloc
-   	{ /*TODO $$ = ; */ }
-      | Expr   	{ /*TODO $$ = ; */ }
+     { /*TODO $$ = ; */ }
+      | Expr     { /*TODO $$ = ; */ }
 ;
 
-BlocExpr : Expr   	{ /* TODO $$ = $1; */ }
-         | Bloc   	{ /* TODO $$ = $1; */ }
+BlocExpr : Expr     { /* TODO $$ = $1; */ }
+         | Bloc     { /* TODO $$ = $1; */ }
 ;
 
-Expr : ExprSansAffect %prec PREC_MIN   	{ /* TODO $$ = $1; */ }
-     | Affect   	{ /* TODO $$ = $1;*/ }
+Expr : ExprSansAffect %prec PREC_MIN     { /* TODO $$ = $1; */ }
+     | Affect     { /* TODO $$ = $1;*/ }
 ;
 
-ExprSansAffect : IfThenElse   	{ /*TODO $$ = ; */ }
-               | ID   	{ /*TODO $$ = ; */}
-               | Selection   	{ /*TODO $$ = ; */ }
-               | CSTE   	{ /*TODO $$ = ; */ }
-               | STRING   	{ /*TODO $$ = ; */ }
-               | NOUVEAU ID_CLASS '(' LArgOpt ')'   	{ /*TODO $$ = ; */ }
-               | EnvoiMsg   	{ /*TODO $$ = ; */ }
-               | ExprSansAffect '+' ExprSansAffect   	{ /*TODO $$ = ; */ }
-               | ExprSansAffect '-' ExprSansAffect   	{ /*TODO $$ = ; */ }
-               | ExprSansAffect '*' ExprSansAffect   	{ /*TODO $$ = ; */ }
-               | ExprSansAffect '/' ExprSansAffect   	{ /*TODO $$ = ; */ }
-               | '+' ExprSansAffect %prec PREC_UNAIRE   	{ /*TODO $$ = ; */ }
-               | '-' ExprSansAffect %prec PREC_UNAIRE   	{ /*TODO $$ = ; */ }
-               | ExprSansAffect RELOP ExprSansAffect   	{ /*TODO $$ = ; */ }
-               | '(' Expr ')'   	{ /*TODO $$ = ; */ }
+ExprSansAffect : IfThenElse     { /*TODO $$ = ; */ }
+               | ID     { /*TODO $$ = ; */}
+               | Selection     { /*TODO $$ = ; */ }
+               | CSTE     { /*TODO $$ = ; */ }
+               | STRING     { /*TODO $$ = ; */ }
+               | NOUVEAU ID_CLASS '(' LArgOpt ')'     { /*TODO $$ = ; */ }
+               | EnvoiMsg     { /*TODO $$ = ; */ }
+               | ExprSansAffect '+' ExprSansAffect     { /*TODO $$ = ; */ }
+               | ExprSansAffect '-' ExprSansAffect     { /*TODO $$ = ; */ }
+               | ExprSansAffect '*' ExprSansAffect     { /*TODO $$ = ; */ }
+               | ExprSansAffect '/' ExprSansAffect     { /*TODO $$ = ; */ }
+               | '+' ExprSansAffect %prec PREC_UNAIRE     { /*TODO $$ = ; */ }
+               | '-' ExprSansAffect %prec PREC_UNAIRE     { /*TODO $$ = ; */ }
+               | ExprSansAffect RELOP ExprSansAffect     { /*TODO $$ = ; */ }
+               | '(' Expr ')'     { /*TODO $$ = ; */ }
 ;
 
-ExprSelec : '(' Expr ')'   	{ /*TODO $$ = $1; */ }
-          | CSTE   	{ /*TODO $$ = ; */ }
-          | STRING   	{ /*TODO $$ = ; */ }
-          | ID   	{ /*TODO $$ = ; */ }
-          | Selection   	{ /*TODO $$ = ; */ }
-          | EnvoiMsg   	{ /*TODO $$ = ; */ }
+ExprSelec : '(' Expr ')'     { /*TODO $$ = $1; */ }
+          | CSTE     { /*TODO $$ = ; */ }
+          | STRING     { /*TODO $$ = ; */ }
+          | ID     { /*TODO $$ = ; */ }
+          | Selection     { /*TODO $$ = ; */ }
+          | EnvoiMsg     { /*TODO $$ = ; */ }
 ;
 
-Selection : ExprSelec '.' ID   	{ /*TODO $$ = ; */ }
-          | ID_CLASS '.' ID   	{ /*TODO $$ = ; */ }
+Selection : ExprSelec '.' ID     { /*TODO $$ = ; */ }
+          | ID_CLASS '.' ID     { /*TODO $$ = ; */ }
 ;
 
 EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
-   	{ /*TODO $$ = ; */ }
-         | ID_CLASS '.' ID '(' LArgOpt ')'   	{ /*TODO $$ = ; */ }
+     { /*TODO $$ = ; */ }
+         | ID_CLASS '.' ID '(' LArgOpt ')'     { /*TODO $$ = ; */ }
 ;
 
-IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr   	{ /*TODO $$ = ; */ }
+IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr     { /*TODO $$ = ; */ }
 ;
 
 // liste d'arguments optionnelle
-LArgOpt : LArg   	{ /*TODO $$ = $1; */ }
-        |    	{ /*TODO$$ = nouvelle_liste_variables(NULL); */ }
+LArgOpt : LArg     { /*TODO $$ = $1; */ }
+        |      { /*TODO$$ = nouvelle_liste_variables(NULL); */ }
 ;
  // liste d'arguments
-LArg : LArg ',' Expr   	{ /*TODO $$ = ajouter_variable($1, $3); */ }
-     | Expr	{ /*TODO $$ = nouvelle_liste_variables($1); */ }
+LArg : LArg ',' Expr     { /*TODO $$ = ajouter_variable($1, $3); */ }
+     | Expr  { /*TODO $$ = nouvelle_liste_variables($1); */ }
 ;
