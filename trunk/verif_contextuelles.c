@@ -83,6 +83,8 @@ char* masque_attribut(classe_t* classe_mere, char* attribut)
 void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
 {
   methode_t* methode = classe->methodes.tete;
+  methode_t* methode_redefinie;
+  classe_t* c;
   
   while (methode != NULL)
   {
@@ -99,7 +101,87 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
       }
     }
     
+    sont_valides_params(decl, classe, methode);
+    
+    methode_redefinie = NULL;
+    c = classe->classe_mere;
+    
+    while (c != NULL && methode_redefinie == NULL)
+    {
+      methode_redefinie = chercher_methode(c->methodes, methode->nom);
+      c = c->classe_mere;
+    }
+    
+    if (methode_redefinie != NULL)
+    {
+      if (methode->type_methode != REDEFINIE)
+      {
+        printf("Classe %s : la méthode %s devrait être déclarée comme redéfinie.\n", classe->nom, methode->nom);
+        exit(EXIT_FAILURE);
+      }
+      else
+        est_valide_redefinition(classe, methode, methode_redefinie);
+    }
+    else if (methode->type_methode == REDEFINIE)
+    {
+      printf("Classe %s : la méthode %s ne devrait pas être déclarée comme redéfinie.\n", classe->nom, methode->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     methode = methode->suiv;
+  }
+}
+
+void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* methode)
+{
+  param_t* param = methode->params.tete;
+  
+  while (param != NULL)
+  {
+    param->type = chercher_classe(decl, param->nom_type);
+    
+    if (param->type == NULL)
+    {
+      if (!strcmp(param->nom_type, classe->nom))  // Si un param de la classe A est de type A
+        param->type = classe;
+      else
+      {
+        printf("Classe %s : Type invalide pour le paramètre %s de la méthode %s : la classe %s est inconnue.\n", classe->nom, param->nom, methode->nom, param->nom_type);
+        exit(EXIT_FAILURE);
+      }
+    }
+    
+    param = param->suiv;
+  }
+}
+
+void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* methode_redefinie)
+{
+  param_t* param = methode->params.tete;
+  param_t* param_redef = methode_redefinie->params.tete;
+  
+  if (methode->type_retour != methode_redefinie->type_retour)
+  {
+    printf("Classe %s : la méthode %s n'est pas valide, elle n'a pas le même type de retour que la méthode qu'elle redéfinit.\n", classe->nom, methode->nom);
+    exit(EXIT_FAILURE);
+  }
+  
+  while (param != NULL && param_redef != NULL)
+  {
+    if (param->type != param_redef->type)
+    {
+      printf("Classe %s : la méthode %s n'est pas valide, ses paramètres n'ont pas les même types que ceux de la méthode qu'elle redéfinit.\n", classe->nom, methode->nom);
+      exit(EXIT_FAILURE);
+    }
+    
+    param = param->suiv;
+    param_redef = param_redef->suiv;
+  }
+  
+  if (param != NULL || param_redef != NULL)
+  {
+    printf("Classe %s : la méthode %s n'est pas valide, elle n'a pas le même nombre de paramètres que la méthode qu'elle redéfinit.\n", classe->nom, methode->nom);
+    exit(EXIT_FAILURE);
   }
 }
 

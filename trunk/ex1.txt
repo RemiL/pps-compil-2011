@@ -95,7 +95,7 @@ class PointNoir(xc: Entier, yc:Entier)
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def override couleur() returns Chaine is { "Noir" }
+  def couleur() returns Chaine is { "Noir" }
 }
 
 class DefaultPoint()
@@ -103,7 +103,7 @@ class DefaultPoint()
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def override couleur() returns Chaine is { "Blanc" }
+  def couleur() returns Chaine is { "Blanc" }
 }
 
 class Test() is {
