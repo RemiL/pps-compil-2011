@@ -76,6 +76,7 @@ struct methode_t
   methode_t* suiv;
 };
 
+
 /* Structure représentant une file chainée de méthodes */
 typedef struct
 {

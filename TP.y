@@ -89,7 +89,10 @@ S : LDefClass Bloc { liberer_liste_classes($1); liberer_liste_variables($2.varia
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
-	{est_valide_classe($1, $2); $$ = ajouter_classe($1, $2);	}
+  {
+   	est_valide_classe($1, $2); 
+    $$ = ajouter_classe($1, $2);	
+  }
           | DefClass
   {
     liste_classes_t l = nouvelle_liste_classes_preinitialisee();
@@ -113,7 +116,10 @@ LParamOpt : LParam
 ;
 
 LParam : Param ',' LParam
-	{$$ = ajouter_param($3, $1);}
+	{
+    est_valide_nom_param($3, $1);
+    $$ = ajouter_param($3, $1);
+  }
        | Param
 	{ $$ = nouvelle_liste_params($1); }
        | LParamInit
@@ -121,7 +127,10 @@ LParam : Param ',' LParam
 ;
 
 LParamInit : LParamInit ',' ParamInit
-	{ $$ = ajouter_param($1, $3); }
+	{ 
+    est_valide_nom_param($3, $1);
+    $$ = ajouter_param($1, $3);
+ }
            | ParamInit
 	{ $$ = nouvelle_liste_params($1); }
 ;
@@ -161,9 +170,10 @@ LDeclAttrOpt : LDeclAttr        // liste de déclaration d'attributs optionnelle
              |   	{ $$ = nouvelle_liste_variables(NIL(var_t)); }
 ;
 
+
 LDeclMethOpt : LDeclMeth        // liste de déclaration de méthodes optionnelle
    	{ $$ = $1; }
-             |   	{ $$ = nouvelle_liste_methodes(NIL(methode_t)); }
+     |   	{ $$ = nouvelle_liste_methodes(NIL(methode_t)); }
 ;
 
 LDeclAttr : LDeclAttr ';' DeclAttr    // liste de déclaration d'un attribut
@@ -185,7 +195,12 @@ InitOpt : AFF ExprSansAffect   	{ /*TODO $$ = $1;*/ }
         |    	{ /*TODO $$ = ; */}
 ;
 
-LDeclMeth : LDeclMeth DeclMeth   	{ $$ = ajouter_methode($1, $2); }
+LDeclMeth : LDeclMeth DeclMeth
+   	{
+   	  
+   	  est_valide_nom_methode($1, $2);
+   	  $$ = ajouter_methode($1, $2);
+   	}
           | DeclMeth   	{ $$ = nouvelle_liste_methodes($1); }
 ;
 

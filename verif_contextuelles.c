@@ -52,7 +52,7 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
     
     if (attribut->type == NULL)
     {
-      if (!strcmp(attribut->nom_type, classe->nom))
+      if (!strcmp(attribut->nom_type, classe->nom))	// si un attribut de la classe a est de type a
         attribut->type = classe;
       else
       {
@@ -102,3 +102,48 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
     methode = methode->suiv;
   }
 }
+
+// vérifie qu'un paramètre avec le même nom n'a pas été déclaré
+// la liste de paramètre ne doit pas être vide
+void est_valide_nom_param(liste_params_t liste, param_t* parametre)
+{
+	param_t* param = liste.tete;
+	while(param != NULL)
+	{
+	  if (!strcmp(param->nom, parametre->nom))
+	  {
+	    printf("parametre %s invalide : un parametre avec le meme nom a ete declare.\n", param->nom);
+        exit(EXIT_FAILURE);
+	  }
+	  param = param->suiv;
+	
+	}
+	
+}
+
+// vérifie qu'il n'y a pas 2 méthodes avec le même nom déclarées dans la même classe
+void est_valide_nom_methode(liste_methodes_t liste, methode_t* methode)
+{
+
+  methode_t* meth = liste.tete;
+	while(meth != NULL)
+	{
+	  if (!strcmp(meth->nom, methode->nom))
+	  {
+	    printf("methode %s invalide : un parametre avec le meme nom a ete declare.\n", methode->nom);
+        exit(EXIT_FAILURE);
+	  }
+	  meth = meth->suiv;
+	
+	}
+  
+  
+}
+
+
+
+
+
+
+
+
