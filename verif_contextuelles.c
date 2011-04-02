@@ -160,6 +160,12 @@ void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* me
   param_t* param = methode->params.tete;
   param_t* param_redef = methode_redefinie->params.tete;
   
+  if (methode_redefinie->type_methode == STATIQUE)
+  {
+    printf("Classe %s : la méthode %s n'est pas valide, la redéfinition d'une méthode statique n'est pas autorisée.\n", classe->nom, methode->nom);
+    exit(EXIT_FAILURE);
+  }
+  
   if (methode->type_retour != methode_redefinie->type_retour)
   {
     printf("Classe %s : la méthode %s n'est pas valide, elle n'a pas le même type de retour que la méthode qu'elle redéfinit.\n", classe->nom, methode->nom);
@@ -190,17 +196,10 @@ void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* me
  */
 void est_valide_param(liste_params_t liste, param_t* parametre)
 {
-  param_t* param = liste.tete;
-  
-  while (param != NULL)
+  if (chercher_param(liste, parametre->nom) != NULL)
   {
-    if (!strcmp(param->nom, parametre->nom))
-    {
-      printf("Paramètre %s invalide : un paramètre avec le même nom a déjà été déclaré.\n", param->nom);
-      exit(EXIT_FAILURE);
-    }
-    
-    param = param->suiv;
+    printf("Paramètre %s invalide : un paramètre avec le même nom a déjà été déclaré.\n", parametre->nom);
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -208,17 +207,10 @@ void est_valide_param(liste_params_t liste, param_t* parametre)
  * Vérifie qu'il n'y a pas 2 méthodes avec le même nom déclarées dans la même classe.
  */
 void est_valide_methode(liste_methodes_t liste, methode_t* methode)
-{
-  methode_t* meth = liste.tete;
-  
-  while (meth != NULL)
+{  
+  if (chercher_methode(liste, methode->nom) != NULL)
   {
-    if (!strcmp(meth->nom, methode->nom))
-    {
-      printf("Méthode %s invalide : une méthode avec le même nom a déjà été déclarée.\n", methode->nom);
-      exit(EXIT_FAILURE);
-    }
-    
-    meth = meth->suiv;
+    printf("Méthode %s invalide : une méthode avec le même nom a déjà été déclarée.\n", methode->nom);
+    exit(EXIT_FAILURE);
   }
 }

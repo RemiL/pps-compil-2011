@@ -88,6 +88,10 @@ class PointColore(xc: Entier, yc:Entier, c: Couleur:= Couleur.blanc())
       super.print(); this.couleur().imprimer(); "\n".imprimer();
       this
       }
+      
+  def couleur() returns Chaine is {
+      coul.couleur()
+      }
 }
 
 class PointNoir(xc: Entier, yc:Entier)
@@ -95,7 +99,7 @@ class PointNoir(xc: Entier, yc:Entier)
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def couleur() returns Chaine is { "Noir" }
+  def override couleur() returns Chaine is { "Noir" }
 }
 
 class DefaultPoint()
@@ -103,7 +107,7 @@ class DefaultPoint()
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def couleur() returns Chaine is { "Blanc" }
+  def override couleur() returns Chaine is { "Blanc" }
 }
 
 class Test() is {
