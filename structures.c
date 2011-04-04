@@ -5,13 +5,13 @@
 
 var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
 {
-  var_t* var = (var_t*) malloc(sizeof(var_t));
+  var_t* var = NEW(1, var_t);
   
   var->nom = nom;
   var->nom_type = type;
   var->constante = constante;
   var->statique = statique;
-  var->suiv = NULL;
+  var->suiv = NIL(var_t);
   
   return var;
 }
@@ -20,7 +20,7 @@ liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var)
 {
   liste_vars_t l;
   
-  if (liste_vars.tete == NULL) /* Liste vide */
+  if (liste_vars.tete == NIL(var_t)) /* Liste vide */
     l.tete = var;
   else
   {
@@ -35,9 +35,9 @@ liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var)
 
 var_t* chercher_variable(liste_vars_t liste_vars, char* nom)
 {
-  var_t* var = (nom == NULL) ? NULL : liste_vars.tete;
+  var_t* var = (nom == NULL) ? NIL(var_t) : liste_vars.tete;
   
-  while (var != NULL && (strcmp(nom, var->nom) != 0))
+  while (var != NIL(var_t) && (strcmp(nom, var->nom) != 0))
     var = var->suiv;
   
   return var;
@@ -58,7 +58,7 @@ void liberer_liste_variables(liste_vars_t liste_variables)
   var_t* variable = liste_variables.tete;
   var_t* tmp;
   
-  while (variable != NULL)
+  while (variable != NIL(var_t))
   {
     free(variable->nom);
     free(variable->nom_type);
@@ -72,11 +72,11 @@ void liberer_liste_variables(liste_vars_t liste_variables)
 
 param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */)
 {
-  param_t* param = (param_t*) malloc(sizeof(param_t));
+  param_t* param = NEW(1, param_t);
   
   param->nom = nom;
   param->nom_type = type;
-  param->suiv = NULL;
+  param->suiv = NIL(param_t);
   
   return param;
 }
@@ -85,7 +85,7 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
 {
   liste_params_t l;
   
-  if (liste_params.tete == NULL) /* Liste vide */
+  if (liste_params.tete == NIL(param_t)) /* Liste vide */
     l.tete = param;
   else
   {
@@ -100,9 +100,9 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
 
 param_t* chercher_param(liste_params_t liste_params, char* nom)
 {
-  param_t* param = (nom == NULL) ? NULL : liste_params.tete;
+  param_t* param = (nom == NULL) ? NIL(param_t) : liste_params.tete;
   
-  while (param != NULL && (strcmp(nom, param->nom) != 0))
+  while (param != NIL(param_t) && (strcmp(nom, param->nom) != 0))
     param = param->suiv;
   
   return param;
@@ -123,7 +123,7 @@ void liberer_liste_params(liste_params_t liste_params)
   param_t* param = liste_params.tete;
   param_t* tmp;
   
-  while (param != NULL)
+  while (param != NIL(param_t))
   {
     free(param->nom);
     free(param->nom_type);
@@ -137,14 +137,14 @@ void liberer_liste_params(liste_params_t liste_params)
 
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, liste_vars_t vars, char* type_retour)
 {
-  methode_t* methode = (methode_t*) malloc(sizeof(methode_t));
+  methode_t* methode = NEW(1, methode_t);
   
   methode->nom = nom;
   methode->type_methode = type_methode;
   methode->params = params;
   methode->vars = vars;
   methode->nom_type_retour = type_retour;
-  methode->suiv = NULL;
+  methode->suiv = NIL(methode_t);
   
   return methode;
 }
@@ -153,7 +153,7 @@ liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* met
 {
   liste_methodes_t l;
   
-  if (liste_methodes.tete == NULL) /* Liste vide */
+  if (liste_methodes.tete == NIL(methode_t)) /* Liste vide */
     l.tete = methode;
   else
   {
@@ -168,7 +168,7 @@ liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* met
 
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode)
 {
-  if (liste_methodes->tete == NULL) /* Liste vide */
+  if (liste_methodes->tete == NIL(methode_t)) /* Liste vide */
   {
     liste_methodes->tete = methode;
     liste_methodes->queue = methode;
@@ -182,9 +182,9 @@ void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode)
 
 methode_t* chercher_methode(liste_methodes_t liste_methodes, char* nom)
 {
-  methode_t* methode = (nom == NULL) ? NULL : liste_methodes.tete;
+  methode_t* methode = (nom == NULL) ? NIL(methode_t) : liste_methodes.tete;
   
-  while (methode != NULL && (strcmp(nom, methode->nom) != 0))
+  while (methode != NIL(methode_t) && (strcmp(nom, methode->nom) != 0))
     methode = methode->suiv;
   
   return methode;
@@ -205,7 +205,7 @@ void liberer_liste_methodes(liste_methodes_t liste_methodes)
   methode_t* methode = liste_methodes.tete;
   methode_t* tmp;
   
-  while (methode != NULL)
+  while (methode != NIL(methode_t))
   {
     liberer_liste_params(methode->params);
     liberer_liste_variables(methode->vars);
@@ -223,16 +223,16 @@ void liberer_liste_methodes(liste_methodes_t liste_methodes)
 
 classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
 {
-  classe_t* classe = (classe_t*) malloc(sizeof(classe_t));
+  classe_t* classe = NEW(1, classe_t);
   
   classe->nom = nom;
   classe->nom_classe_mere = classe_mere;
   classe->attributs = attributs;
   classe->methodes = methodes;
-  classe->suiv = NULL;
+  classe->suiv = NIL(classe_t);
   
   /* Ajout constructeur (p-e à revoir ?) */
-  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, nouvelle_liste_variables(NULL), NULL));
+  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, nouvelle_liste_variables(NIL(var_t)), NULL));
   
   return classe;
 }
@@ -241,7 +241,7 @@ liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe)
 {
   liste_classes_t l;
   
-  if (liste_classes.tete == NULL) /* Liste vide */
+  if (liste_classes.tete == NIL(classe_t)) /* Liste vide */
     l.tete = classe;
   else
   {
@@ -256,9 +256,9 @@ liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe)
 
 classe_t* chercher_classe(liste_classes_t liste_classes, char* nom)
 {
-  classe_t* classe = (nom == NULL) ? NULL : liste_classes.tete;
+  classe_t* classe = (nom == NULL) ? NIL(classe_t) : liste_classes.tete;
   
-  while (classe != NULL && (strcmp(nom, classe->nom) != 0))
+  while (classe != NIL(classe_t) && (strcmp(nom, classe->nom) != 0))
     classe = classe->suiv;
   
   return classe;
@@ -280,8 +280,8 @@ liste_classes_t nouvelle_liste_classes_preinitialisee()
   liste_classes_t liste_classes; 
   
   /* TODO à compléter ? */
-  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
-  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_params(NULL), nouvelle_liste_variables(NULL), nouvelle_liste_methodes(NULL)));
+  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_params(NIL(param_t)), nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
+  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_params(NIL(param_t)), nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
   
   return liste_classes;
 }
@@ -291,7 +291,7 @@ void liberer_liste_classes(liste_classes_t liste_classes)
   classe_t* classe = liste_classes.tete;
   classe_t* tmp;
   
-  while (classe != NULL)
+  while (classe != NIL(classe_t))
   {
     liberer_liste_variables(classe->attributs);
     liberer_liste_methodes(classe->methodes);
