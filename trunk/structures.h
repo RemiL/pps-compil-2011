@@ -1,6 +1,8 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#include "utils.h"
+
 /* Propositions pour les structures permettant de stocker les informations récupérés via les attributs de la grammaire */
 
 /* Déclaration des types */

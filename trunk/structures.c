@@ -3,10 +3,6 @@
 
 #include "structures.h"
 
-// TODO mettre ça à un endroit plus approprié.
-#define VRAI 1
-#define FAUX 0
-
 var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
 {
   var_t* var = (var_t*) malloc(sizeof(var_t));

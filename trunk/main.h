@@ -3,13 +3,9 @@
 
 #include <stdlib.h>
 
+#include "utils.h"
 #include "structures.h"
 #include "verif_contextuelles.h"
-
-/* deux macros pratiques, utilisées dans les allocations */
-#define NEW(howmany, type) (type *) calloc((unsigned) howmany, sizeof(type))
-#define NIL(type) (type *) 0
-
 
 /* Etiquettes pour les noeuds de l'arbre de syntaxe abstraite representant une
  * expression.

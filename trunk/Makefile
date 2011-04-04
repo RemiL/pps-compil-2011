@@ -11,16 +11,16 @@ TP.c : TP.y
 TP.o:  TP.c TP.h main.h
 	$(CC) $(CFLAGS) -c TP.c
 
-main.o: main.h main.c TP.h
+main.o: utils.h main.h main.c TP.h
 	$(CC) $(CFLAGS) -c main.c
 
 lex.o: TP.h main.h lex.c
 	$(CC) $(CFLAGS) -c lex.c
 
-structures.o: structures.h structures.c
+structures.o: utils.h structures.h structures.c
 	$(CC) $(CFLAGS) -c structures.c
 	
-verif_contextuelles.o: verif_contextuelles.h verif_contextuelles.c
+verif_contextuelles.o: utils.h verif_contextuelles.h verif_contextuelles.c
 	$(CC) $(CFLAGS) -c verif_contextuelles.c
 
 lex.c : TP.l

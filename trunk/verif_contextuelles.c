@@ -4,10 +4,6 @@
 
 #include "verif_contextuelles.h"
 
-// TODO mettre ça à un endroit plus approprié.
-#define VRAI 1
-#define FAUX 0
-
 void est_valide_classe(liste_classes_t decl, classe_t* classe)
 {  
   classe->classe_mere = chercher_classe(decl, classe->nom_classe_mere);
