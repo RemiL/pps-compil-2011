@@ -21,7 +21,7 @@ IntString  ({BS}|{PasBSG})*
 
 %{
 #include "main.h"
-#include "TP.h"
+#include "comp.h"
 
 extern YYSTYPE yylval;
 extern int yylineno;
