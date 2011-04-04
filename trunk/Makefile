@@ -1,4 +1,4 @@
-OBJ=TP.o lex.o main.o structures.o verif_contextuelles.o
+OBJ=TP.o lex.o main.o structures.o arbres.o verif_contextuelles.o
 CC=gcc
 CFLAGS=-Wall -I./ -g 
 LDFLAGS= -g -lfl
@@ -19,6 +19,9 @@ lex.o: TP.h main.h lex.c
 
 structures.o: utils.h structures.h structures.c
 	$(CC) $(CFLAGS) -c structures.c
+	
+arbres.o: utils.h arbres.h arbres.c
+	$(CC) $(CFLAGS) -c arbres.c
 	
 verif_contextuelles.o: utils.h verif_contextuelles.h verif_contextuelles.c
 	$(CC) $(CFLAGS) -c verif_contextuelles.c
