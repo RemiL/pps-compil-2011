@@ -6,25 +6,25 @@ LDFLAGS= -g -lfl
 comp : comp.l $(OBJ)
 	$(CC) -o comp $(CFLAGS) $(OBJ) -lfl
 
-comp.c : comp.y 
+comp.c : comp.y
 	bison -v -b comp -o comp.c -d comp.y
 
-comp.o: comp.h main.h comp.c
+comp.o: comp.c comp.h main.h
 	$(CC) $(CFLAGS) -c comp.c
 
-main.o: comp.h utils.h main.h main.c
+main.o: utils.h main.h main.c comp.h
 	$(CC) $(CFLAGS) -c main.c
 
-lex.o: comp.h main.h lex.c
+lex.o: main.h lex.c comp.h
 	$(CC) $(CFLAGS) -c lex.c
 
-structures.o: utils.h structures.h structures.c
+structures.o: structures.c structures.h utils.h
 	$(CC) $(CFLAGS) -c structures.c
 	
-arbres.o: utils.h arbres.h arbres.c
+arbres.o: arbres.c arbres.h utils.h
 	$(CC) $(CFLAGS) -c arbres.c
 	
-verif_contextuelles.o: utils.h verif_contextuelles.h verif_contextuelles.c
+verif_contextuelles.o: verif_contextuelles.c verif_contextuelles.h utils.h
 	$(CC) $(CFLAGS) -c verif_contextuelles.c
 
 lex.c : comp.l
