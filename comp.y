@@ -203,8 +203,8 @@ Def : DEF STATIC     { $$ = STATIQUE; }
     | DEF OVERRIDE     { $$ = REDEFINIE; }
 ;
 
-Bloc : '{' LExpr '}'     { $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
-     | '{' LDeclA IS LExpr '}'     { $$ = nouveau_bloc($2); }
+Bloc : '{' LBlocExpr '}'     { $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
+     | '{' LDeclA IS LBlocExpr '}'     { $$ = nouveau_bloc($2); }
 ;
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
@@ -212,9 +212,9 @@ LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statiqu
        | DeclA     { $$ = nouvelle_liste_variables($1); }
 ;
 
-LExpr : LExpr ';' Expr            // liste d'expression d'un bloc
+LBlocExpr : LBlocExpr ';' BlocExpr            // liste d'expression d'un bloc
      { /*TODO $$ = ; */ }
-      | Expr     { /*TODO $$ = ; */ }
+          | BlocExpr     { /*TODO $$ = ; */ }
 ;
 
 BlocExpr : Expr     { /* TODO $$ = $1; */ }
