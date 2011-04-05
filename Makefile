@@ -1,4 +1,4 @@
-OBJ=comp.o lex.o main.o structures.o arbres.o verif_contextuelles.o
+OBJ=structures.o arbres.o verif_contextuelles.o comp.o lex.o main.o
 CC=gcc
 CFLAGS=-Wall -I./ -g 
 LDFLAGS= -g -lfl
