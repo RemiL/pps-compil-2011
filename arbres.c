@@ -43,11 +43,12 @@ arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d)
 }
 
 /**
- * Constructeur de noeud pour l'opérateur opposé.
+ * Constructeur de noeud pour l'opérateur "opposé".
+ * On traite simplement -expr comme 0 - expr.
  */
 arbre_t* creer_noeud_oppose(arbre_t* expr)
 {
-  return creer_noeud(Opp, expr, NIL(arbre_t));
+  return creer_noeud('-', creer_feuille_cste(0), expr);
 }
 
 /**

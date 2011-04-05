@@ -16,8 +16,7 @@ typedef enum
   Chaine,
   EQ, NEQ, GT, GE, LT, LE, /* les differents operateurs de comparaison */
   ITE,                     /* le if-then-else */
-  NOP, 			               /* etiquette "auxiliaire */
-  Opp 			               /* l'oppose */
+  NOP 			               /* etiquette "auxiliaire */
 } etiquette_t;
 
 typedef struct arbre arbre_t;
