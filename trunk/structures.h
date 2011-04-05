@@ -11,6 +11,12 @@ typedef struct param_t param_t;
 typedef struct methode_t methode_t;
 typedef struct classe_t classe_t;
 
+/* Pour éviter les dépendances cylindriques */
+#ifndef arbre_t
+typedef struct arbre arbre_t;
+#define arbre_t arbre_t
+#endif
+
 /* Structure représentant une variable */
 struct var_t
 {
@@ -70,14 +76,13 @@ struct methode_t
   char* nom;
   type_methode_t type_methode;
   liste_params_t params;
-  liste_vars_t vars; /* Variables locales */
+  arbre_t* bloc; /* L'arbre syntaxique du bloc */
   char* nom_type_retour;
   classe_t* type_retour;
 
   /* On utilise une liste chainée */
   methode_t* suiv;
 };
-
 
 /* Structure représentant une file chainée de méthodes */
 typedef struct
@@ -108,12 +113,6 @@ typedef struct
 typedef struct
 {
   liste_vars_t variables;
-  /* TODO : les expressions */
-} bloc_t;
-
-typedef struct
-{
-  liste_vars_t variables;
   liste_methodes_t methodes;
 } corps_t;
 
@@ -131,7 +130,7 @@ param_t* chercher_param(liste_params_t liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
 void liberer_liste_params(liste_params_t liste_params);
 
-methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, liste_vars_t vars, char* type_retour);
+methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, arbre_t* bloc, char* type_retour);
 liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode);
 void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
 methode_t* chercher_methode(liste_methodes_t liste_methodes, char* nom);
@@ -145,7 +144,6 @@ liste_classes_t nouvelle_liste_classes(classe_t* var);
 liste_classes_t nouvelle_liste_classes_preinitialisee();
 void liberer_liste_classes(liste_classes_t liste_classes);
 
-bloc_t nouveau_bloc(liste_vars_t variables);
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);
 
 #endif

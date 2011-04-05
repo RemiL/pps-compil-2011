@@ -8,7 +8,7 @@ arbre_t* creer_feuille_id(char* var)
 {
   arbre_t* res = NEW(1, arbre_t);
   res->op = Id; res->gauche.S = var; res->droit.A = NIL(arbre_t);
-  return(res);
+  return res;
 }
 
 /**
@@ -18,7 +18,7 @@ arbre_t* creer_feuille_cste(int val)
 {
   arbre_t* res = NEW(1, arbre_t);
   res->op = Cste; res->gauche.E = val; res->droit.A = NIL(arbre_t);
-  return(res);
+  return res;
 }
 
 /**
@@ -28,7 +28,7 @@ arbre_t* creer_feuille_chaine(char* chaine)
 {
   arbre_t* res = NEW(1, arbre_t);
   res->op = Chaine; res->gauche.S = chaine; res->droit.A = NIL(arbre_t);
-  return(res);
+  return res;
 }
 
 /**
@@ -39,7 +39,7 @@ arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d)
 {
  arbre_t* res = NEW(1, arbre_t);
  res->op = op; res->gauche.A = g; res->droit.A = d;
- return(res);
+ return res;
 }
 
 /**
@@ -57,10 +57,22 @@ arbre_t* creer_noeud_oppose(arbre_t* expr)
  * gauche la condition et de sous-arbre droit un autre arbre d'etiquette
  * arbitraire (NOP) et dont les fils sont les arbres des parties then et else.
  */
-arbre_t* creer_arbre_ITE(arbre_t* pCond, arbre_t* pThen, arbre_t* pElse)
+arbre_t* creer_arbre_ITE(arbre_t* cond, arbre_t* expr_then, arbre_t* expr_else)
 {
-  arbre_t* p = creer_noeud(NOP, pThen, pElse);
-  return creer_noeud(ITE, pCond, p); 
+  arbre_t* a = creer_noeud(NOP, expr_then, expr_else);
+  return creer_noeud(ITE, cond, a);
+}
+
+/**
+ * Constructeur pour les noeuds de type Bloc : le fils gauche est une feuille
+ * contenant un pointeur sur une liste de variables, le fils droit est l'arbre
+ * syntaxique du bloc.
+ */
+arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr)
+{
+  arbre_t* res = NEW(1, arbre_t);
+  res->op = Bloc; res->gauche.vars = vars; res->droit.A = expr;
+  return res;
 }
 
 /* XXX : Pas utile pour le moment, puisqu'on construit un compilateur et non un

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "structures.h"
+#include "arbres.h"
 
 var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
 {
@@ -135,14 +136,14 @@ void liberer_liste_params(liste_params_t liste_params)
   }
 }
 
-methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, liste_vars_t vars, char* type_retour)
+methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, arbre_t* bloc, char* type_retour)
 {
   methode_t* methode = NEW(1, methode_t);
   
   methode->nom = nom;
   methode->type_methode = type_methode;
   methode->params = params;
-  methode->vars = vars;
+  methode->bloc = bloc;
   methode->nom_type_retour = type_retour;
   methode->suiv = NIL(methode_t);
   
@@ -208,7 +209,6 @@ void liberer_liste_methodes(liste_methodes_t liste_methodes)
   while (methode != NIL(methode_t))
   {
     liberer_liste_params(methode->params);
-    liberer_liste_variables(methode->vars);
     
     free(methode->nom);
     if (methode->nom_type_retour)
@@ -232,7 +232,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_co
   classe->suiv = NIL(classe_t);
   
   /* Ajout constructeur (p-e à revoir ?) */
-  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, nouvelle_liste_variables(NIL(var_t)), NULL));
+  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, NIL(arbre_t), NULL));
   
   return classe;
 }
@@ -305,15 +305,6 @@ void liberer_liste_classes(liste_classes_t liste_classes)
     
     free(tmp);
   }
-}
-
-bloc_t nouveau_bloc(liste_vars_t variables)
-{
-  bloc_t bloc;
-  
-  bloc.variables = variables;
-  
-  return bloc;
 }
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes)
