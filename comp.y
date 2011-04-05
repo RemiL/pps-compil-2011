@@ -37,7 +37,7 @@
 %type <Param> Param ParamInit
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
 %type <Var> DeclAttr DeclA
-%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg
+%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect
 %type <E> CSTE
 %type <C> RELOP REL
 %{
@@ -212,16 +212,16 @@ LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statiqu
 ;
 
 LBlocExpr : LBlocExpr ';' BlocExpr            // liste d'expression d'un bloc
-     { /*TODO $$ = ; */ }
-          | BlocExpr     { /*TODO $$ = ; */ }
+     { $$ = creer_noeud(';', $1, $3); } /* L'étiquette ';' correspond à la liste d'expressions ou de blocs */
+          | BlocExpr     { $$ = $1; }
 ;
 
-BlocExpr : Expr     { /* TODO $$ = $1; */ }
-         | Bloc     { /* TODO $$ = $1; */ }
+BlocExpr : Expr     { $$ = $1; }
+         | Bloc     { $$ = $1; }
 ;
 
-Expr : ExprSansAffect %prec PREC_MIN     { /* TODO $$ = $1; */ }
-     | Affect     { /* TODO $$ = $1;*/ }
+Expr : ExprSansAffect %prec PREC_MIN     { $$ = $1; }
+     | Affect     { $$ = $1; }
 ;
 
 ExprSansAffect : IfThenElse     { $$ = $1; }
