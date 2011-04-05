@@ -13,6 +13,7 @@ typedef enum
 { 
   Id,
   Cste,
+  Chaine,
   EQ, NEQ, GT, GE, LT, LE, /* les differents operateurs de comparaison */
   ITE,                     /* le if-then-else */
   NOP, 			               /* etiquette "auxiliaire */
@@ -32,8 +33,15 @@ typedef union
 /* la structure d'un noeud interne */
 struct arbre
 {
-  char op;		            /* une etiquette: voir l'enumeration ci-dessus */
-  noeud_t gauche, droit;  /* deux noeuds: internes ou feuilles */
+  char op;		            /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
+  noeud_t gauche, droit;  /* deux noeuds : internes ou feuilles */
 };
+
+arbre_t* creer_feuille_id(char* var);
+arbre_t* creer_feuille_cste(int val);
+arbre_t* creer_feuille_chaine(char* chaine);
+arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d);
+arbre_t* creer_noeud_oppose(arbre_t* expr);
+arbre_t* creer_arbre_ITE(arbre_t* pCond, arbre_t* pThen, arbre_t* pElse);
 
 #endif
