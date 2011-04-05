@@ -1,6 +1,7 @@
 #include "arbres.h"
 
-/* Constructeur de feuille de type ID pour l'arbre de syntaxe abstraite: 
+/**
+ * Constructeur de feuille de type ID pour l'arbre de syntaxe abstraite: 
  * on stocke l'id.
  */
 arbre_t* creer_feuille_id(char* var)
@@ -10,7 +11,9 @@ arbre_t* creer_feuille_id(char* var)
   return(res);
 }
 
-/* Idem pour une feuille de type CSTE: on stocke la valeur */
+/**
+ * Idem pour une feuille de type CSTE : on stocke la valeur.
+ */
 arbre_t* creer_feuille_cste(int val)
 {
   arbre_t* res = NEW(1, arbre_t);
@@ -18,7 +21,18 @@ arbre_t* creer_feuille_cste(int val)
   return(res);
 }
 
-/* Constructeur pour un noeud interne: une etiquette pour l'operateur, et deux
+/**
+ * Constructeur de feuille de type CHAINE : on stocke la valeur.
+ */
+arbre_t* creer_feuille_chaine(char* chaine)
+{
+  arbre_t* res = NEW(1, arbre_t);
+  res->op = Chaine; res->gauche.S = chaine; res->droit.A = NIL(arbre_t);
+  return(res);
+}
+
+/**
+ * Constructeur pour un noeud interne: une etiquette pour l'operateur, et deux
  * sous-arbres.
  */
 arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d)
@@ -28,7 +42,16 @@ arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d)
  return(res);
 }
 
-/* Constructeur pour le if_then_else qui oblige a coder un arbre ternaire avec
+/**
+ * Constructeur de noeud pour l'opérateur opposé.
+ */
+arbre_t* creer_noeud_oppose(arbre_t* expr)
+{
+  return creer_noeud(Opp, expr, NIL(arbre_t));
+}
+
+/**
+ * Constructeur pour le if_then_else qui oblige a coder un arbre ternaire avec
  * des arbres binaires. On cree un arbre racine d'etiquette ITE, de sous-arbre
  * gauche la condition et de sous-arbre droit un autre arbre d'etiquette
  * arbitraire (NOP) et dont les fils sont les arbres des parties then et else.
