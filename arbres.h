@@ -4,8 +4,15 @@
 #include "utils.h"
 #include "structures.h"
 
-/* Etiquettes pour les noeuds de l'arbre de syntaxe abstraite representant une
- * expression.
+/* Pour éviter les dépendances cylindriques */
+#ifndef arbre_t
+typedef struct arbre arbre_t;
+#define arbre_t arbre_t
+#endif
+
+/**
+ * Etiquettes pour les noeuds de l'arbre de syntaxe abstraite representant
+ * une expression.
  * Les opérateurs arithmétiques sont directement utilisés aussi comme
  * etiquettes.
  */
@@ -14,18 +21,18 @@ typedef enum
   Id,
   Cste,
   Chaine,
+  Bloc,
   EQ, NEQ, GT, GE, LT, LE, /* les differents operateurs de comparaison */
   ITE,                     /* le if-then-else */
   NOP 			               /* etiquette "auxiliaire */
 } etiquette_t;
 
-typedef struct arbre arbre_t;
-
 /* la structure d'un noeud de l'arbre: un noeud interne ou une feuille */
 typedef union
 {
-  char* S;        /* feuille de type Identificateur */
+  char* S;        /* feuille de type Identificateur ou Chaine */
   int E;	 	      /* feuille de type constante entiere */
+  liste_vars_t vars; /* feuille de type liste de variables utilisé pour les noeuds de type Bloc */
   arbre_t* A;     /* noeud interne : un operateur et deux operandes */
 } noeud_t;
 
@@ -41,6 +48,7 @@ arbre_t* creer_feuille_cste(int val);
 arbre_t* creer_feuille_chaine(char* chaine);
 arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d);
 arbre_t* creer_noeud_oppose(arbre_t* expr);
-arbre_t* creer_arbre_ITE(arbre_t* pCond, arbre_t* pThen, arbre_t* pElse);
+arbre_t* creer_arbre_ITE(arbre_t* cond, arbre_t* expr_then, arbre_t* expr_else);
+arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr);
 
 #endif

@@ -26,7 +26,6 @@
  * La "valeur" associée a un terminal doit toujours utiliser la variante de
  * meme type
  */
-//TODO
 %type <S> ID ID_CLASS ExtendsOpt AppelConstr STRING
 %type <LClasses> LDefClass
 %type <Classe> DefClass
@@ -34,12 +33,11 @@
 %type <LMethodes> LDeclMethOpt LDeclMeth
 %type <Methode> DeclMeth
 %type <TypeMethode> Def
-%type <Bloc> Bloc
 %type <LParams> LParam LParamOpt LParamInit
 %type <Param> Param ParamInit
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
 %type <Var> DeclAttr DeclA
-%type <A> Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg
+%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg
 %type <E> CSTE
 %type <C> RELOP REL
 %{
@@ -74,7 +72,7 @@ extern void yyerror();
   *
   */
 
-S : LDefClass Bloc { liberer_liste_classes($1); liberer_liste_variables($2.variables); }
+S : LDefClass Bloc { liberer_liste_classes($1); }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
@@ -195,7 +193,7 @@ LDeclMeth : LDeclMeth DeclMeth
 
 DeclMeth : Def ID '(' LParamOpt ')' RETURNS ID_CLASS IS Bloc
 {
-  $$ = nouvelle_methode($2, $1, $4, $9.variables, $7);
+  $$ = nouvelle_methode($2, $1, $4, $9, $7);
 }
 ;
 
@@ -204,8 +202,8 @@ Def : DEF STATIC     { $$ = STATIQUE; }
     | DEF OVERRIDE     { $$ = REDEFINIE; }
 ;
 
-Bloc : '{' LBlocExpr '}'     { $$ = nouveau_bloc(nouvelle_liste_variables(NIL(var_t))); }
-     | '{' LDeclA IS LBlocExpr '}'     { $$ = nouveau_bloc($2); }
+Bloc : '{' LBlocExpr '}'     { $$ = creer_noeud_bloc(nouvelle_liste_variables(NIL(var_t)), $2); }
+     | '{' LDeclA IS LBlocExpr '}'     { $$ = creer_noeud_bloc($2, $4); }
 ;
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
@@ -261,7 +259,7 @@ EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou 
          | ID_CLASS '.' ID '(' LArgOpt ')'     { /*TODO $$ = ; */ }
 ;
 
-IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr     { /*TODO $$ = ; */ }
+IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr     { $$ = creer_arbre_ITE($2, $4, $6); }
 ;
 
 REL : RELOP { $$ = $1; } /* Nécessaire pour avoir une copie du caractère. */
