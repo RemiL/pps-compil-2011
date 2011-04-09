@@ -6,6 +6,7 @@
 
 
 extern int yyparse();
+extern void yylex_destroy();
 
 /* Principes de l'interprete:
  * 1. Pendant le traitement des declarations de la forme x := E, on construit
@@ -64,6 +65,7 @@ char *fname;
  */
 int main(int argc, char **argv) {
   int fi;
+  int ret;
 
   if (argc < 2) { 
     fprintf(stderr, "Fichier programme manquant\n");
@@ -93,8 +95,16 @@ int main(int argc, char **argv) {
    * associees aux mouvements REDUCE, une fois que yyparse a termine il n'y
    * a plus rien a faire.
    */
-  if (yyparse()) {
-    fprintf(stderr, "Programme Incorrect \n");  return 2; 
-  } else return 0;
+  ret = yyparse();
+  // Libération de la mémoire utilisé par flex
+  yylex_destroy();
+  
+  if (ret)
+  {
+    fprintf(stderr, "Programme Incorrect\n");
+    return 2;
+  }
+  else
+    return 0;
 }
 

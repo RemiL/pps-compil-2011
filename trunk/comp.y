@@ -74,7 +74,7 @@ extern void yyerror();
   *
   */
 
-S : LDefClass Bloc { liberer_liste_classes($1); }
+S : LDefClass Bloc { liberer_liste_classes($1); liberer_arbre($2); }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe
@@ -138,8 +138,8 @@ InitBlocOpt : Bloc  { $$ = $1; }
             |       { $$ = NIL(arbre_t); }
 ;
 
-Affect : ID AFF ExprSansAffect { creer_noeud(Aff, creer_feuille_id($1), $3); }
-       | Selection AFF ExprSansAffect { creer_noeud(Aff, $1, $3); }
+Affect : ID AFF ExprSansAffect { $$ = creer_noeud(Aff, creer_feuille_id($1), $3); }
+       | Selection AFF ExprSansAffect { $$ = creer_noeud(Aff, $1, $3); }
 ;
 
 Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
@@ -239,7 +239,7 @@ ExprSansAffect : IfThenElse     { $$ = $1; }
 ExprSelec : '(' Expr ')'     { $$ = $2; }
           | CSTE     { $$ = creer_feuille_cste($1); }
           | STRING     { $$ = creer_feuille_chaine($1); }
-          | ID     { creer_feuille_id($1); }
+          | ID     { $$ = creer_feuille_id($1); }
           | Selection     { $$ = $1; }
           | EnvoiMsg     { $$ = $1; }
 ;

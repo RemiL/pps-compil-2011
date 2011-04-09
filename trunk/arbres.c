@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "arbres.h"
 
 /**
@@ -93,13 +95,13 @@ arbre_t* creer_noeud_selection(arbre_t* dest, char* nom_attribut, int statique)
  * Constructeur pour l'envoi de message qui oblige a coder un arbre ternaire avec
  * des arbres binaires. On cree un arbre racine d'etiquette Appel ou AppelStatique,
  * de sous-arbre gauche le destinataire et de sous-arbre droit un autre arbre d'etiquette
- * arbitraire (NOP) et dont le fil gauche est le nom de la methode et le fils droit
- * est un pointeur vers une liste d'arguments.
+ * AppelAuxiliaire dont le fil gauche est le nom de la methode et le fils droit est
+ * un pointeur vers une liste d'arguments.
  */
 arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, int statique)
 {
   arbre_t* a = NEW(1, arbre_t);
-  a->op = NOP;
+  a->op = AppelAuxiliaire;
   a->gauche.S = nom_methode;
   a->droit.args = args;
   
@@ -119,6 +121,42 @@ arbre_t* creer_noeud_new(char* nom_classe, liste_args_t args)
   new->droit.args = args;
   
   return new;
+}
+
+/* Libère la mémoire occupée par un arbre syntaxique */
+void liberer_arbre(arbre_t* arbre)
+{
+  if (arbre)
+  {
+    switch (arbre->op)
+    {
+      case Cste:
+        break;
+      case Id:
+      case Chaine:
+        free(arbre->gauche.S);
+        break;
+      case Bloc:
+        liberer_liste_variables(arbre->gauche.vars);
+        liberer_arbre(arbre->droit.A);
+        break;
+      case Selection:
+      case SelectionStatique:
+        liberer_arbre(arbre->gauche.A);
+        free(arbre->droit.S);
+        break;
+      case AppelAuxiliaire:
+      case New:
+        free(arbre->gauche.S);
+        liberer_liste_arguments(arbre->droit.args);
+        break;
+      default:
+        liberer_arbre(arbre->gauche.A);
+        liberer_arbre(arbre->droit.A);
+    }
+    
+    free(arbre);
+  }
 }
 
 /* XXX : Pas utile pour le moment, puisqu'on construit un compilateur et non un
