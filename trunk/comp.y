@@ -37,7 +37,7 @@
 %type <Param> Param ParamInit
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
 %type <Var> DeclAttr DeclA
-%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect
+%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect InitOpt
 %type <E> CSTE
 %type <C> RELOP REL
 %{
@@ -144,8 +144,8 @@ InitBlocOpt : Bloc
             | 
 ;
 
-Affect : ID AFF ExprSansAffect { /* TODO */ }
-       | Selection AFF ExprSansAffect { /* TODO */ }
+Affect : ID AFF ExprSansAffect { creer_noeud(Aff, creer_feuille_id($1), $3); }
+       | Selection AFF ExprSansAffect { creer_noeud(Aff, $1, $3); }
 ;
 
 Corps : '{' LDeclAttrOpt LDeclMethOpt '}'        // corps d'une classe
@@ -178,8 +178,8 @@ DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut
       | VAL ID ':' ID_CLASS InitOpt     { $$ = nouvelle_variable($2, $4, 1, 0); }
 ;
 
-InitOpt : AFF ExprSansAffect     { /*TODO $$ = $1;*/ }
-        |      { /*TODO $$ = ; */}
+InitOpt : AFF ExprSansAffect     { $$ = $2; }
+        |      { $$ = NIL(arbre_t); }
 ;
 
 LDeclMeth : LDeclMeth DeclMeth
@@ -250,8 +250,8 @@ ExprSelec : '(' Expr ')'     { $$ = $2; }
           | EnvoiMsg     { $$ = $1; }
 ;
 
-Selection : ExprSelec '.' ID     { /*TODO $$ = ; */ }
-          | ID_CLASS '.' ID     { /*TODO $$ = ; */ }
+Selection : ExprSelec '.' ID     { $$ = creer_noeud(Selection, $1, $3); }
+          | ID_CLASS '.' ID     { $$ = creer_noeud(SelectionStatique, $1, $3); }
 ;
 
 EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
