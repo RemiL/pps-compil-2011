@@ -106,6 +106,21 @@ arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, 
   return creer_noeud(statique ? AppelStatique : Appel, dest, a);
 }
 
+/**
+ * Constructeur pour les noeuds de type New : le fils gauche est une feuille contenant
+ * le nom de la classe de l'objet à créer et le fils droit est une feuille contenant
+ * un pointeur vers une liste d'argument.
+ */
+arbre_t* creer_noeud_new(char* nom_classe, liste_args_t args)
+{
+  arbre_t* new = NEW(1, arbre_t);
+  new->op = New;
+  new->gauche.S = nom_classe;
+  new->droit.args = args;
+  
+  return new;
+}
+
 /* XXX : Pas utile pour le moment, puisqu'on construit un compilateur et non un
  *       interpréteur mais pourrait être peut-être  réutilisé pour autre chose ...
  * 

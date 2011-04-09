@@ -26,9 +26,10 @@
  * La "valeur" associée a un terminal doit toujours utiliser la variante de
  * meme type
  */
-%type <S> ID ID_CLASS ExtendsOpt AppelConstr STRING
+%type <S> ID ID_CLASS STRING
 %type <LClasses> LDefClass
 %type <Classe> DefClass
+%type <Heritage> ExtendsOpt
 %type <Corps> Corps
 %type <LMethodes> LDeclMethOpt LDeclMeth
 %type <Methode> DeclMeth
@@ -38,7 +39,7 @@
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
 %type <Var> DeclAttr DeclA
 %type <LArgs> LArgOpt LArg
-%type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect InitOpt
+%type <A> LBlocExpr BlocExpr Bloc InitBlocOpt Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect InitOpt
 %type <E> CSTE
 %type <C> RELOP REL
 %{
@@ -91,9 +92,7 @@ LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de
 
 DefClass : CLASS ID_CLASS '(' LParamOpt ')' ExtendsOpt InitBlocOpt IS Corps    // une declaration de classe
 {
-  //classe_t* nouvelle_classe(char* nom, classe_t* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
-
-  $$ = nouvelle_classe($2, $6, $4, $9.variables, $9.methodes);
+  $$ = nouvelle_classe($2, $6.nom_classe_mere, $6.args_classe_mere, $4, $7, $9.variables, $9.methodes);
 }
 ;
 
@@ -124,25 +123,19 @@ LParamInit : LParamInit ',' ParamInit
 ;
 
 Param : ID ':' ID_CLASS
-  { $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
+  { $$ = nouveau_param($1, $3, NIL(arbre_t)); }
 ;
 
 ParamInit : ID ':' ID_CLASS AFF ExprSansAffect
-  { $$ = nouveau_param($1, $3 /* TODO expression par défaut */); }
+  { $$ = nouveau_param($1, $3, $5); }
 ;
 
-ExtendsOpt : EXTENDS AppelConstr
-  { $$ = $2;}
-           | 
-  { $$ = NULL;}
+ExtendsOpt : EXTENDS ID_CLASS '(' LArgOpt ')'   { $$ = nouvel_heritage($2, $4); }
+           |    { $$ = nouvel_heritage(NULL, nouvelle_liste_arguments(NIL(arg_t))); }
 ;
 
-AppelConstr : ID_CLASS '(' LArgOpt ')'
-  { $$ = $1; } // TODO arguments
-;
-
-InitBlocOpt : Bloc
-            | 
+InitBlocOpt : Bloc  { $$ = $1; }
+            |       { $$ = NIL(arbre_t); }
 ;
 
 Affect : ID AFF ExprSansAffect { creer_noeud(Aff, creer_feuille_id($1), $3); }
@@ -175,8 +168,8 @@ DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statiqu
 ;
 
 DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
-     { $$ = nouvelle_variable($2, $4, 0, 0); }
-      | VAL ID ':' ID_CLASS InitOpt     { $$ = nouvelle_variable($2, $4, 1, 0); }
+     { $$ = nouvelle_variable($2, $4, 0, 0, $5); }
+      | VAL ID ':' ID_CLASS InitOpt     { $$ = nouvelle_variable($2, $4, 1, 0, $5); }
 ;
 
 InitOpt : AFF ExprSansAffect     { $$ = $2; }
@@ -230,7 +223,7 @@ ExprSansAffect : IfThenElse     { $$ = $1; }
                | Selection     { $$ = $1; }
                | CSTE     { $$ = creer_feuille_cste($1); }
                | STRING     { $$ = creer_feuille_chaine($1); }
-               | NOUVEAU ID_CLASS '(' LArgOpt ')'     { /*TODO $$ = ; */ }
+               | NOUVEAU ID_CLASS '(' LArgOpt ')'     { $$ = creer_noeud_new($2, $4); }
                | EnvoiMsg     { $$ = $1; }
                | ExprSansAffect '+' ExprSansAffect     { $$ = creer_noeud('+', $1, $3); }
                | ExprSansAffect '-' ExprSansAffect     { $$ = creer_noeud('-', $1, $3); }

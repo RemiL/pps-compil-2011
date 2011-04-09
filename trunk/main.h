@@ -14,6 +14,7 @@ typedef union
   int E;              /* la grammaire.                                    */
   liste_classes_t LClasses;
   classe_t* Classe;
+  heritage_t Heritage;
   corps_t Corps;
   liste_methodes_t LMethodes;
   methode_t* Methode;

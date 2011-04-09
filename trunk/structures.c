@@ -4,7 +4,7 @@
 #include "structures.h"
 #include "arbres.h"
 
-var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
+var_t* nouvelle_variable(char* nom, char* type, int constante, int statique, arbre_t* valeur_defaut)
 {
   var_t* var = NEW(1, var_t);
   
@@ -12,6 +12,7 @@ var_t* nouvelle_variable(char* nom, char* type, int constante, int statique)
   var->nom_type = type;
   var->constante = constante;
   var->statique = statique;
+  var->valeur_defaut = valeur_defaut;
   var->suiv = NIL(var_t);
   
   return var;
@@ -71,12 +72,13 @@ void liberer_liste_variables(liste_vars_t liste_variables)
   }
 }
 
-param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */)
+param_t* nouveau_param(char* nom, char* type, arbre_t* valeur_defaut)
 {
   param_t* param = NEW(1, param_t);
   
   param->nom = nom;
   param->nom_type = type;
+  param->valeur_defaut = valeur_defaut;
   param->suiv = NIL(param_t);
   
   return param;
@@ -272,18 +274,21 @@ void liberer_liste_arguments(liste_args_t liste_arguments)
   }
 }
 
-classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
+classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_args_t args_classe_mere,
+                          liste_params_t params_constructeur, arbre_t* bloc_constructeur,
+                          liste_vars_t attributs, liste_methodes_t methodes)
 {
   classe_t* classe = NEW(1, classe_t);
   
   classe->nom = nom;
   classe->nom_classe_mere = classe_mere;
+  classe->args_classe_mere = args_classe_mere;
   classe->attributs = attributs;
   classe->methodes = methodes;
   classe->suiv = NIL(classe_t);
   
   /* Ajout constructeur (p-e à revoir ?) */
-  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, NIL(arbre_t), NULL));
+  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, bloc_constructeur, NULL));
   
   return classe;
 }
@@ -331,8 +336,12 @@ liste_classes_t nouvelle_liste_classes_preinitialisee()
   liste_classes_t liste_classes; 
   
   /* TODO à compléter ? */
-  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_params(NIL(param_t)), nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
-  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_params(NIL(param_t)), nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
+  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
+                                         nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
+                                         nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
+  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
+                                                                nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
+                                                                nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
   
   return liste_classes;
 }
@@ -356,6 +365,16 @@ void liberer_liste_classes(liste_classes_t liste_classes)
     
     free(tmp);
   }
+}
+
+heritage_t nouvel_heritage(char* nom_classe_mere, liste_args_t args_classe_mere)
+{
+  heritage_t heritage;
+  
+  heritage.nom_classe_mere = nom_classe_mere;
+  heritage.args_classe_mere = args_classe_mere;
+  
+  return heritage;
 }
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes)

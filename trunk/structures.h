@@ -28,8 +28,8 @@ struct var_t
      d'où l'utilisation de deux booléens plutôt qu'un enum. */
   int constante;
   int statique;
-  /* TBD : un pointeur sur l'arbre correspondant à 
-           l'expression donnant la valeur par défaut ? */
+  /* Arbre syntaxique donnant l'expression de la valeur par défaut */
+  arbre_t* valeur_defaut;
 
   /* On utilise une liste chainée */
   var_t* suiv;
@@ -57,8 +57,8 @@ struct param_t
   char* nom;
   char* nom_type;
   classe_t* type;
-  /* TBD : un pointeur sur l'arbre correspondant à 
-           l'expression donnant la valeur par défaut ? */
+  /* Arbre syntaxique donnant l'expression de la valeur par défaut */
+  arbre_t* valeur_defaut;
 
   /* On utilise une liste chainée */
   param_t* suiv;
@@ -112,6 +112,7 @@ struct classe_t
   char* nom;
   char* nom_classe_mere;
   classe_t* classe_mere;
+  liste_args_t args_classe_mere; /* Les arguments de la classe mère en cas d'héritage. */
   liste_vars_t attributs;
   liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
 
@@ -127,19 +128,25 @@ typedef struct
 
 typedef struct
 {
+  char* nom_classe_mere;
+  liste_args_t args_classe_mere;
+} heritage_t;
+
+typedef struct
+{
   liste_vars_t variables;
   liste_methodes_t methodes;
 } corps_t;
 
 /* Déclaration des fonctions permettant de manipuler les structures */
 
-var_t* nouvelle_variable(char* nom, char* type, int constante, int statique);
+var_t* nouvelle_variable(char* nom, char* type, int constante, int statique, arbre_t* valeur_defaut);
 liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var);
 var_t* chercher_variable(liste_vars_t liste_vars, char* nom);
 liste_vars_t nouvelle_liste_variables(var_t* var);
 void liberer_liste_variables(liste_vars_t liste_variables);
 
-param_t* nouveau_param(char* nom, char* type /* TODO expression par défaut */);
+param_t* nouveau_param(char* nom, char* type, arbre_t* valeur_defaut);
 liste_params_t ajouter_param(liste_params_t liste_params, param_t* param);
 param_t* chercher_param(liste_params_t liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
@@ -157,12 +164,16 @@ liste_args_t ajouter_argument(liste_args_t liste_arguments, arg_t* arg);
 liste_args_t nouvelle_liste_arguments(arg_t* arg);
 void liberer_liste_arguments(liste_args_t liste_arguments);
 
-classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
+classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_args_t args_classe_mere,
+                          liste_params_t params_constructeur, arbre_t* bloc_constructeur,
+                          liste_vars_t attributs, liste_methodes_t methodes);
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t liste_classes, char* nom);
 liste_classes_t nouvelle_liste_classes(classe_t* var);
 liste_classes_t nouvelle_liste_classes_preinitialisee();
 void liberer_liste_classes(liste_classes_t liste_classes);
+
+heritage_t nouvel_heritage(char* nom_classe_mere, liste_args_t args_classe_mere);
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);
 
