@@ -9,6 +9,7 @@
 typedef struct var_t var_t;
 typedef struct param_t param_t;
 typedef struct methode_t methode_t;
+typedef struct arg_t arg_t;
 typedef struct classe_t classe_t;
 
 /* Pour éviter les dépendances cylindriques */
@@ -91,6 +92,20 @@ typedef struct
   methode_t* queue;
 } liste_methodes_t;
 
+/* Structure représentant un argument */
+struct arg_t
+{
+  arbre_t* expr;
+  arg_t* suiv;
+};
+
+/* Structure représentant une file chainée d'arguments */
+typedef struct
+{
+  arg_t* tete;
+  arg_t* queue;
+} liste_args_t;
+
 /* Structure représentant une classe */
 struct classe_t
 {
@@ -136,6 +151,11 @@ void ajouter_methode_tete(liste_methodes_t* liste_methodes, methode_t* methode);
 methode_t* chercher_methode(liste_methodes_t liste_methodes, char* nom);
 liste_methodes_t nouvelle_liste_methodes(methode_t* methode);
 void liberer_liste_methodes(liste_methodes_t liste_methodes);
+
+arg_t* nouvel_argument(arbre_t* expr);
+liste_args_t ajouter_argument(liste_args_t liste_arguments, arg_t* arg);
+liste_args_t nouvelle_liste_arguments(arg_t* arg);
+void liberer_liste_arguments(liste_args_t liste_arguments);
 
 classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes);
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);

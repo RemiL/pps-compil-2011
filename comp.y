@@ -37,6 +37,7 @@
 %type <Param> Param ParamInit
 %type <LVars> LDeclAttrOpt LDeclAttr LDeclA
 %type <Var> DeclAttr DeclA
+%type <LArgs> LArgOpt LArg
 %type <A> LBlocExpr BlocExpr Bloc Expr ExprSansAffect IfThenElse ExprSelec Selection EnvoiMsg Affect InitOpt
 %type <E> CSTE
 %type <C> RELOP REL
@@ -250,13 +251,13 @@ ExprSelec : '(' Expr ')'     { $$ = $2; }
           | EnvoiMsg     { $$ = $1; }
 ;
 
-Selection : ExprSelec '.' ID     { $$ = creer_noeud(Selection, $1, $3); }
-          | ID_CLASS '.' ID     { $$ = creer_noeud(SelectionStatique, $1, $3); }
+Selection : ExprSelec '.' ID     { $$ = creer_noeud_selection($1, $3, FAUX); }
+          | ID_CLASS '.' ID     { $$ = creer_noeud_selection(creer_feuille_id($1), $3, VRAI); }
 ;
 
-EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'     // envoi d'un message simple ou appel à une fonction statique
-     { /*TODO $$ = ; */ }
-         | ID_CLASS '.' ID '(' LArgOpt ')'     { /*TODO $$ = ; */ }
+/* Envoi d'un message simple ou appel à une fonction statique */
+EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'    { $$ = creer_noeud_appel($1, $3, $5, FAUX); }
+         | ID_CLASS '.' ID '(' LArgOpt ')'     { $$ = creer_noeud_appel(creer_feuille_id($1), $3, $5, VRAI); }
 ;
 
 IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr     { $$ = creer_arbre_ITE($2, $4, $6); }
@@ -266,10 +267,11 @@ REL : RELOP { $$ = $1; } /* Nécessaire pour avoir une copie du caractère. */
 ;
 
 // liste d'arguments optionnelle
-LArgOpt : LArg     { /*TODO $$ = $1; */ }
-        |      { /*TODO$$ = nouvelle_liste_variables(NULL); */ }
+LArgOpt : LArg     { $$ = $1; }
+        |      { $$ = nouvelle_liste_arguments(NIL(arg_t)); }
 ;
- // liste d'arguments
-LArg : LArg ',' Expr     { /*TODO $$ = ajouter_variable($1, $3); */ }
-     | Expr  { /*TODO $$ = nouvelle_liste_variables($1); */ }
+
+// liste d'arguments
+LArg : LArg ',' Expr     { $$ = ajouter_argument($1, nouvel_argument($3)); }
+     | Expr  { $$ = nouvelle_liste_arguments(nouvel_argument($1)); }
 ;

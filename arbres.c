@@ -75,6 +75,37 @@ arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr)
   return res;
 }
 
+/**
+ * Constructeur pour les noeuds de type sélection : le fils gauche est le destinataire
+ * et le fils droit est une feuille contenant le nom de l'attribut.
+ */
+arbre_t* creer_noeud_selection(arbre_t* dest, char* nom_attribut, int statique)
+{
+  arbre_t* selection = NEW(1, arbre_t);
+  selection->op = statique ? SelectionStatique : Selection;
+  selection->gauche.A = dest;
+  selection->droit.S = nom_attribut;
+  
+  return selection;
+}
+
+/**
+ * Constructeur pour l'envoi de message qui oblige a coder un arbre ternaire avec
+ * des arbres binaires. On cree un arbre racine d'etiquette Appel ou AppelStatique,
+ * de sous-arbre gauche le destinataire et de sous-arbre droit un autre arbre d'etiquette
+ * arbitraire (NOP) et dont le fil gauche est le nom de la methode et le fils droit
+ * est un pointeur vers une liste d'arguments.
+ */
+arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, int statique)
+{
+  arbre_t* a = NEW(1, arbre_t);
+  a->op = NOP;
+  a->gauche.S = nom_methode;
+  a->droit.args = args;
+  
+  return creer_noeud(statique ? AppelStatique : Appel, dest, a);
+}
+
 /* XXX : Pas utile pour le moment, puisqu'on construit un compilateur et non un
  *       interpréteur mais pourrait être peut-être  réutilisé pour autre chose ...
  * 

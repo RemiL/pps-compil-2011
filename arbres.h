@@ -27,6 +27,8 @@ typedef enum
   ITE,                     /* le if-then-else */
   Selection,               /* Selection */
   SelectionStatique,       /* Selection statique */
+  Appel,                   /* Envoi de message */
+  AppelStatique,           /* Envoi de message statique */
   NOP 			               /* etiquette "auxiliaire */
 } etiquette_t;
 
@@ -36,6 +38,7 @@ typedef union
   char* S;        /* feuille de type Identificateur ou Chaine */
   int E;	 	      /* feuille de type constante entiere */
   liste_vars_t vars; /* feuille de type liste de variables utilisé pour les noeuds de type Bloc */
+  liste_args_t args; /* feuille de type liste d'arguments utilisé pour les appels */
   arbre_t* A;     /* noeud interne : un operateur et deux operandes */
 } noeud_t;
 
@@ -53,5 +56,7 @@ arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d);
 arbre_t* creer_noeud_oppose(arbre_t* expr);
 arbre_t* creer_arbre_ITE(arbre_t* cond, arbre_t* expr_then, arbre_t* expr_else);
 arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr);
+arbre_t* creer_noeud_selection(arbre_t* dest, char* nom_attribut, int statique);
+arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, int statique);
 
 #endif

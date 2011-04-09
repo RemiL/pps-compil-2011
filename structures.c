@@ -221,6 +221,57 @@ void liberer_liste_methodes(liste_methodes_t liste_methodes)
   }
 }
 
+arg_t* nouvel_argument(arbre_t* expr)
+{
+  arg_t* arg = NEW(1, arg_t);
+  
+  arg->expr = expr;
+  arg->suiv = NULL;
+  
+  return arg;
+}
+
+liste_args_t ajouter_argument(liste_args_t liste_arguments, arg_t* arg)
+{
+  liste_args_t l;
+  
+  if (liste_arguments.tete == NIL(arg_t)) /* Liste vide */
+    l.tete = arg;
+  else
+  {
+    liste_arguments.queue->suiv = arg;
+    l.tete = liste_arguments.tete;
+  }
+  
+  l.queue = arg;
+  
+  return l;
+}
+
+liste_args_t nouvelle_liste_arguments(arg_t* arg)
+{
+  liste_args_t liste_arguments;
+  
+  liste_arguments.tete = arg;
+  liste_arguments.queue = arg;
+  
+  return liste_arguments;
+}
+
+void liberer_liste_arguments(liste_args_t liste_arguments)
+{
+  arg_t* arg = liste_arguments.tete;
+  arg_t* tmp;
+  
+  while (arg != NIL(arg_t))
+  {    
+    tmp = arg;
+    arg = arg->suiv;
+    
+    free(tmp);
+  }
+}
+
 classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_params_t params_constructeur, liste_vars_t attributs, liste_methodes_t methodes)
 {
   classe_t* classe = NEW(1, classe_t);
