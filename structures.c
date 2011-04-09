@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "structures.h"
 #include "arbres.h"
@@ -64,6 +65,7 @@ void liberer_liste_variables(liste_vars_t liste_variables)
   {
     free(variable->nom);
     free(variable->nom_type);
+    liberer_arbre(variable->valeur_defaut);
     
     tmp = variable;
     variable = variable->suiv;
@@ -130,6 +132,7 @@ void liberer_liste_params(liste_params_t liste_params)
   {
     free(param->nom);
     free(param->nom_type);
+    liberer_arbre(param->valeur_defaut);
     
     tmp = param;
     param = param->suiv;
@@ -211,6 +214,7 @@ void liberer_liste_methodes(liste_methodes_t liste_methodes)
   while (methode != NIL(methode_t))
   {
     liberer_liste_params(methode->params);
+    liberer_arbre(methode->bloc);
     
     free(methode->nom);
     if (methode->nom_type_retour)
@@ -267,6 +271,8 @@ void liberer_liste_arguments(liste_args_t liste_arguments)
   
   while (arg != NIL(arg_t))
   {    
+    liberer_arbre(arg->expr);
+    
     tmp = arg;
     arg = arg->suiv;
     
@@ -353,6 +359,7 @@ void liberer_liste_classes(liste_classes_t liste_classes)
   
   while (classe != NIL(classe_t))
   {
+    liberer_liste_arguments(classe->args_classe_mere);
     liberer_liste_variables(classe->attributs);
     liberer_liste_methodes(classe->methodes);
     

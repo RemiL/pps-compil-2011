@@ -29,6 +29,7 @@ typedef enum
   SelectionStatique,       /* Selection statique */
   Appel,                   /* Envoi de message */
   AppelStatique,           /* Envoi de message statique */
+  AppelAuxiliaire,         /* Noeud auxiliaire pour l'appel */
   New,                     /* Création dynamique d'objets */
   NOP 			               /* etiquette "auxiliaire */
 } etiquette_t;
@@ -60,5 +61,7 @@ arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr);
 arbre_t* creer_noeud_selection(arbre_t* dest, char* nom_attribut, int statique);
 arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, int statique);
 arbre_t* creer_noeud_new(char* nom_classe, liste_args_t args);
+
+void liberer_arbre(arbre_t* arbre);
 
 #endif
