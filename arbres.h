@@ -22,8 +22,11 @@ typedef enum
   Cste,
   Chaine,
   Bloc,
+  Aff,                     /* Affectation */
   EQ, NEQ, GT, GE, LT, LE, /* les differents operateurs de comparaison */
   ITE,                     /* le if-then-else */
+  Selection,               /* Selection */
+  SelectionStatique,       /* Selection statique */
   NOP 			               /* etiquette "auxiliaire */
 } etiquette_t;
 
