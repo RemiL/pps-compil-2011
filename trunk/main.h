@@ -22,6 +22,7 @@ typedef union
   param_t* Param;
   liste_vars_t LVars;
   var_t* Var;
+  liste_args_t LArgs;
 } YYSTYPE;
 
 #define YYSTYPE YYSTYPE
