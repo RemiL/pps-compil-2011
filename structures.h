@@ -144,6 +144,7 @@ var_t* nouvelle_variable(char* nom, char* type, int constante, int statique, arb
 liste_vars_t ajouter_variable(liste_vars_t liste_vars, var_t* var);
 var_t* chercher_variable(liste_vars_t liste_vars, char* nom);
 liste_vars_t nouvelle_liste_variables(var_t* var);
+liste_vars_t concatener_liste_variables(liste_vars_t l1, liste_vars_t l2);
 void liberer_liste_variables(liste_vars_t liste_variables);
 
 param_t* nouveau_param(char* nom, char* type, arbre_t* valeur_defaut);

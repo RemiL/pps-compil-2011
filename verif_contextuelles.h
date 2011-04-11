@@ -2,6 +2,7 @@
 #define VERIF_CONTEXTUELLES_H
 
 #include "structures.h"
+#include "arbres.h"
 
 void est_valide_classe(liste_classes_t decl, classe_t* classe);
 void sont_valides_attributs(liste_classes_t decl, classe_t* classe);
