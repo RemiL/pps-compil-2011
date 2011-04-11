@@ -354,10 +354,13 @@ liste_classes_t nouvelle_liste_classes_preinitialisee()
   /* TODO à compléter ? */
   liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
                                          nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
-                                         nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
-  liste_classes = ajouter_classe(liste_classes, nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
-                                                                nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
-                                                                nouvelle_liste_variables(NIL(var_t)), nouvelle_liste_methodes(NIL(methode_t))));
+                                         nouvelle_liste_variables(NIL(var_t)),
+                                         nouvelle_liste_methodes(nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Entier")))));
+  liste_classes = ajouter_classe(liste_classes,
+                                 nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
+                                                 nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
+                                                 nouvelle_liste_variables(NIL(var_t)),
+                                                 nouvelle_liste_methodes(nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Chaine")))));
   
   return liste_classes;
 }
