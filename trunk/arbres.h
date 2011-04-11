@@ -44,10 +44,19 @@ typedef union
   arbre_t* A;     /* noeud interne : un operateur et deux operandes */
 } noeud_t;
 
+/* Information sur un noeud */
+typedef union
+{
+  classe_t* type;
+  var_t* var;
+  methode_t* methode;
+} info_t;
+
 /* la structure d'un noeud interne */
 struct arbre
 {
   char op;		            /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
+  info_t info;            /* information sur le noeud */
   noeud_t gauche, droit;  /* deux noeuds : internes ou feuilles */
 };
 

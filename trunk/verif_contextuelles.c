@@ -210,3 +210,60 @@ void est_valide_methode(liste_methodes_t liste, methode_t* methode)
     exit(EXIT_FAILURE);
   }
 }
+
+/**
+ * Vérifications contexuelles dans l'arbre syntaxique.
+ * Retourne le type de l'arbre et remplit les informations supplémentaires
+ * caractérisant un noeud disponibles uniquement quand l'environnement est
+ * accessible.
+ */
+classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, liste_vars_t decl_vars, arbre_t* arbre)
+{
+  classe_t* type = NIL(classe_t);
+  
+  if (arbre)
+  {
+    switch (arbre->op)
+    {
+      case Cste:
+        arbre->info.type = chercher_classe(decl_classes, "Entier");
+        return arbre->info.type;
+      case Chaine:
+        arbre->info.type = chercher_classe(decl_classes, "Chaine");
+        return arbre->info.type;
+      case Id:
+        // Soit on a un identifiant de classe
+        if ((type = chercher_classe(decl_classes, arbre->gauche.S)) != NIL(classe_t))
+          arbre->info.type = type;
+        // Soit on a un identifiant de variable
+        else if ((arbre->info.var = chercher_variable(decl_vars, arbre->gauche.S)) != NIL(var_t))
+          type = arbre->info.var->type;
+        
+        if (type == NIL(classe_t))
+        {
+          printf("Identifiant inconnu : %s.", arbre->gauche.S);
+          exit(EXIT_FAILURE);
+        }
+      case Appel:
+      case AppelStatique:
+        type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
+        arbre->info.methode = chercher_methode(type->methodes, arbre->droit.A->gauche.S);
+        if (arbre->info.methode == NIL(methode_t))
+        {
+          printf("La classe %s ne possède pas de méthode %s.", type->nom, arbre->droit.A->gauche.S);
+          exit(EXIT_FAILURE);
+        }
+        return arbre->info.methode->type_retour;
+      case Bloc:
+        // On ajoute à la liste courante de variables déclarées la liste des variables locales du bloc (en tête pour avoir la bonne notion de portée).
+        return est_valide_arbre_syntaxique(decl_classes, concatener_liste_variables(arbre->gauche.vars, decl_vars), arbre->droit.A);
+      case ';': // Séparateur d'expression, on renvoie le type de l'expression de droite.
+        est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
+        return est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A);
+      
+      // TODO ajouter les autres vérifications
+    }
+  }
+  
+  return type;
+}

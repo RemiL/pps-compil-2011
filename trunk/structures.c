@@ -56,6 +56,16 @@ liste_vars_t nouvelle_liste_variables(var_t* var)
   return liste_vars;
 }
 
+liste_vars_t concatener_liste_variables(liste_vars_t l1, liste_vars_t l2)
+{
+  liste_vars_t liste_vars;
+  
+  liste_vars.tete = (l1.tete != NIL(var_t)) ? l1.tete : l2.tete;
+  liste_vars.queue = (l2.queue != NIL(var_t)) ? l2.queue : l1.queue;
+
+  return liste_vars;
+}
+
 void liberer_liste_variables(liste_vars_t liste_variables)
 {
   var_t* variable = liste_variables.tete;
