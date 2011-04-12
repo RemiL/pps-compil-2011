@@ -211,6 +211,46 @@ void est_valide_methode(liste_methodes_t liste, methode_t* methode)
   }
 }
 
+
+/**
+  Vérifie que les arguments passés à une méthode sont du bon type
+  */
+void sont_valides_arguments(liste_classes_t decl_classes, liste_vars_t decl_vars, methode_t* methode, liste_args_t arguments)
+{
+   param_t* p = methode->params.tete;
+   arg_t* a = arguments.tete;
+   classe_t* type = NIL(classe_t);
+   while(p!=NULL) // pour tous les paramètres on vérifie qu'on a un argument, on une valeur par défaut
+   {
+      if( a==NULL && p->valeur_defaut == NULL)  //erreur : ni l'un ni l'autre
+      {
+          printf("Les arguements passes à la methode %s ne correspondent pas, il manque des arguments", methode->nom);
+          exit(EXIT_FAILURE);
+      }
+      
+      if(a!=NULL) // un argument
+      {
+          type = est_valide_arbre_syntaxique(decl_classes, decl_vars, a->expr);
+          if(type != p->type)
+          {
+             printf("Les arguements passes à la methode %s de la classe  %s ne correspondent pas", methode->nom, type->nom);
+             exit(EXIT_FAILURE);
+          }
+          a = a->suiv;  // on chope l'argument suivant
+      }
+      p = p->suiv;  // on passe au paramètre d'après
+        
+   }
+   if((p==NULL && a!= NULL) )
+   {
+       printf("Les arguements passes à la methode %s de la classe  %s ne correspondent pas\n Il y a trop d'argumement",
+        methode->nom, type->nom);
+       exit(EXIT_FAILURE);
+   }
+        
+        
+
+}
 /**
  * Vérifications contexuelles dans l'arbre syntaxique.
  * Retourne le type de l'arbre et remplit les informations supplémentaires
@@ -228,9 +268,11 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, liste_vars_t
       case Cste:
         arbre->info.type = chercher_classe(decl_classes, "Entier");
         return arbre->info.type;
+        
       case Chaine:
         arbre->info.type = chercher_classe(decl_classes, "Chaine");
         return arbre->info.type;
+        
       case Id:
         // Soit on a un identifiant de classe
         if ((type = chercher_classe(decl_classes, arbre->gauche.S)) != NIL(classe_t))
@@ -244,6 +286,8 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, liste_vars_t
           printf("Identifiant inconnu : %s.", arbre->gauche.S);
           exit(EXIT_FAILURE);
         }
+        return type;
+        
       case Appel:
       case AppelStatique:
         type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
@@ -253,15 +297,72 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, liste_vars_t
           printf("La classe %s ne possède pas de méthode %s.", type->nom, arbre->droit.A->gauche.S);
           exit(EXIT_FAILURE);
         }
+        
+        sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args);
         return arbre->info.methode->type_retour;
+        
       case Bloc:
         // On ajoute à la liste courante de variables déclarées la liste des variables locales du bloc (en tête pour avoir la bonne notion de portée).
         return est_valide_arbre_syntaxique(decl_classes, concatener_liste_variables(arbre->gauche.vars, decl_vars), arbre->droit.A);
+        
       case ';': // Séparateur d'expression, on renvoie le type de l'expression de droite.
         est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
         return est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A);
       
-      // TODO ajouter les autres vérifications
+      // opérateur : il faut que les deux opérandes soient des entiers
+      case '+':  
+      case '-' : 
+      case '*' :
+      case '/' :
+      case '=' :
+      case '<' :
+      case '>' :
+        if (arbre->gauche.A->info.type == chercher_classe(decl_classes, "Entier") && arbre->droit.A->info.type == chercher_classe(decl_classes, "Entier"))
+        return chercher_classe(decl_classes, "Entier");
+        
+        printf("Les operateurs sont reserves aux entiers");
+        exit(1);
+      
+      /**
+ * Constructeur pour les noeuds de type sélection : le fils gauche est le destinataire
+ * et le fils droit est une feuille contenant le nom de l'attribut.
+ */
+      case Selection :
+      case SelectionStatique :
+        arbre->info.var = chercher_variable(decl_vars, arbre->gauche.S);
+        if(arbre->info.var == NIL(var_t))
+        {
+           printf("La variable %s n'a pas ete declaree.", arbre->gauche.S);
+           exit(EXIT_FAILURE);
+        }
+        type = arbre->info.var->type;
+        if (chercher_variable(type->attributs, arbre->droit.S) != NULL)
+        {
+          printf("La classe %s ne possède pas d'attribut %s.", type->nom, arbre->droit.S);
+          exit(EXIT_FAILURE);
+        }
+        
+        return arbre->info.methode->type_retour;
+        
+        /**
+ * Constructeur pour les noeuds de type New : le fils gauche est une feuille contenant
+ * le nom de la classe de l'objet à créer et le fils droit est une feuille contenant
+ * un pointeur vers une liste d'argument.
+ */
+      case New :
+          type = chercher_classe(decl_classes, arbre->gauche.S);
+          if(type == NIL(classe_t))
+          {
+            printf("La classe %s n'a pas ete declaree", arbre->gauche.S );
+            exit(1);
+          }          
+          arbre->info.methode = chercher_methode(type->methodes, type->nom);  // on récupère le constructeur
+          sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.args); // et on vérifie ses paramètres
+        return type;
+       
+      default :
+        printf("Erreur dans la verification contextuelle : case non pris en compte");
+        exit(1);
     }
   }
   
