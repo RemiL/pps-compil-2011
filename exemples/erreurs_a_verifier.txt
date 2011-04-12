@@ -1,0 +1,25 @@
+
+- nom inexistant
+	classe
+	méthode
+	attribut
+	variable
+	
+-nom en double	
+	
+- override comme il faut
+
+- paramètres incorrects rejetés / corrects acceptés
+	méthodes normales
+	constructeur
+	
+	*avec et sans paramètre optionnel
+	
+- opérateurs seulement pour les entiers
+
+- appels corrects
+
+- sélection correcte
+
+
+	
