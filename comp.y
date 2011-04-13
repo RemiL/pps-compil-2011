@@ -5,7 +5,7 @@
  * de la ligne suivante. Donc c'est cette ligne qu'il faut mettre a jour, si elle
  * ne correspond pas a ce que vous avez fait, pas TP.h !
  */
-%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VARIABLE VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN PREC_UNAIRE
+%token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VAR VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN PREC_UNAIRE
 
  /* indications de precedence et d'associativite. Les precedences sont
   * donnees en ordre croissant. Les operateurs sur une meme ligne (separes par
@@ -167,7 +167,7 @@ DeclAttr : STATIC DeclA    // déclaration d'un attribut statique ou pas statiqu
          | DeclA     { $$ = $1;}
 ;
 
-DeclA : VARIABLE ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
+DeclA : VAR ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
      { $$ = nouvelle_variable($2, $4, 0, 0, $5); }
       | VAL ID ':' ID_CLASS InitOpt     { $$ = nouvelle_variable($2, $4, 1, 0, $5); }
 ;

@@ -45,7 +45,7 @@ int TesteMotClef(char *s)
   if (! strcmp(s, "returns")) return(RETURNS);
   if (! strcmp(s, "is")) return(IS);
   if (! strcmp(s, "val")) return(VAL);
-  if (! strcmp(s, "var")) return(VARIABLE);
+  if (! strcmp(s, "var")) return(VAR);
   if (! strcmp(s, "override")) return(OVERRIDE);
   if (! strcmp(s, "extends")) return(EXTENDS);
   if (! strcmp(s, "new")) return(NOUVEAU);

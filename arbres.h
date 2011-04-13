@@ -56,6 +56,7 @@ typedef union
 /* la structure d'un noeud interne */
 struct arbre
 {
+  int num_ligne;          /* le numéro de la ligne correspondante */
   char op;                /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
   type_decl_t type_var;   /* type de la variable (attribut, variable locale ou paramètre) */
   info_t info;            /* information sur le noeud */
