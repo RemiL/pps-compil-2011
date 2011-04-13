@@ -31,14 +31,14 @@ typedef enum
   AppelStatique,           /* Envoi de message statique */
   AppelAuxiliaire,         /* Noeud auxiliaire pour l'appel */
   New,                     /* Création dynamique d'objets */
-  NOP 			               /* etiquette "auxiliaire */
+  NOP                      /* etiquette "auxiliaire */
 } etiquette_t;
 
 /* la structure d'un noeud de l'arbre: un noeud interne ou une feuille */
 typedef union
 {
   char* S;        /* feuille de type Identificateur ou Chaine */
-  int E;	 	      /* feuille de type constante entiere */
+  int E;          /* feuille de type constante entiere */
   liste_vars_t vars; /* feuille de type liste de variables utilisé pour les noeuds de type Bloc */
   liste_args_t args; /* feuille de type liste d'arguments utilisé pour les appels */
   arbre_t* A;     /* noeud interne : un operateur et deux operandes */
@@ -56,7 +56,7 @@ typedef union
 /* la structure d'un noeud interne */
 struct arbre
 {
-  char op;		            /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
+  char op;                /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
   type_decl_t type_var;   /* type de la variable (attribut, variable locale ou paramètre) */
   info_t info;            /* information sur le noeud */
   noeud_t gauche, droit;  /* deux noeuds : internes ou feuilles */
