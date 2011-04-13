@@ -304,7 +304,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_args_t args_classe
   classe->suiv = NIL(classe_t);
   
   /* Ajout constructeur (p-e à revoir ?) */
-  ajouter_methode_tete(&classe->methodes, nouvelle_methode(strdup(nom), NORMALE, params_constructeur, bloc_constructeur, NULL));
+  classe->constructeur = nouvelle_methode(strdup(nom), NORMALE, params_constructeur, bloc_constructeur, NULL);
   
   return classe;
 }

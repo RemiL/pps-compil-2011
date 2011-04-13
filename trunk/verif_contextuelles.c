@@ -35,6 +35,10 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
   
   sont_valides_attributs(decl, classe);
   sont_valides_methodes(decl, classe);
+  
+  /* Vérification du constructeur */
+  sont_valides_params(decl, classe, classe->constructeur);
+  est_valide_arbre_syntaxique(decl, decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), classe->constructeur->bloc);
 }
 
 void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
@@ -296,6 +300,24 @@ void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars
 }
 
 /**
+ * Vérifie si un objet de type1 peut être manipulé comme un objet de type2.
+ * Revient à vérifier si la classe type2 a pour descendant la classe type1
+ * ou si type1 et type2 sont égaux.
+ */
+int type_est_compatible(classe_t* type1, classe_t* type2)
+{
+  int est_compatible = (type1 == type2);
+  
+  while (type1 != NIL(classe_t) && !est_compatible)
+  {
+    est_compatible = (type1->classe_mere == type2);
+    type1 = type1->classe_mere;
+  }
+  
+  return est_compatible;
+}
+
+/**
  * Vérifications contexuelles dans l'arbre syntaxique.
  * Retourne le type de l'arbre et remplit les informations supplémentaires
  * caractérisant un noeud disponibles uniquement quand l'environnement est
@@ -356,7 +378,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         }
         else if (arbre->op == AppelStatique && arbre->info.methode->type_methode != STATIQUE)
         {
-          printf("La méthode %s de la classe %s n'est pas statique.\n", arbre->droit.S, type->nom);
+          printf("La méthode %s de la classe %s n'est pas statique.\n", arbre->droit.A->gauche.S, type->nom);
           exit(EXIT_FAILURE);
         }
         sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args);
@@ -415,15 +437,14 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("La classe %s n'a pas été déclarée.\n", arbre->gauche.S);
           exit(EXIT_FAILURE);
         }
-        // On cherche le constructeur (stocké comme une méthode portant le nom de la classe)
-        arbre->info.methode = chercher_methode(type->methodes, type->nom);
-        // et on vérifie ses paramètres
+        arbre->info.methode = type->constructeur;
+        // On vérifie les paramètres du constructeur
         sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.args);
         return arbre->info.methode->type_retour;
       
       case Aff:
         arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
-        if (arbre->info.type != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A))
+        if (!type_est_compatible(est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A), arbre->info.type))
         {
           printf("Affectation impossible, les types des opérandes diffèrent.\n");
           exit(EXIT_FAILURE);
