@@ -397,6 +397,68 @@ heritage_t nouvel_heritage(char* nom_classe_mere, liste_args_t args_classe_mere)
   return heritage;
 }
 
+decl_vars_t* decl_ajouter_attributs(decl_vars_t* decl, liste_vars_t attributs)
+{
+  if (attributs.tete == NIL(var_t))
+    return decl;
+  
+  decl_vars_t* d = NEW(1, decl_vars_t);
+  
+  d->decl.vars = attributs;
+  d->type = ATTRIBUT;
+  d->suiv = decl;
+  
+  return d;
+}
+
+decl_vars_t* decl_ajouter_variables(decl_vars_t* decl, liste_vars_t variables)
+{
+  if (variables.tete == NIL(var_t))
+    return decl;
+  
+  decl_vars_t* d = NEW(1, decl_vars_t);
+  
+  d->decl.vars = variables;
+  d->type = VARIABLE;
+  d->suiv = decl;
+  
+  return d;
+}
+
+decl_vars_t* decl_ajouter_params(decl_vars_t* decl, liste_params_t params)
+{
+  if (params.tete == NIL(param_t))
+    return decl;
+  
+  decl_vars_t* d = NEW(1, decl_vars_t);
+  
+  d->decl.params = params;
+  d->type = PARAM;
+  d->suiv = decl;
+
+  return d;
+}
+
+type_decl_t decl_chercher_id(decl_vars_t* decl, char* id, var_t** var, param_t** param)
+{
+  type_decl_t type = 0;
+  
+  while (decl != NIL(decl_vars_t) && type == 0)
+  {
+    if (decl->type == PARAM)
+    {
+      if ((*param = chercher_param(decl->decl.params, id)) != NIL(param_t))
+        type = PARAM;
+    }
+    else if ((*var = chercher_variable(decl->decl.vars, id)) != NIL(var_t))
+      type = decl->type;
+    
+    decl = decl->suiv;
+  }
+  
+  return type;
+}
+
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes)
 {
   corps_t corps;

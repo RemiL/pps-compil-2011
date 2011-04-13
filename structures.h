@@ -11,6 +11,7 @@ typedef struct param_t param_t;
 typedef struct methode_t methode_t;
 typedef struct arg_t arg_t;
 typedef struct classe_t classe_t;
+typedef struct decl_vars_t decl_vars_t;
 
 /* Pour éviter les dépendances cylindriques */
 #ifndef arbre_t
@@ -132,6 +133,25 @@ typedef struct
   liste_args_t args_classe_mere;
 } heritage_t;
 
+typedef enum
+{
+  ATTRIBUT = 1,
+  VARIABLE,
+  PARAM
+} type_decl_t;
+
+struct decl_vars_t
+{
+  union
+  {
+    liste_vars_t vars;
+    liste_params_t params;
+  } decl;
+  type_decl_t type;
+  
+  decl_vars_t* suiv;
+};
+
 typedef struct
 {
   liste_vars_t variables;
@@ -175,6 +195,11 @@ liste_classes_t nouvelle_liste_classes_preinitialisee();
 void liberer_liste_classes(liste_classes_t liste_classes);
 
 heritage_t nouvel_heritage(char* nom_classe_mere, liste_args_t args_classe_mere);
+
+decl_vars_t* decl_ajouter_attributs(decl_vars_t* decl, liste_vars_t attributs);
+decl_vars_t* decl_ajouter_variables(decl_vars_t* decl, liste_vars_t variables);
+decl_vars_t* decl_ajouter_params(decl_vars_t* decl, liste_params_t params);
+type_decl_t decl_chercher_id(decl_vars_t* decl, char* id, var_t** var, param_t** param);
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);
 

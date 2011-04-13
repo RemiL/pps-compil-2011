@@ -49,6 +49,7 @@ typedef union
 {
   classe_t* type;
   var_t* var;
+  param_t* param;
   methode_t* methode;
 } info_t;
 
@@ -56,6 +57,7 @@ typedef union
 struct arbre
 {
   char op;		            /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
+  type_decl_t type_var;   /* type de la variable (attribut, variable locale ou paramètre) */
   info_t info;            /* information sur le noeud */
   noeud_t gauche, droit;  /* deux noeuds : internes ou feuilles */
 };
