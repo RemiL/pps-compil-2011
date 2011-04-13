@@ -115,7 +115,8 @@ struct classe_t
   classe_t* classe_mere;
   liste_args_t args_classe_mere; /* Les arguments de la classe mère en cas d'héritage. */
   liste_vars_t attributs;
-  liste_methodes_t methodes; /* le constructeur n'est rien de plus qu'une méthode particulière */
+  liste_methodes_t methodes;
+  methode_t* constructeur; /* le constructeur n'est rien de plus qu'une méthode particulière */
 
   /* On utilise une liste chainée */
   classe_t* suiv;
