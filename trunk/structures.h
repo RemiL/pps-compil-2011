@@ -138,7 +138,8 @@ typedef enum
 {
   ATTRIBUT = 1,
   VARIABLE,
-  PARAM
+  PARAM,
+  THIS
 } type_decl_t;
 
 struct decl_vars_t
@@ -170,6 +171,7 @@ void liberer_liste_variables(liste_vars_t liste_variables);
 
 param_t* nouveau_param(char* nom, char* type, arbre_t* valeur_defaut);
 liste_params_t ajouter_param(liste_params_t liste_params, param_t* param);
+liste_params_t ajouter_param_en_tete(liste_params_t liste_params, param_t* param);
 param_t* chercher_param(liste_params_t liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
 void liberer_liste_params(liste_params_t liste_params);
