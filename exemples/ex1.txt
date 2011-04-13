@@ -52,8 +52,8 @@ is {
 
 class Couleur(cinit: Entier := 0) 
         /* 3 couleurs seulement : couleur = 0, 1 ou autre chose ! */
-      { c := if cinit <> 0 then if cinit <> 1 then 2 else 1 else 0 } is {
-  val c: Entier /* initialise dans le constructeur */
+      { coul := if cinit <> 0 then if cinit <> 1 then 2 else 1 else 0 } is {
+  val coul: Entier /* initialise dans le constructeur */
 
   def static blanc() returns Couleur is { new Couleur() }
 
@@ -63,8 +63,8 @@ class Couleur(cinit: Entier := 0)
 
   def couleur() returns Chaine is {
       "Inside Couleur::couleur\n".imprimer();
-      if c = 0 then "Blanc"
-      else if c = 1 then "Noir" 
+      if coul = 0 then "Blanc"
+      else if coul = 1 then "Noir" 
       else "Gris"
       }
 }
