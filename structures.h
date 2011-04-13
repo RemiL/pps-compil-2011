@@ -202,6 +202,7 @@ heritage_t nouvel_heritage(char* nom_classe_mere, liste_args_t args_classe_mere)
 decl_vars_t* decl_ajouter_attributs(decl_vars_t* decl, liste_vars_t attributs);
 decl_vars_t* decl_ajouter_variables(decl_vars_t* decl, liste_vars_t variables);
 decl_vars_t* decl_ajouter_params(decl_vars_t* decl, liste_params_t params);
+decl_vars_t* decl_generer_depuis_classe(classe_t* classe);
 type_decl_t decl_chercher_id(decl_vars_t* decl, char* id, var_t** var, param_t** param);
 
 corps_t nouveau_corps(liste_vars_t variables, liste_methodes_t methodes);

@@ -38,7 +38,7 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
   
   /* Vérification du constructeur */
   sont_valides_params(decl, classe, classe->constructeur);
-  est_valide_arbre_syntaxique(ajouter_classe(decl, classe), decl_ajouter_params(decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), classe->constructeur->params), classe->constructeur->bloc, classe);
+  est_valide_arbre_syntaxique(ajouter_classe(decl, classe), decl_ajouter_params(decl_generer_depuis_classe(classe), classe->constructeur->params), classe->constructeur->bloc, classe);
   
   sont_valides_valeurs_defauts_attributs(decl, classe);
   sont_valides_arbres_syntaxiques_methodes(decl, classe);
@@ -79,11 +79,12 @@ void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* clas
   
   while (attribut != NULL)
   {
-    if (attribut->valeur_defaut != NIL(arbre_t) && attribut->type != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
-                                                                                                 decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs),
-                                                                                                 attribut->valeur_defaut, classe))
+    if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
+                                                                                                    decl_generer_depuis_classe(classe),
+                                                                                                    attribut->valeur_defaut, classe),
+                                                                        attribut->type))
     {
-      printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s.\n", classe->nom, attribut->nom);
+      printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s (ligne %d).\n", classe->nom, attribut->nom, attribut->valeur_defaut->num_ligne);
       exit(EXIT_FAILURE);
     }
     
@@ -161,11 +162,12 @@ void sont_valides_arbres_syntaxiques_methodes(liste_classes_t decl, classe_t* cl
   {
     sont_valides_valeurs_defauts_params(decl, classe, methode);
     
-    if (methode->type_retour != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
-                                                            decl_ajouter_params(decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), methode->params),
-                                                            methode->bloc, classe))
+    if (!type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
+                                                         decl_ajouter_params(decl_generer_depuis_classe(classe), methode->params),
+                                                         methode->bloc, classe),
+                             methode->type_retour))
     {
-      printf("Classe %s : Type de retour réel incohérent avec le type déclaré pour de la méthode %s.\n", classe->nom, methode->nom);
+      printf("Classe %s : Type de retour réel incohérent avec le type de retour déclaré par la méthode %s (ligne %d).\n", classe->nom, methode->nom, methode->bloc->num_ligne);
       exit(EXIT_FAILURE);
     }
     
@@ -202,11 +204,12 @@ void sont_valides_valeurs_defauts_params(liste_classes_t decl, classe_t* classe,
   
   while (param != NULL)
   {
-    if (param->valeur_defaut != NIL(arbre_t) && param->type != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
-                                                                                           decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs),
-                                                                                           param->valeur_defaut, classe))
+    if (param->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
+                                                                                                 decl_generer_depuis_classe(classe),
+                                                                                                 param->valeur_defaut, classe),
+                                                                     param->type))
     {
-      printf("Classe %s : Type incohérent pour la valeur par défaut du paramètre %s de la méthode %s.\n", classe->nom, param->nom, methode->nom);
+      printf("Classe %s : Type incohérent pour la valeur par défaut du paramètre %s de la méthode %s (ligne %d).\n", classe->nom, param->nom, methode->nom, param->valeur_defaut->num_ligne);
       exit(EXIT_FAILURE);
     }
     
