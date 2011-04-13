@@ -105,7 +105,9 @@ LParamOpt : LParam
 LParam : Param ',' LParam
   {
     est_valide_param($3, $1);
-    $$ = ajouter_param($3, $1);
+    /* règle récursive droite, on doit ajouter en
+     * tête pour avoir l'ordre attendu */
+    $$ = ajouter_param_en_tete($3, $1);
   }
        | Param
   { $$ = nouvelle_liste_params($1); }

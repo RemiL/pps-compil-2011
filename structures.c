@@ -113,6 +113,23 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
   return l;
 }
 
+liste_params_t ajouter_param_en_tete(liste_params_t liste_params, param_t* param)
+{
+  liste_params_t l;
+  
+  if (liste_params.tete == NIL(param_t)) /* Liste vide */
+    l.queue = param;
+  else
+  {
+    param->suiv = liste_params.tete;
+    l.queue = liste_params.queue;
+  }
+  
+  l.tete = param;
+  
+  return l;
+}
+
 param_t* chercher_param(liste_params_t liste_params, char* nom)
 {
   param_t* param = (nom == NULL) ? NIL(param_t) : liste_params.tete;
@@ -305,6 +322,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_args_t args_classe
   
   /* Ajout constructeur (p-e à revoir ?) */
   classe->constructeur = nouvelle_methode(strdup(nom), NORMALE, params_constructeur, bloc_constructeur, NULL);
+  classe->constructeur->type_retour = classe; /* Simplifie les manipulations mais un constructeur ne retourne rien */
   
   return classe;
 }

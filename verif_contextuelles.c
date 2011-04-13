@@ -38,7 +38,10 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
   
   /* Vérification du constructeur */
   sont_valides_params(decl, classe, classe->constructeur);
-  est_valide_arbre_syntaxique(decl, decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), classe->constructeur->bloc);
+  est_valide_arbre_syntaxique(ajouter_classe(decl, classe), decl_ajouter_params(decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), classe->constructeur->params), classe->constructeur->bloc, classe);
+  
+  sont_valides_valeurs_defauts_attributs(decl, classe);
+  sont_valides_arbres_syntaxiques_methodes(decl, classe);
 }
 
 void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
@@ -66,9 +69,19 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
       exit(EXIT_FAILURE);
     }
     
+    attribut = attribut->suiv;
+  }
+}
+
+void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* classe)
+{
+  var_t* attribut = classe->attributs.tete;
+  
+  while (attribut != NULL)
+  {
     if (attribut->valeur_defaut != NIL(arbre_t) && attribut->type != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                  decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs),
-                                                                                                 attribut->valeur_defaut))
+                                                                                                 attribut->valeur_defaut, classe))
     {
       printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s.\n", classe->nom, attribut->nom);
       exit(EXIT_FAILURE);
@@ -136,9 +149,21 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
       exit(EXIT_FAILURE);
     }
     
+    methode = methode->suiv;
+  }
+}
+
+void sont_valides_arbres_syntaxiques_methodes(liste_classes_t decl, classe_t* classe)
+{
+  methode_t* methode = classe->methodes.tete;
+  
+  while (methode != NULL)
+  {
+    sont_valides_valeurs_defauts_params(decl, classe, methode);
+    
     if (methode->type_retour != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                             decl_ajouter_params(decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs), methode->params),
-                                                            methode->bloc))
+                                                            methode->bloc, classe))
     {
       printf("Classe %s : Type de retour réel incohérent avec le type déclaré pour de la méthode %s.\n", classe->nom, methode->nom);
       exit(EXIT_FAILURE);
@@ -167,9 +192,19 @@ void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* meth
       }
     }
     
+    param = param->suiv;
+  }
+}
+
+void sont_valides_valeurs_defauts_params(liste_classes_t decl, classe_t* classe, methode_t* methode)
+{
+  param_t* param = methode->params.tete;
+  
+  while (param != NULL)
+  {
     if (param->valeur_defaut != NIL(arbre_t) && param->type != est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                            decl_ajouter_attributs(NIL(decl_vars_t), classe->attributs),
-                                                                                           param->valeur_defaut))
+                                                                                           param->valeur_defaut, classe))
     {
       printf("Classe %s : Type incohérent pour la valeur par défaut du paramètre %s de la méthode %s.\n", classe->nom, param->nom, methode->nom);
       exit(EXIT_FAILURE);
@@ -239,7 +274,7 @@ void est_valide_methode(liste_methodes_t liste, methode_t* methode)
   }
 }
 
-void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars, liste_vars_t variables)
+void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars, liste_vars_t variables, classe_t* type_this)
 {
   var_t* var = variables.tete;
   
@@ -253,7 +288,7 @@ void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars
       exit(EXIT_FAILURE);
     }
     
-    if (var->valeur_defaut != NIL(arbre_t) && var->type != est_valide_arbre_syntaxique(decl_classes, decl_vars, var->valeur_defaut))
+    if (var->valeur_defaut != NIL(arbre_t) && var->type != est_valide_arbre_syntaxique(decl_classes, decl_vars, var->valeur_defaut, type_this))
     {
       printf("Type incohérent pour la valeur par défaut de la variable %s.\n", var->nom);
       exit(EXIT_FAILURE);
@@ -266,7 +301,7 @@ void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars
 /**
  * Vérifie que les arguments passés à une méthode sont du bon type et en nombres suffisants
  */
-void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars, methode_t* methode, liste_args_t arguments)
+void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars, methode_t* methode, liste_args_t arguments, classe_t* type_this)
 {
   int num = 1;
   param_t* p = methode->params.tete;
@@ -275,9 +310,9 @@ void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars
   // Pour tous les arguments on vérifie qu'ils correspondent aux paramètres attendus
   while (a != NIL(arg_t) && p != NIL(param_t))
   {
-    if(est_valide_arbre_syntaxique(decl_classes, decl_vars, a->expr) != p->type)
+    if(est_valide_arbre_syntaxique(decl_classes, decl_vars, a->expr, type_this) != p->type)
     {
-      printf("L'argument n°%d passé à la méthode %s n'a pas le type attendu du paramètre %s.\n",  num, methode->nom, p->nom);
+      printf("L'argument n°%d passé à la méthode %s n'a pas le type attendu du paramètre %s (ligne %d).\n",  num, methode->nom, p->nom, a->expr->num_ligne);
       exit(EXIT_FAILURE);
     }
 
@@ -323,7 +358,7 @@ int type_est_compatible(classe_t* type1, classe_t* type2)
  * caractérisant un noeud disponibles uniquement quand l'environnement est
  * accessible.
  */
-classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t* decl_vars, arbre_t* arbre)
+classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t* decl_vars, arbre_t* arbre, classe_t* type_this)
 {
   classe_t* type = NIL(classe_t);
   var_t* var = NIL(var_t);
@@ -359,40 +394,48 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
             type = arbre->info.var->type;
           }
         }
+        else // identificateurs réservés
+        {
+          if (!strcmp("this", arbre->gauche.S))
+          {
+            arbre->type_var = THIS;
+            arbre->info.type = type = type_this;
+          }
+        }
         
         if (type == NIL(classe_t))
         {
-          printf("Identifiant inconnu : %s.\n", arbre->gauche.S);
+          printf("Identifiant inconnu : %s (ligne : %d).\n", arbre->gauche.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         return type;
         
       case Appel:
       case AppelStatique:
-        type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
+        type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
         arbre->info.methode = chercher_methode(type->methodes, arbre->droit.A->gauche.S);
         if (arbre->info.methode == NIL(methode_t))
         {
-          printf("La classe %s ne possède pas de méthode %s.\n", type->nom, arbre->droit.A->gauche.S);
+          printf("La classe %s ne possède pas de méthode %s (ligne : %d).\n", type->nom, arbre->droit.A->gauche.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         else if (arbre->op == AppelStatique && arbre->info.methode->type_methode != STATIQUE)
         {
-          printf("La méthode %s de la classe %s n'est pas statique.\n", arbre->droit.A->gauche.S, type->nom);
+          printf("La méthode %s de la classe %s n'est pas statique (ligne : %d).\n", arbre->droit.A->gauche.S, type->nom, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
-        sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args);
+        sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args, type_this);
         return arbre->info.methode->type_retour;
         
       case Bloc:
-        sont_valides_variables(decl_classes, decl_vars, arbre->gauche.vars);
+        sont_valides_variables(decl_classes, decl_vars, arbre->gauche.vars, type_this);
         // On ajoute à la liste courante de variables déclarées la liste des variables locales du bloc (en tête pour avoir la bonne notion de portée).
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_ajouter_variables(decl_vars, arbre->gauche.vars), arbre->droit.A);
+        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_ajouter_variables(decl_vars, arbre->gauche.vars), arbre->droit.A, type_this);
         return arbre->info.type;
         
       case ';': // Séparateur d'expression, on renvoie le type de l'expression de droite.
-        est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A);
+        est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
+        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this);
         return arbre->info.type;
       
       // Opérateurs arithméritiques et de comparaison : il faut que les deux opérandes soient des entiers
@@ -407,9 +450,9 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       case LT:
       case LE:
         type = chercher_classe(decl_classes, "Entier");
-        if (est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A) != type || est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A) != type)
+        if (est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this) != type || est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this) != type)
         {
-          printf("Les opérateurs arithmétiques et de comparaison sont réservés aux entiers.\n");
+          printf("Les opérateurs arithmétiques et de comparaison sont réservés aux entiers (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         arbre->info.type = type;
@@ -417,15 +460,15 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       
       case Selection:
       case SelectionStatique:
-        type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
+        type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
         if ((arbre->info.var = chercher_variable(type->attributs, arbre->droit.S)) == NIL(var_t))
         {
-          printf("La classe %s ne possède pas d'attribut %s.\n", type->nom, arbre->droit.S);
+          printf("La classe %s ne possède pas d'attribut %s (ligne : %d).\n", type->nom, arbre->droit.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         else if (arbre->op == SelectionStatique && !arbre->info.var->statique)
         {
-          printf("L'attribut %s de la classe %s n'est pas statique.\n", arbre->droit.S, type->nom);
+          printf("L'attribut %s de la classe %s n'est pas statique (ligne : %d).\n", arbre->droit.S, type->nom, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         return arbre->info.var->type;
@@ -434,39 +477,39 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         type = chercher_classe(decl_classes, arbre->gauche.S);
         if(type == NIL(classe_t))
         {
-          printf("La classe %s n'a pas été déclarée.\n", arbre->gauche.S);
+          printf("La classe %s n'a pas été déclarée (ligne : %d).\n", arbre->gauche.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         arbre->info.methode = type->constructeur;
         // On vérifie les paramètres du constructeur
-        sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.args);
+        sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.args, type_this);
         return arbre->info.methode->type_retour;
       
       case Aff:
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A);
-        if (!type_est_compatible(est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A), arbre->info.type))
+        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
+        if (!type_est_compatible(est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this), arbre->info.type))
         {
-          printf("Affectation impossible, les types des opérandes diffèrent.\n");
+          printf("Affectation impossible, les types des opérandes diffèrent (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         return arbre->info.type;
       
       case ITE:
-        if (chercher_classe(decl_classes, "Entier") != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A))
+        if (chercher_classe(decl_classes, "Entier") != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this))
         {
-          printf("La condition d'une expression conditionnelle doit être de type entier.\n");
+          printf("La condition d'une expression conditionnelle doit être de type entier (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->gauche.A);
-        if (arbre->info.type != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->droit.A))
+        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->gauche.A, type_this);
+        if (arbre->info.type != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->droit.A, type_this))
         {
-          printf("Les parties else et then d'une expression conditionnelles doivent être de type compatible.\n");
+          printf("Les parties else et then d'une expression conditionnelles doivent être de type compatible (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         return arbre->info.type;
       
       default:
-        printf("Erreur dans la vérification contextuelle : cas %c (%d) non pris en compte.\n", arbre->op, arbre->op);
+        printf("Erreur dans la vérification contextuelle : cas %c (%d) non pris en compte (ligne : %d).\n", arbre->op, arbre->op, arbre->num_ligne);
         exit(EXIT_FAILURE);
     }
   }

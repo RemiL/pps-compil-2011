@@ -62,9 +62,9 @@ class Couleur(cinit: Entier := 0)
   def static gris() returns Couleur is { new Couleur(2) }
 
   def couleur() returns Chaine is {
-      "Inside PointColore::couleur\n".imprimer();
-      if coul = 0 then "Blanc"
-      else if coul = 1 then "Noir" 
+      "Inside Couleur::couleur\n".imprimer();
+      if c = 0 then "Blanc"
+      else if c = 1 then "Noir" 
       else "Gris"
       }
 }
