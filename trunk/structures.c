@@ -457,6 +457,14 @@ decl_vars_t* decl_ajouter_params(decl_vars_t* decl, liste_params_t params)
   return d;
 }
 
+decl_vars_t* decl_generer_depuis_classe(classe_t* classe)
+{
+  if (classe != NIL(classe_t))
+    return decl_ajouter_attributs(decl_generer_depuis_classe(classe->classe_mere), classe->attributs);
+  else
+    return NIL(decl_vars_t);
+}
+
 type_decl_t decl_chercher_id(decl_vars_t* decl, char* id, var_t** var, param_t** param)
 {
   type_decl_t type = 0;
