@@ -2,6 +2,8 @@
 
 #include "arbres.h"
 
+extern int yylineno;
+
 /**
  * Constructeur de feuille de type ID pour l'arbre de syntaxe abstraite: 
  * on stocke l'id.
@@ -9,6 +11,7 @@
 arbre_t* creer_feuille_id(char* var)
 {
   arbre_t* res = NEW(1, arbre_t);
+  res->num_ligne = yylineno;
   res->op = Id; res->gauche.S = var; res->droit.A = NIL(arbre_t);
   return res;
 }
@@ -19,6 +22,7 @@ arbre_t* creer_feuille_id(char* var)
 arbre_t* creer_feuille_cste(int val)
 {
   arbre_t* res = NEW(1, arbre_t);
+  res->num_ligne = yylineno;
   res->op = Cste; res->gauche.E = val; res->droit.A = NIL(arbre_t);
   return res;
 }
@@ -29,6 +33,7 @@ arbre_t* creer_feuille_cste(int val)
 arbre_t* creer_feuille_chaine(char* chaine)
 {
   arbre_t* res = NEW(1, arbre_t);
+  res->num_ligne = yylineno;
   res->op = Chaine; res->gauche.S = chaine; res->droit.A = NIL(arbre_t);
   return res;
 }
@@ -39,9 +44,10 @@ arbre_t* creer_feuille_chaine(char* chaine)
  */
 arbre_t* creer_noeud(char op, arbre_t* g, arbre_t* d)
 {
- arbre_t* res = NEW(1, arbre_t);
- res->op = op; res->gauche.A = g; res->droit.A = d;
- return res;
+  arbre_t* res = NEW(1, arbre_t);
+  res->num_ligne = yylineno;
+  res->op = op; res->gauche.A = g; res->droit.A = d;
+  return res;
 }
 
 /**
@@ -73,6 +79,7 @@ arbre_t* creer_arbre_ITE(arbre_t* cond, arbre_t* expr_then, arbre_t* expr_else)
 arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr)
 {
   arbre_t* res = NEW(1, arbre_t);
+  res->num_ligne = yylineno;
   res->op = Bloc; res->gauche.vars = vars; res->droit.A = expr;
   return res;
 }
@@ -84,6 +91,7 @@ arbre_t* creer_noeud_bloc(liste_vars_t vars, arbre_t* expr)
 arbre_t* creer_noeud_selection(arbre_t* dest, char* nom_attribut, int statique)
 {
   arbre_t* selection = NEW(1, arbre_t);
+  selection->num_ligne = yylineno;
   selection->op = statique ? SelectionStatique : Selection;
   selection->gauche.A = dest;
   selection->droit.S = nom_attribut;
@@ -116,6 +124,7 @@ arbre_t* creer_noeud_appel(arbre_t* dest, char* nom_methode, liste_args_t args, 
 arbre_t* creer_noeud_new(char* nom_classe, liste_args_t args)
 {
   arbre_t* new = NEW(1, arbre_t);
+  new->num_ligne = yylineno;
   new->op = New;
   new->gauche.S = nom_classe;
   new->droit.args = args;
