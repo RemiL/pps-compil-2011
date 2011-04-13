@@ -354,6 +354,11 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("La classe %s ne possède pas de méthode %s.\n", type->nom, arbre->droit.A->gauche.S);
           exit(EXIT_FAILURE);
         }
+        else if (arbre->op == AppelStatique && arbre->info.methode->type_methode != STATIQUE)
+        {
+          printf("La méthode %s de la classe %s n'est pas statique.\n", arbre->droit.S, type->nom);
+          exit(EXIT_FAILURE);
+        }
         sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args);
         return arbre->info.methode->type_retour;
         
