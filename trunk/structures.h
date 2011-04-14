@@ -139,7 +139,8 @@ typedef enum
   ATTRIBUT = 1,
   VARIABLE,
   PARAM,
-  THIS
+  THIS,
+  SUPER
 } type_decl_t;
 
 struct decl_vars_t
