@@ -87,6 +87,11 @@ void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* clas
       printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s (ligne %d).\n", classe->nom, attribut->nom, attribut->valeur_defaut->num_ligne);
       exit(EXIT_FAILURE);
     }
+    else if (attribut->constante == CONSTANTE_NON_INITIALISEE)
+    {
+      printf("Classe %s : l'attribut constant %s n'est pas initialisé avec une valeur par défaut ou dans le constructeur.\n", classe->nom, attribut->nom);
+      exit(EXIT_FAILURE);
+    }
     
     attribut = attribut->suiv;
   }
@@ -297,6 +302,12 @@ void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars
       exit(EXIT_FAILURE);
     }
     
+    if (var->constante == CONSTANTE_NON_INITIALISEE)
+    {
+      printf("La variable constante %s n'est pas initialisée lors de sa déclaration.\n", var->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     var = var->suiv;
   }
 }
@@ -484,7 +495,8 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       case LT:
       case LE:
         type = chercher_classe(decl_classes, "Entier");
-        if (est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this) != type || est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this) != type)
+        if (est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this) != type
+            || est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this) != type)
         {
           printf("Les opérateurs arithmétiques et de comparaison sont réservés aux entiers (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
@@ -529,6 +541,13 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         if (!type_est_compatible(est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this), arbre->info.type))
         {
           printf("Affectation impossible, les types des opérandes diffèrent (ligne : %d).\n", arbre->num_ligne);
+          exit(EXIT_FAILURE);
+        }
+        else if (arbre->gauche.A->info.var->constante == CONSTANTE_NON_INITIALISEE)
+          arbre->gauche.A->info.var->constante = CONSTANTE_INITIALISEE;
+        else if (arbre->gauche.A->info.var->constante == CONSTANTE_INITIALISEE)
+        {
+          printf("Affectation impossible, une constante ne peut pas être modifiée une fois initialisée (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         return arbre->info.type;

@@ -19,6 +19,13 @@ typedef struct arbre arbre_t;
 #define arbre_t arbre_t
 #endif
 
+typedef enum
+{
+  NON_CONSTANTE,
+  CONSTANTE_NON_INITIALISEE,
+  CONSTANTE_INITIALISEE
+} type_const_t;
+
 /* Structure représentant une variable */
 struct var_t
 {
@@ -26,8 +33,8 @@ struct var_t
   char* nom_type;
   classe_t* type;
   /* On peut avoir un attribut statique et constant dans le même temps,
-     d'où l'utilisation de deux booléens plutôt qu'un enum. */
-  int constante;
+     d'où l'utilisation de deux variables séparées plutôt qu'une seule. */
+  type_const_t constante;
   int statique;
   /* Arbre syntaxique donnant l'expression de la valeur par défaut */
   arbre_t* valeur_defaut;

@@ -11,7 +11,10 @@ var_t* nouvelle_variable(char* nom, char* type, int constante, int statique, arb
   
   var->nom = nom;
   var->nom_type = type;
-  var->constante = constante;
+  if (constante)
+    var->constante = (valeur_defaut != NIL(arbre_t)) ? CONSTANTE_INITIALISEE : CONSTANTE_NON_INITIALISEE;
+  else
+    var->constante = NON_CONSTANTE;
   var->statique = statique;
   var->valeur_defaut = valeur_defaut;
   var->suiv = NIL(var_t);
