@@ -1,0 +1,33 @@
+/**
+ * Pour vérifier que les blocs imbriqués sont bien gérés.
+ */
+
+class Test() is {
+  var x: Entier;
+  var y : Entier  
+  
+  def kung(o : Entier) returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+  def foo() returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+}
+
+class Barre(m : Entier) is {
+  var x: Entier;
+  var y : Entier  
+  
+}
+
+{
+  var t: Test;
+  var b : Barre
+  is
+  t := new Test();
+  b := new Barre();
+  t.kung();
+  t.foo(3)
+}

@@ -1,0 +1,29 @@
+/**
+ * Pour vérifier que les blocs imbriqués sont bien gérés.
+ */
+
+class Test() is {
+  var x: Entier;
+  var y : Entier
+
+  def foo() returns Entier is {
+    x := 42
+  }
+}
+
+{
+  var t: Test
+  is
+ /**/
+  new Test()+1337; 
+  new Test()-1337;
+  new Test()*1337;
+  new Test()/1337;
+  new Test()+1337;
+  42+new Test();
+  42-new Test();
+  42*new Test();
+  42/new Test();
+ /*  */
+  t := new Test()
+}

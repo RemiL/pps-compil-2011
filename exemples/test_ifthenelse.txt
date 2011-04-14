@@ -1,0 +1,32 @@
+class Test() is {
+
+  def foo() returns Entier is {
+    1111
+  }
+}
+
+{
+  var e: Entier
+  is
+  e := 4;
+  e := if(4 >= 5) then
+    {
+      if 9 then 0 else 2;
+      4
+    }
+    
+    else
+    {
+      4
+    };
+  9;
+  /* le suivant doit bugguer car then et else renvoient un type différent
+  e := if 8>0 then "bouh" else "ahahah"; */
+  
+  if 8=8 then 3 else "cassé !";
+  
+  4
+}
+
+
+

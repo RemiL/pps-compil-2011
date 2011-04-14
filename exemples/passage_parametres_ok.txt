@@ -1,0 +1,57 @@
+/**
+ * Pour vérifier que les appels de méthodes normales et constructeurs 
+ * ne sont pas rejetés s'ils sont corrects
+ */
+
+class Test(xc: Entier) is {
+  var x: Entier;
+  val y : Entier := 8
+
+  def foo(z : Entier) returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+  
+  def kung(z : Entier := 34) returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+}
+
+class TestBis(xc: Entier := 42) is {
+  var x: Entier
+  
+  def foo(z : Entier) returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+  
+  def kung(z : Entier := 34, e: Chaine := "vers l'infini et au-delà") returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+  
+  def static meth(c : Chaine, z : Entier := 34) returns Entier is {
+    x := 42;
+    x := x + 1
+  }
+  
+}
+
+{
+  var t: Test;
+  var m : TestBis
+  is
+  t := new Test(3);
+  t.foo(34);
+  t.kung();
+  t.kung(6);
+  m := new TestBis(3);
+  m := new TestBis();
+  m.kung(8);
+  TestBis.meth("bouh")
+  
+  
+  
+  
+}
