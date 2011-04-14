@@ -354,6 +354,23 @@ classe_t* chercher_classe(liste_classes_t liste_classes, char* nom)
   return classe;
 }
 
+/**
+ * Recherche si une classe ou une des classes dont elle descend
+ * possède une méthode du nom fourni.
+ */
+methode_t* chercher_methode_arborescence_classe(classe_t* classe, char* nom)
+{
+  methode_t* methode = NIL(methode_t);
+  
+  while (classe != NIL(classe_t) && methode == NIL(methode_t))
+  {
+    methode = chercher_methode(classe->methodes, nom);
+    classe = classe->classe_mere;
+  }
+  
+  return methode;
+}
+
 liste_classes_t nouvelle_liste_classes(classe_t* classe)
 {
   liste_classes_t liste_classes;

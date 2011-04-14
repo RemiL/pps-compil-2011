@@ -421,7 +421,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       case Appel:
       case AppelStatique:
         type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
-        arbre->info.methode = chercher_methode(type->methodes, arbre->droit.A->gauche.S);
+        arbre->info.methode = chercher_methode_arborescence_classe(type, arbre->droit.A->gauche.S);
         if (arbre->info.methode == NIL(methode_t))
         {
           printf("La classe %s ne possède pas de méthode %s (ligne : %d).\n", type->nom, arbre->droit.A->gauche.S, arbre->num_ligne);

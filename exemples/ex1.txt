@@ -67,6 +67,11 @@ class Couleur(cinit: Entier := 0)
       else if coul = 1 then "Noir" 
       else "Gris"
       }
+
+  def estGris() returns Entier is {
+      "Inside Couleur::estGris\n".imprimer();
+      coul * (coul - 1) <> 0
+      }
 }
 
 class PointColore(xc: Entier, yc:Entier, c: Couleur:= Couleur.blanc())
@@ -80,7 +85,7 @@ class PointColore(xc: Entier, yc:Entier, c: Couleur:= Couleur.blanc())
 
   def estGris() returns Entier is {
       "Inside PointColore::estGris\n".imprimer();
-      coul * (coul - 1) <> 0
+      coul.estGris()
       }
 
   def override print() returns Point is {
@@ -117,24 +122,24 @@ class Test() is {
       p.print(); "\n".imprimer();
       p2.print(); "\n".imprimer();
       "Appel 1: \n".imprimer();
-      c := if p2.colore <> 0 then "colore" else "gris";
+      c := if p2.estGris() = 0 then "colore" else "gris";
       "Appel 2: \n".imprimer();
-      c2 := if p3.colore <> 0 then "colore" else "gris";
+      c2 := if p3.estGris() = 0 then "colore" else "gris";
       "Appel 3: \n".imprimer();
-      c3 := if p3.colore() <> 0 then "colore" else "gris";
+      c3 := if p3.estGris() = 0 then "colore" else "gris";
       "Resultats de test: ".imprimer();
       c.imprimer(); " ".imprimer();
       c2.imprimer(); " ".imprimer();
       c3.imprimer(); "\n".imprimer();
       0  
       } 
-  def static test2(p: PointColore) returns Entier is { p.couleur.imprimer(); 1 }
+  def static test2(p: PointColore) returns Entier is { p.couleur().imprimer(); 1 }
 }
 /* Bloc qui correspond au programme principal */ 
 { 
   var p1: Point := new Point(1, 5);
   var p2: Point := new Point(2, 3);
-  var o : PointColore := new PointColore(0, 0, 5);
+  var o : PointColore := new PointColore(0, 0);
   var pn : PointNoir := new PointNoir(+1, -1);
   var dp : DefaultPoint := new DefaultPoint()
 is
@@ -160,6 +165,6 @@ is
 
   "test(PointNoir, PointNoir, PointNoir)\n".imprimer();
   Test.test(p1, o, pn);
-  test.test2(o);
+  Test.test2(o);
   Test.test2(pn)
 }
