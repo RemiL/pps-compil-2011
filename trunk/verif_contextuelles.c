@@ -500,6 +500,11 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("La classe %s ne possède pas d'attribut %s (ligne : %d).\n", type->nom, arbre->droit.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
+        else if (type_this == NIL(classe_t) || !type_est_compatible(type, type_this)) // Les attributs sont protected
+        {
+          printf("L'accès à l'attribut %s est interdit en dehors de la classe %s ou de ses classes filles (ligne : %d).\n", arbre->droit.S, type->nom, arbre->num_ligne);
+          exit(EXIT_FAILURE);
+        }
         else if (arbre->op == SelectionStatique && !arbre->info.var->statique)
         {
           printf("L'attribut %s de la classe %s n'est pas statique (ligne : %d).\n", arbre->droit.S, type->nom, arbre->num_ligne);
