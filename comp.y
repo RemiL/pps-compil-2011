@@ -74,7 +74,7 @@ extern void yyerror();
   *
   */
 
-S : LDefClass Bloc { liberer_liste_classes($1); liberer_arbre($2); }
+S : LDefClass Bloc { est_valide_arbre_syntaxique($1, NIL(decl_vars_t), $2, NIL(classe_t)); liberer_liste_classes($1); liberer_arbre($2); }
 ;
 
 LDefClass : LDefClass DefClass        // Ldef : liste non vide de declaration de classe

@@ -313,7 +313,7 @@ void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars
   // Pour tous les arguments on vérifie qu'ils correspondent aux paramètres attendus
   while (a != NIL(arg_t) && p != NIL(param_t))
   {
-    if(est_valide_arbre_syntaxique(decl_classes, decl_vars, a->expr, type_this) != p->type)
+    if(!type_est_compatible(est_valide_arbre_syntaxique(decl_classes, decl_vars, a->expr, type_this), p->type))
     {
       printf("L'argument n°%d passé à la méthode %s n'a pas le type attendu du paramètre %s (ligne %d).\n",  num, methode->nom, p->nom, a->expr->num_ligne);
       exit(EXIT_FAILURE);
@@ -403,6 +403,11 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           {
             arbre->type_var = THIS;
             arbre->info.type = type = type_this;
+          }
+          else if (!strcmp("super", arbre->gauche.S))
+          {
+            arbre->type_var = SUPER;
+            arbre->info.type = type = type_this->classe_mere;
           }
         }
         
