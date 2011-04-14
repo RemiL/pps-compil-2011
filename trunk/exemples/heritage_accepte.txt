@@ -1,0 +1,60 @@
+/**
+ * Pour vérifier qu'une fille arrive bien à récupérer 50 % des biens de sa mère après sa mort
+ * (dans la condition où elle est la seule descendante et que la mère était veuve)
+ * (la valeur de 50 % est valable en France mais peut prendre des valeurs différentes dans d'autres pays)
+ */
+
+class Maman(a : Entier)
+{ age := a}
+
+ is {
+  
+  var age : Entier
+  
+  def lukeJeSuisTaMere() returns Entier is {
+    14
+  }
+  
+  def static sabrer() returns Entier is{
+    30
+   }
+   
+   
+  def leviter() returns Chaine is{
+    "esquive"
+   }
+   
+}
+
+class Fifille(a : Entier ) extends Maman(a) is {
+
+  def override lukeJeSuisTaMere() returns Entier is {
+    14
+  }
+
+  def static areYouMyMummy(m : Maman) returns Chaine is {
+    "Viens voir d'un peu plus près"
+  }
+  
+  def manger() returns Chaine is {
+    "miam"
+  }
+}
+
+
+
+{
+  var t: Maman
+  is
+  t := new Maman(3);
+  t := new Fifille(19);
+  t.lukeJeSuisTaMere();
+  Fifille.areYouMyMummy(new Maman(34) );
+ /*  t.manger();     doit bugguer */
+  3
+}
+
+
+
+
+

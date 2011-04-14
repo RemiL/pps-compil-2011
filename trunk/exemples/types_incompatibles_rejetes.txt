@@ -1,0 +1,33 @@
+/*
+  Vérifie que 2 classes de familles différentes ne peuvent se transférer de l'une à l'autre
+
+*/
+
+
+class Gentil() is {
+
+  def foo() returns Entier is {
+    42
+  }
+}
+
+class Mechant() is {
+
+  def foo() returns Entier is {
+    1337
+  }
+}
+
+{
+  var g: Gentil
+  is
+  g := new Gentil();  
+  g := new Mechant() /* un gentil ne peut pas se transformer en méchant si facilement (sauf s'il s'agit de Dr Jekyll et Mr Hide) */
+}
+
+
+
+
+
+
+

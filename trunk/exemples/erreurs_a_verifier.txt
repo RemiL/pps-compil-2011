@@ -4,7 +4,11 @@
 	méthode
 	attribut
 	variable
+
+- opérateurs seulement pour les entiers
 	
+- appels corrects
+
 -nom en double	
 	
 - override comme il faut
@@ -15,11 +19,10 @@
 	
 	*avec et sans paramètre optionnel
 	
-- opérateurs seulement pour les entiers
 
-- appels corrects
+- type conforme
 
-- sélection correcte
+- héritage accepté
 
 
 	
