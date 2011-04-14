@@ -8,7 +8,7 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
 {  
   classe->classe_mere = chercher_classe(decl, classe->nom_classe_mere);
   
-  if (chercher_classe(decl, classe->nom) != NULL)
+  if (chercher_classe(decl, classe->nom) != NIL(classe_t))
   {
     printf("Classe %s invalide : une classe portant de le même nom existe déjà.\n", classe->nom);
     exit(EXIT_FAILURE);
@@ -21,7 +21,7 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
       printf("Classe %s invalide : une classe ne peut pas hériter d'elle-même.\n", classe->nom);
       exit(EXIT_FAILURE);
     }
-    else if (classe->classe_mere == NULL)
+    else if (classe->classe_mere == NIL(classe_t))
     {
       printf("Classe %s invalide : la classe mère %s n'existe pas.\n", classe->nom, classe->nom_classe_mere);
       exit(EXIT_FAILURE);
@@ -49,11 +49,11 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
   var_t* attribut = classe->attributs.tete;
   char* nom_classe_masquage;
   
-  while (attribut != NULL)
+  while (attribut != NIL(var_t))
   {
     attribut->type = chercher_classe(decl, attribut->nom_type);
     
-    if (attribut->type == NULL)
+    if (attribut->type == NIL(classe_t))
     {
       if (!strcmp(attribut->nom_type, classe->nom))  // si un attribut de la classe a est de type a
         attribut->type = classe;
@@ -77,7 +77,7 @@ void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* clas
 {
   var_t* attribut = classe->attributs.tete;
   
-  while (attribut != NULL)
+  while (attribut != NIL(var_t))
   {
     if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                     decl_generer_depuis_classe(classe),
@@ -94,7 +94,7 @@ void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* clas
 
 char* masque_attribut(classe_t* classe_mere, char* attribut)
 {
-  if (classe_mere == NULL)
+  if (classe_mere == NIL(classe_t))
     return NULL;
   else if (chercher_variable(classe_mere->attributs, attribut) != NULL)
     return classe_mere->nom;
@@ -108,11 +108,11 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
   methode_t* methode_redefinie;
   classe_t* c;
   
-  while (methode != NULL)
+  while (methode != NIL(methode_t))
   {
     methode->type_retour = chercher_classe(decl, methode->nom_type_retour);
     
-    if (methode->nom_type_retour != NULL && methode->type_retour == NULL)
+    if (methode->nom_type_retour != NULL && methode->type_retour == NIL(classe_t))
     {
       if (!strcmp(methode->nom_type_retour, classe->nom))
         methode->type_retour = classe;
@@ -125,16 +125,16 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
     
     sont_valides_params(decl, classe, methode);
     
-    methode_redefinie = NULL;
+    methode_redefinie = NIL(methode_t);
     c = classe->classe_mere;
     
-    while (c != NULL && methode_redefinie == NULL)
+    while (c != NIL(classe_t) && methode_redefinie == NIL(methode_t))
     {
       methode_redefinie = chercher_methode(c->methodes, methode->nom);
       c = c->classe_mere;
     }
     
-    if (methode_redefinie != NULL)
+    if (methode_redefinie != NIL(methode_t))
     {
       if (methode->type_methode != REDEFINIE)
       {
@@ -158,7 +158,7 @@ void sont_valides_arbres_syntaxiques_methodes(liste_classes_t decl, classe_t* cl
 {
   methode_t* methode = classe->methodes.tete;
   
-  while (methode != NULL)
+  while (methode != NIL(methode_t))
   {
     sont_valides_valeurs_defauts_params(decl, classe, methode);
     
@@ -179,11 +179,11 @@ void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* meth
 {
   param_t* param = methode->params.tete;
   
-  while (param != NULL)
+  while (param != NIL(param_t))
   {
     param->type = chercher_classe(decl, param->nom_type);
     
-    if (param->type == NULL)
+    if (param->type == NIL(classe_t))
     {
       if (!strcmp(param->nom_type, classe->nom))  // Si un param de la classe A est de type A
         param->type = classe;
@@ -202,7 +202,7 @@ void sont_valides_valeurs_defauts_params(liste_classes_t decl, classe_t* classe,
 {
   param_t* param = methode->params.tete;
   
-  while (param != NULL)
+  while (param != NIL(param_t))
   {
     if (param->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                  decl_generer_depuis_classe(classe),
@@ -234,7 +234,7 @@ void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* me
     exit(EXIT_FAILURE);
   }
   
-  while (param != NULL && param_redef != NULL)
+  while (param != NIL(param_t) && param_redef != NIL(param_t))
   {
     if (param->type != param_redef->type)
     {
@@ -246,7 +246,7 @@ void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* me
     param_redef = param_redef->suiv;
   }
   
-  if (param != NULL || param_redef != NULL)
+  if (param != NIL(param_t) || param_redef != NIL(param_t))
   {
     printf("Classe %s : la méthode %s n'est pas valide, elle n'a pas le même nombre de paramètres que la méthode qu'elle redéfinit.\n", classe->nom, methode->nom);
     exit(EXIT_FAILURE);
@@ -258,7 +258,7 @@ void est_valide_redefinition(classe_t* classe, methode_t* methode, methode_t* me
  */
 void est_valide_param(liste_params_t liste, param_t* parametre)
 {
-  if (chercher_param(liste, parametre->nom) != NULL)
+  if (chercher_param(liste, parametre->nom) != NIL(param_t))
   {
     printf("Paramètre %s invalide : un paramètre avec le même nom a déjà été déclaré.\n", parametre->nom);
     exit(EXIT_FAILURE);
@@ -270,7 +270,7 @@ void est_valide_param(liste_params_t liste, param_t* parametre)
  */
 void est_valide_methode(liste_methodes_t liste, methode_t* methode)
 {  
-  if (chercher_methode(liste, methode->nom) != NULL)
+  if (chercher_methode(liste, methode->nom) != NIL(methode_t))
   {
     printf("Méthode %s invalide : une méthode avec le même nom a déjà été déclarée.\n", methode->nom);
     exit(EXIT_FAILURE);
@@ -281,11 +281,11 @@ void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars
 {
   var_t* var = variables.tete;
   
-  while (var != NULL)
+  while (var != NIL(var_t))
   {
     var->type = chercher_classe(decl_classes, var->nom_type);
     
-    if (var->type == NULL)
+    if (var->type == NIL(classe_t))
     {
       printf("Type invalide pour la variable %s : la classe %s est inconnue.\n", var->nom, var->nom_type);
       exit(EXIT_FAILURE);
@@ -326,7 +326,7 @@ void sont_valides_arguments(liste_classes_t decl_classes, decl_vars_t* decl_vars
    
   if (p == NIL(param_t) && a != NIL(arg_t))
   {
-    printf("Les arguments passés à la methode %s ne correspondent pas : il y a trop d'arguments.\n", methode->nom);
+    printf("Les arguments passés à la methode %s ne correspondent pas : il y a trop d'arguments (ligne %d).\n", methode->nom, a->expr->num_ligne);
     exit(EXIT_FAILURE);
   }
    
@@ -353,6 +353,32 @@ int type_est_compatible(classe_t* type1, classe_t* type2)
   }
   
   return est_compatible;
+}
+
+/**
+ * Retourne l'éventuel ancètre commun de deux classes
+ * ou NIL(classe_t) s'il n'en existe pas.
+ */
+classe_t* ancetre_commun(classe_t* type1, classe_t* type2)
+{
+  classe_t* t = type2;
+  classe_t* ancetre = NIL(classe_t);
+  
+  while (type1 != NIL(classe_t) && ancetre == NIL(classe_t))
+  {
+    while (t != NIL(classe_t) && ancetre == NIL(classe_t))
+    {
+      if (type1 == t)
+        ancetre = t;
+      
+      t = t->classe_mere;
+    }
+    
+    t = type2;
+    type1 = type1->classe_mere;
+  }
+  
+  return ancetre;
 }
 
 /**
@@ -508,8 +534,9 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("La condition d'une expression conditionnelle doit être de type entier (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->gauche.A, type_this);
-        if (arbre->info.type != est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->droit.A, type_this))
+        arbre->info.type = ancetre_commun(est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->gauche.A, type_this),
+                                          est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A->droit.A, type_this));
+        if (arbre->info.type == NIL(classe_t))
         {
           printf("Les parties else et then d'une expression conditionnelles doivent être de type compatible (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
