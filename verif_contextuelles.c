@@ -42,6 +42,11 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
   
   sont_valides_valeurs_defauts_attributs(decl, classe);
   sont_valides_arbres_syntaxiques_methodes(decl, classe);
+  
+  /* Vérification de l'appel au constructeur de la classe mère */
+  if (classe->classe_mere != NIL(classe_t))
+    sont_valides_arguments(ajouter_classe(decl, classe), decl_ajouter_params(NIL(decl_vars_t), classe->constructeur->params),
+                           classe->classe_mere->constructeur, classe->args_classe_mere, NIL(classe_t));
 }
 
 void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
@@ -115,6 +120,13 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
   
   while (methode != NIL(methode_t))
   {
+    /* Bizarre mais demandé par le sujet : un attribut et une méthode ne peuvent avoir le même nom. */
+    if (chercher_variable(classe->attributs, methode->nom) != NIL(var_t))
+    {
+      printf("Classe %s : la méthode %s est invalide, elle porte le même nom qu'un attribut.\n", classe->nom, methode->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     methode->type_retour = chercher_classe(decl, methode->nom_type_retour);
     
     if (methode->nom_type_retour != NULL && methode->type_retour == NIL(classe_t))
