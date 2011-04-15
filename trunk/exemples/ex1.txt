@@ -69,15 +69,20 @@ class Couleur(cinit: Entier := 0)
       }
 
   def estGris() returns Entier is {
-      "Inside Couleur::estGris\n".imprimer();
-      coul * (coul - 1) <> 0
-      }
+  "Inside Couleur::estGris\n".imprimer();
+  coul = 2
+  }
+
 }
 
 class PointColore(xc: Entier, yc:Entier, c: Couleur:= Couleur.blanc())
       extends Point(xc, yc) { coul := c } is {
       
   val coul: Couleur
+
+  def couleur() returns Couleur is { coul }
+
+  def colore() returns Entier is { coul.estGris() <> 0 }
 
   def override clone() returns Point /* pas PointColore ! */ is {
       new PointColore(x, y, coul)
@@ -90,12 +95,8 @@ class PointColore(xc: Entier, yc:Entier, c: Couleur:= Couleur.blanc())
 
   def override print() returns Point is {
       "Inside PointColore::print\n".imprimer();
-      super.print(); this.couleur().imprimer(); "\n".imprimer();
+      super.print(); this.couleur().couleur().imprimer(); "\n".imprimer();
       this
-      }
-      
-  def couleur() returns Chaine is {
-      coul.couleur()
       }
 }
 
@@ -104,7 +105,7 @@ class PointNoir(xc: Entier, yc:Entier)
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def override couleur() returns Chaine is { "Noir" }
+  def override couleur() returns Couleur is { Couleur.noir() }
 }
 
 class DefaultPoint()
@@ -112,7 +113,7 @@ class DefaultPoint()
       /* pas d'instruction d'initialisation pour cette classe */
   is {
   def override estGris() returns Entier is { 0 }
-  def override couleur() returns Chaine is { "Blanc" }
+  def override couleur() returns Couleur is {  Couleur.blanc() }
 }
 
 class Test() is {
@@ -122,18 +123,21 @@ class Test() is {
       p.print(); "\n".imprimer();
       p2.print(); "\n".imprimer();
       "Appel 1: \n".imprimer();
-      c := if p2.estGris() = 0 then "colore" else "gris";
+      c := if p2.colore() <> 0 then "colore" else "gris";
       "Appel 2: \n".imprimer();
-      c2 := if p3.estGris() = 0 then "colore" else "gris";
+      c2 := if p3.colore() <> 0 then "colore" else "gris";
       "Appel 3: \n".imprimer();
-      c3 := if p3.estGris() = 0 then "colore" else "gris";
+      c3 := if p3.colore() <> 0 then "colore" else "gris";
       "Resultats de test: ".imprimer();
       c.imprimer(); " ".imprimer();
       c2.imprimer(); " ".imprimer();
       c3.imprimer(); "\n".imprimer();
       0  
       } 
-  def static test2(p: PointColore) returns Entier is { p.couleur().imprimer(); 1 }
+  def static test2(p: PointColore) returns Entier is { 
+      p.couleur().couleur().imprimer(); 
+      1 
+      }
 }
 /* Bloc qui correspond au programme principal */ 
 { 
@@ -150,7 +154,7 @@ is
   p2.print();
   o.clone().print();
   o.clone().move(54, 36).print();
-  /* la ligne ci-dessous ne compile pas car clone() renvoie un Point */
+  /* la ligne ci-dessous ne compile pas car clone() renvoie statiquement un Point */
   /* o := o.clone(); */
   p1 := p1.clone().move(+2, -3); p1.print();
   o.clone().print();
