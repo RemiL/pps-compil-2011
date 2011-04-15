@@ -450,11 +450,23 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         {
           if (!strcmp("this", arbre->gauche.S))
           {
+            if (type_this == NIL(classe_t))
+            {
+              printf("L'identificateur this ne peut pas être utilisé en dehors d'une classe (ligne : %d).\n", arbre->num_ligne);
+              exit(EXIT_FAILURE);
+            }
+            
             arbre->type_var = THIS;
             arbre->info.type = type = type_this;
           }
           else if (!strcmp("super", arbre->gauche.S))
           {
+            if (type_this == NIL(classe_t) || type_this->classe_mere == NIL(classe_t))
+            {
+              printf("L'identificateur super ne peut pas être utilisé en dehors d'une classe définie par héritage (ligne : %d).\n", arbre->num_ligne);
+              exit(EXIT_FAILURE);
+            }
+            
             arbre->type_var = SUPER;
             arbre->info.type = type = type_this->classe_mere;
           }
@@ -479,6 +491,11 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         else if (arbre->op == AppelStatique && arbre->info.methode->type_methode != STATIQUE)
         {
           printf("La méthode %s de la classe %s n'est pas statique (ligne : %d).\n", arbre->droit.A->gauche.S, type->nom, arbre->num_ligne);
+          exit(EXIT_FAILURE);
+        }
+        else if (arbre->gauche.A->type_var == SUPER && chercher_methode(type_this->methodes, arbre->info.methode->nom) == NIL(methode_t))
+        {
+          printf("L'identificateur super ne peut être utilisé que comme destinataire d'une méthode redéfinie (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
         sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.A->droit.args, type_this);
@@ -519,7 +536,12 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       case Selection:
       case SelectionStatique:
         type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->gauche.A, type_this);
-        if ((arbre->info.var = chercher_variable(type->attributs, arbre->droit.S)) == NIL(var_t))
+        if (arbre->gauche.A->type_var == SUPER)
+        {
+          printf("L'identificateur super ne peut être utilisé que pour les envois de message (ligne : %d).\n", arbre->num_ligne);
+          exit(EXIT_FAILURE);
+        }
+        else if ((arbre->info.var = chercher_variable(type->attributs, arbre->droit.S)) == NIL(var_t))
         {
           printf("La classe %s ne possède pas d'attribut %s (ligne : %d).\n", type->nom, arbre->droit.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
