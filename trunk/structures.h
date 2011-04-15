@@ -201,6 +201,7 @@ classe_t* nouvelle_classe(char* nom, char* classe_mere, liste_args_t args_classe
                           liste_vars_t attributs, liste_methodes_t methodes);
 liste_classes_t ajouter_classe(liste_classes_t liste_classes, classe_t* classe);
 classe_t* chercher_classe(liste_classes_t liste_classes, char* nom);
+var_t* chercher_attribut_arborescence_classe(classe_t* classe, char* nom);
 methode_t* chercher_methode_arborescence_classe(classe_t* classe, char* nom);
 liste_classes_t nouvelle_liste_classes(classe_t* classe);
 liste_classes_t nouvelle_liste_classes_preinitialisee();

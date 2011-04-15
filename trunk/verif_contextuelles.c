@@ -556,7 +556,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("L'identificateur super ne peut être utilisé que pour les envois de message (ligne : %d).\n", arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
-        else if ((arbre->info.var = chercher_variable(type->attributs, arbre->droit.S)) == NIL(var_t))
+        else if ((arbre->info.var = chercher_attribut_arborescence_classe(type, arbre->droit.S)) == NIL(var_t))
         {
           printf("La classe %s ne possède pas d'attribut %s (ligne : %d).\n", type->nom, arbre->droit.S, arbre->num_ligne);
           exit(EXIT_FAILURE);

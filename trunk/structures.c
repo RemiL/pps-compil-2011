@@ -359,6 +359,23 @@ classe_t* chercher_classe(liste_classes_t liste_classes, char* nom)
 
 /**
  * Recherche si une classe ou une des classes dont elle descend
+ * possède un attribut du nom fourni.
+ */
+var_t* chercher_attribut_arborescence_classe(classe_t* classe, char* nom)
+{
+  var_t* attribut = NIL(var_t);
+  
+  while (classe != NIL(classe_t) && attribut == NIL(var_t))
+  {
+    attribut = chercher_variable(classe->attributs, nom);
+    classe = classe->classe_mere;
+  }
+  
+  return attribut;
+}
+
+/**
+ * Recherche si une classe ou une des classes dont elle descend
  * possède une méthode du nom fourni.
  */
 methode_t* chercher_methode_arborescence_classe(classe_t* classe, char* nom)
