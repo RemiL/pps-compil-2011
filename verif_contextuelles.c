@@ -40,13 +40,12 @@ void est_valide_classe(liste_classes_t decl, classe_t* classe)
   sont_valides_params(decl, classe, classe->constructeur);
   est_valide_arbre_syntaxique(ajouter_classe(decl, classe), decl_ajouter_params(decl_generer_depuis_classe(classe), classe->constructeur->params), classe->constructeur->bloc, classe, FAUX);
   
-  sont_valides_valeurs_defauts_attributs(decl, classe);
-  sont_valides_arbres_syntaxiques_methodes(decl, classe);
-  
   /* Vérification de l'appel au constructeur de la classe mère */
   if (classe->classe_mere != NIL(classe_t))
     sont_valides_arguments(ajouter_classe(decl, classe), decl_ajouter_params(NIL(decl_vars_t), classe->constructeur->params),
                            classe->classe_mere->constructeur, classe->args_classe_mere, NIL(classe_t));
+  
+  sont_initialisees_attributs_constants(classe);
 }
 
 void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
@@ -56,6 +55,16 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
   
   while (attribut != NIL(var_t))
   {
+    /* On fait la vérification de la valeur par défaut immédiatement pour n'avoir le bon environnement */
+    if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
+                                                                                                    decl_generer_depuis_classe(classe),
+                                                                                                    attribut->valeur_defaut, classe, FAUX),
+                                                                        attribut->type))
+    {
+      printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s (ligne %d).\n", classe->nom, attribut->nom, attribut->valeur_defaut->num_ligne);
+      exit(EXIT_FAILURE);
+    }
+    
     attribut->type = chercher_classe(decl, attribut->nom_type);
     
     if (attribut->type == NIL(classe_t))
@@ -78,21 +87,13 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
   }
 }
 
-void sont_valides_valeurs_defauts_attributs(liste_classes_t decl, classe_t* classe)
+void sont_initialisees_attributs_constants(classe_t* classe)
 {
   var_t* attribut = classe->attributs.tete;
   
   while (attribut != NIL(var_t))
   {
-    if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
-                                                                                                    decl_generer_depuis_classe(classe),
-                                                                                                    attribut->valeur_defaut, classe, FAUX),
-                                                                        attribut->type))
-    {
-      printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s (ligne %d).\n", classe->nom, attribut->nom, attribut->valeur_defaut->num_ligne);
-      exit(EXIT_FAILURE);
-    }
-    else if (attribut->constante == CONSTANTE_NON_INITIALISEE)
+    if (attribut->constante == CONSTANTE_NON_INITIALISEE)
     {
       printf("Classe %s : l'attribut constant %s n'est pas initialisé avec une valeur par défaut ou dans le constructeur.\n", classe->nom, attribut->nom);
       exit(EXIT_FAILURE);
@@ -167,18 +168,6 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
       exit(EXIT_FAILURE);
     }
     
-    methode = methode->suiv;
-  }
-}
-
-void sont_valides_arbres_syntaxiques_methodes(liste_classes_t decl, classe_t* classe)
-{
-  methode_t* methode = classe->methodes.tete;
-  
-  while (methode != NIL(methode_t))
-  {
-    sont_valides_valeurs_defauts_params(decl, classe, methode);
-    
     if (!type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                          decl_ajouter_params(decl_generer_depuis_classe(classe), methode->params),
                                                          methode->bloc, classe, methode->type_methode == STATIQUE),
@@ -211,16 +200,6 @@ void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* meth
       }
     }
     
-    param = param->suiv;
-  }
-}
-
-void sont_valides_valeurs_defauts_params(liste_classes_t decl, classe_t* classe, methode_t* methode)
-{
-  param_t* param = methode->params.tete;
-  
-  while (param != NIL(param_t))
-  {
     if (param->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                  decl_generer_depuis_classe(classe),
                                                                                                  param->valeur_defaut, classe, FAUX),
@@ -517,9 +496,10 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
         return arbre->info.methode->type_retour;
         
       case Bloc:
-        sont_valides_variables(decl_classes, decl_vars, arbre->gauche.vars, type_this, statique);
         // On ajoute à la liste courante de variables déclarées la liste des variables locales du bloc (en tête pour avoir la bonne notion de portée).
-        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_ajouter_variables(decl_vars, arbre->gauche.vars), arbre->droit.A, type_this, statique);
+        decl_vars = decl_ajouter_variables(decl_vars, arbre->gauche.vars);
+        sont_valides_variables(decl_classes, decl_vars, arbre->gauche.vars, type_this, statique);
+        arbre->info.type = est_valide_arbre_syntaxique(decl_classes, decl_vars, arbre->droit.A, type_this, statique);
         return arbre->info.type;
         
       case ';': // Séparateur d'expression, on renvoie le type de l'expression de droite.

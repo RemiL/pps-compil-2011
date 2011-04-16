@@ -371,6 +371,11 @@ var_t* chercher_attribut_arborescence_classe(classe_t* classe, char* nom)
     classe = classe->classe_mere;
   }
   
+  /* Si attribut est différent de NIL(attribut_t) et que attribut->type vaut NIL(classe_t)
+   * alors c'est que l'attribut n'est pas dans l'environnement accessible actuellement */
+  if (attribut != NIL(var_t) && attribut->type == NIL(classe_t))
+    attribut = NIL(var_t);
+  
   return attribut;
 }
 
@@ -382,11 +387,18 @@ methode_t* chercher_methode_arborescence_classe(classe_t* classe, char* nom)
 {
   methode_t* methode = NIL(methode_t);
   
-  while (classe != NIL(classe_t) && methode == NIL(methode_t))
+  /* Si methode est différent de NIL(methode_t) et que methode->type_retour vaut NIL(classe_t)
+   * alors c'est que la méthode n'est pas dans l'environnement accessible actuellement
+   * donc on continue la recherche si on peut. */
+  while (classe != NIL(classe_t) && (methode == NIL(methode_t) || methode->type_retour == NIL(classe_t)))
   {
     methode = chercher_methode(classe->methodes, nom);
     classe = classe->classe_mere;
   }
+  
+  /* On vérifie que la méthode trouvée appartient bien à l'environnement. */
+  if (methode != NIL(methode_t) && methode->type_retour == NIL(classe_t))
+    methode = NIL(methode_t);
   
   return methode;
 }
@@ -404,18 +416,27 @@ liste_classes_t nouvelle_liste_classes(classe_t* classe)
 
 liste_classes_t nouvelle_liste_classes_preinitialisee()
 {
-  liste_classes_t liste_classes; 
+  liste_classes_t liste_classes;
+  classe_t* classe;
+  methode_t* imprimer;
   
-  /* TODO à compléter ? */
-  liste_classes = nouvelle_liste_classes(nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
-                                         nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
-                                         nouvelle_liste_variables(NIL(var_t)),
-                                         nouvelle_liste_methodes(nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Entier")))));
-  liste_classes = ajouter_classe(liste_classes,
-                                 nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
-                                                 nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
-                                                 nouvelle_liste_variables(NIL(var_t)),
-                                                 nouvelle_liste_methodes(nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Chaine")))));
+  /* Classe Entier */
+  imprimer = nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Entier"));
+  classe = nouvelle_classe(strdup("Entier"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
+                           nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
+                           nouvelle_liste_variables(NIL(var_t)),
+                           nouvelle_liste_methodes(imprimer));
+  imprimer->type_retour = classe;
+  liste_classes = nouvelle_liste_classes(classe);
+  
+  /* Classe Chaine */
+  imprimer = nouvelle_methode(strdup("imprimer"), NORMALE, nouvelle_liste_params(NIL(param_t)), NIL(arbre_t), strdup("Chaine"));
+  classe = nouvelle_classe(strdup("Chaine"), NULL, nouvelle_liste_arguments(NIL(arg_t)),
+                           nouvelle_liste_params(NIL(param_t)), NIL(arbre_t),
+                           nouvelle_liste_variables(NIL(var_t)),
+                           nouvelle_liste_methodes(imprimer));
+  imprimer->type_retour = classe;
+  liste_classes = ajouter_classe(liste_classes, classe);
   
   return liste_classes;
 }
@@ -514,7 +535,7 @@ type_decl_t decl_chercher_id(decl_vars_t* decl, char* id, var_t** var, param_t**
         type = PARAM;
     }
     else if ((*var = chercher_variable(decl->decl.vars, id)) != NIL(var_t))
-      type = decl->type;
+      type = ((*var)->type != NIL(classe_t)) ? decl->type : 0; /* On vérifie que la variable trouvée soit bien dans l'environnement accessible. */
     
     decl = decl->suiv;
   }
