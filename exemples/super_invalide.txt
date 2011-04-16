@@ -1,0 +1,29 @@
+class A() is {
+
+  def foo() returns Chaine is {
+    "A::foo()\n".imprimer()
+  }
+}
+
+class B() extends A() is {
+
+  def override foo() returns Chaine is {
+    "B::foo()\n".imprimer()
+  }
+}
+
+class C() extends B() is {
+  /*def override foo() returns Chaine is {
+    "C::foo()\n".imprimer()
+  }*/
+  
+  def bar() returns Chaine is {
+    super.foo()
+  }
+}
+
+{
+  var t: C := new C()
+  is
+  t.bar()
+}

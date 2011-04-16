@@ -22,6 +22,14 @@ is {
       x := x + dx; y := y + dy; this
   }
 
+  def print() returns Point is {
+      "Inside Point::print\n".imprimer();
+      name.imprimer(); "[".imprimer(); iname.imprimer(); "]".imprimer();
+      "= (".imprimer(); x.imprimer();
+      ", ".imprimer(); y.imprimer(); ")".imprimer();
+      this
+  }
+
   def verboseMove (dx: Entier, dy: Entier) returns Point is {
       this.move(dx, dy); /* le this est obligatoire */
       this.print();
@@ -31,14 +39,6 @@ is {
   def getx() returns Entier is { x }
 
   def gety() returns Entier is { y }
-
-  def print() returns Point is {
-      "Inside Point::print\n".imprimer();
-      name.imprimer(); "[".imprimer(); iname.imprimer(); "]".imprimer();
-      "= (".imprimer(); x.imprimer();
-      ", ".imprimer(); y.imprimer(); ")".imprimer();
-      this
-  }
 
   def clone() returns Point is { new Point(x, y) }
 
