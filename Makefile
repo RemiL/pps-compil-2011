@@ -1,4 +1,4 @@
-OBJ=structures.o arbres.o verif_contextuelles.o comp.o lex.o main.o
+OBJ=structures.o arbres.o verif_contextuelles.o generation_code.o comp.o lex.o main.o
 CC=gcc
 CFLAGS=-Wall -I./ -g 
 LDFLAGS= -g -lfl
@@ -24,8 +24,11 @@ structures.o: structures.c structures.h utils.h
 arbres.o: arbres.c arbres.h utils.h
 	$(CC) $(CFLAGS) -c arbres.c
 	
-verif_contextuelles.o: verif_contextuelles.c verif_contextuelles.h utils.h
+verif_contextuelles.o: verif_contextuelles.c verif_contextuelles.h structures.o arbres.o
 	$(CC) $(CFLAGS) -c verif_contextuelles.c
+
+generation_code.o: generation_code.c generation_code.h structures.o arbres.o
+	$(CC) $(CFLAGS) -c generation_code.c
 
 lex.c : comp.l
 	flex --yylineno -o lex.c comp.l
