@@ -112,6 +112,7 @@ liste_params_t ajouter_param(liste_params_t liste_params, param_t* param)
   }
   
   l.queue = param;
+  l.nb = liste_params.nb + 1;
   
   return l;
 }
@@ -129,6 +130,7 @@ liste_params_t ajouter_param_en_tete(liste_params_t liste_params, param_t* param
   }
   
   l.tete = param;
+  l.nb = liste_params.nb + 1;
   
   return l;
 }
@@ -149,6 +151,7 @@ liste_params_t nouvelle_liste_params(param_t* param)
   
   liste_params.tete = param;
   liste_params.queue = param;
+  liste_params.nb = (param != NIL(param_t));
   
   return liste_params;
 }
