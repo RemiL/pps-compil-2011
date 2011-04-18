@@ -38,6 +38,8 @@ struct var_t
   int statique;
   /* Arbre syntaxique donnant l'expression de la valeur par défaut */
   arbre_t* valeur_defaut;
+  /* Décalage à effectuer pour accéder à la variable */
+  int index;
 
   /* On utilise une liste chainée */
   var_t* suiv;
@@ -67,6 +69,8 @@ struct param_t
   classe_t* type;
   /* Arbre syntaxique donnant l'expression de la valeur par défaut */
   arbre_t* valeur_defaut;
+  /* Décalage à effectuer pour accéder au paramètre */
+  int index;
 
   /* On utilise une liste chainée */
   param_t* suiv;
@@ -77,6 +81,7 @@ typedef struct
 {
   param_t* tete;
   param_t* queue;
+  int nb; /* Nombre de paramètres */
 } liste_params_t;
 
 /* Structure représentant une méthode */
@@ -88,6 +93,8 @@ struct methode_t
   arbre_t* bloc; /* L'arbre syntaxique du bloc */
   char* nom_type_retour;
   classe_t* type_retour;
+  /* Index dans la table des sauts */
+  int index;
 
   /* On utilise une liste chainée */
   methode_t* suiv;
@@ -122,8 +129,15 @@ struct classe_t
   classe_t* classe_mere;
   liste_args_t args_classe_mere; /* Les arguments de la classe mère en cas d'héritage. */
   liste_vars_t attributs;
+  /* Nombre d'attributs non statiques (en incluant ceux des classes parentes) */
+  int nb_attributs_non_statiques;
   liste_methodes_t methodes;
+  /* Nombre de methodes disponibles (en incluant celles des classes parentes) */
+  int nb_methodes;
   methode_t* constructeur; /* le constructeur n'est rien de plus qu'une méthode particulière */
+  /* Décalage à effectuer à partir du fond de pile pour accéder
+   * à la table des sauts de la classe. */
+  int decalage_table_sauts;
 
   /* On utilise une liste chainée */
   classe_t* suiv;

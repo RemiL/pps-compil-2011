@@ -5,6 +5,7 @@
 #include "structures.h"
 #include "arbres.h"
 #include "verif_contextuelles.h"
+#include "generation_code.h"
 
 typedef union
 { 
