@@ -194,6 +194,13 @@ void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* meth
   
   while (param != NIL(param_t))
   {
+    /* On ne peut pas déclarer des attributs utilisant les identificateurs spéciaux this et super */
+    if (!strcmp(param->nom, "this") || !strcmp(param->nom, "super"))
+    {
+      printf("Classe %s : méthode %s : un paramètre ne peut pas utiliser l'identificateur spécial %s.\n", classe->nom, methode->nom, param->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     param->type = chercher_classe(decl, param->nom_type);
     
     if (param->type == NIL(classe_t))
