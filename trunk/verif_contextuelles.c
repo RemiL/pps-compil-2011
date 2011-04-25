@@ -55,6 +55,13 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
   
   while (attribut != NIL(var_t))
   {
+    /* On ne peut pas déclarer des attributs utilisant les identificateurs spéciaux this et super */
+    if (!strcmp(attribut->nom, "this") || !strcmp(attribut->nom, "super"))
+    {
+      printf("Classe %s : un attribut ne peut pas utiliser l'identificateur spécial %s.\n", classe->nom, attribut->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     /* On fait la vérification de la valeur par défaut immédiatement pour n'avoir le bon environnement */
     if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                     decl_generer_depuis_classe(classe),
@@ -279,6 +286,13 @@ void sont_valides_variables(liste_classes_t decl_classes, decl_vars_t* decl_vars
   
   while (var != NIL(var_t))
   {
+    /* On ne peut pas déclarer des variables utilisant les identificateurs spéciaux this et super */
+    if (!strcmp(var->nom, "this") || !strcmp(var->nom, "super"))
+    {
+      printf("Une variable ne peut pas utiliser l'identificateur spécial %s.\n", var->nom);
+      exit(EXIT_FAILURE);
+    }
+    
     var->type = chercher_classe(decl_classes, var->nom_type);
     
     if (var->type == NIL(classe_t))
