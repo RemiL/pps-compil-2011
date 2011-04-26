@@ -128,8 +128,14 @@ void sont_valides_methodes(liste_classes_t decl, classe_t* classe)
   
   while (methode != NIL(methode_t))
   {
+    /* On ne peut pas déclarer des méthodes avec pour nom les identificateurs spéciaux this et super */
+    if (!strcmp(methode->nom, "this") || !strcmp(methode->nom, "super"))
+    {
+      printf("Classe %s : une méthode ne peut pas utiliser l'identificateur spécial %s.\n", classe->nom, methode->nom);
+      exit(EXIT_FAILURE);
+    }
     /* Bizarre mais demandé par le sujet : un attribut et une méthode ne peuvent avoir le même nom. */
-    if (chercher_variable(classe->attributs, methode->nom) != NIL(var_t))
+    else if (chercher_variable(classe->attributs, methode->nom) != NIL(var_t))
     {
       printf("Classe %s : la méthode %s est invalide, elle porte le même nom qu'un attribut.\n", classe->nom, methode->nom);
       exit(EXIT_FAILURE);
