@@ -48,6 +48,8 @@
 
 extern int yylex();
 extern void yyerror();
+
+extern FILE* fichier_code_genere;
 %}
 
 %% 
@@ -81,6 +83,7 @@ S : LDefClass Bloc
   
   /* Génération de code */
   calculer_index($1, $2);
+  generer_code(fichier_code_genere, $1, $2);
   
   liberer_liste_classes($1);
   liberer_arbre($2);
