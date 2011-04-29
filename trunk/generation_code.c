@@ -91,7 +91,7 @@ int calculer_index_methodes(classe_t* classe, int decalage_bg)
     }
     
     calculer_index_params(methode);
-    calculer_index_variables_locales_arbre(methode->bloc, 0);
+    methode->nb_variables_locales = calculer_index_variables_locales_arbre(methode->bloc, 0);
     
     methode = methode->suiv;
   }
@@ -291,8 +291,9 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
     afficher_liste_params(fichier, methode->params);
     fprintf(fichier, ")\n");
     
-    fprintf(fichier, "%s_%s: NOP\n", classe->nom, methode->nom);
+    fprintf(fichier, "%s_%s: PUSHN %d\n", classe->nom, methode->nom, methode->nb_variables_locales);
     
+    fprintf(fichier, "\tPOPN %d\n", methode->nb_variables_locales);
     fprintf(fichier, "\tRETURN\n");
     
     fprintf(fichier, "-- Fin code %s::%s()\n", classe->nom, methode->nom);

@@ -93,6 +93,9 @@ struct methode_t
   arbre_t* bloc; /* L'arbre syntaxique du bloc */
   char* nom_type_retour;
   classe_t* type_retour;
+  /* Nombre de variables locales dans l'arbre 
+   * syntaxique de la méthode. */
+  int nb_variables_locales;
   /* Index dans la table des sauts */
   int index;
 
