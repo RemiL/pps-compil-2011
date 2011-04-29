@@ -51,10 +51,7 @@ void yyerror(char *s) {
   printf("Ligne %d: %s\n", yylineno, s);
 }
 
-
-
 FILE *fichier_code_genere = NIL(FILE);
-char *fname;
 
 /* appel:
  *   tp2 fichier-programme
@@ -67,8 +64,9 @@ int main(int argc, char **argv)
 {
   int fi;
   int ret;
-
-  if (argc < 3) { 
+  char *nom_fichier_code_genere;
+  
+  if (argc < 2) { 
     fprintf(stderr, "Fichier programme manquant\n");
     exit(1);
   }
@@ -80,10 +78,25 @@ int main(int argc, char **argv)
   /* redirige l'entree standard sur le fichier... */
   close(0); dup(fi); close(fi);
 
-  if (argc >= 3) {
-    fname = argv[2];
-    if ((fichier_code_genere = fopen(fname,  "w+")) == NULL)
-      { perror(fname); exit(1); }
+  if (argc == 2)
+  {
+    char* point = strrchr(argv[1], '.');
+    int l = (point != NULL) ? point-argv[1] : strlen(argv[1]);
+    nom_fichier_code_genere = NEW(strlen(argv[1])+5, char);
+    
+    strncpy(nom_fichier_code_genere, argv[1], l);
+    strcpy(nom_fichier_code_genere+l, "_gen");
+    if (point != NULL)
+      strcpy(nom_fichier_code_genere+l+4, argv[1]+l);
+    nom_fichier_code_genere[strlen(argv[1])+4] = '\0';
+  }
+  else
+    nom_fichier_code_genere = strdup(argv[2]);
+  
+  if ((fichier_code_genere = fopen(nom_fichier_code_genere,  "w+")) == NULL)
+  {
+    perror(nom_fichier_code_genere);
+    exit(1);
   }
 
   /* yyparse: appel à l'analyseur syntaxique. Lance l'analyse syntaxique de
@@ -101,6 +114,7 @@ int main(int argc, char **argv)
   yylex_destroy();
   
   fclose(fichier_code_genere);
+  free(nom_fichier_code_genere);
   
   if (ret)
   {
