@@ -16,6 +16,7 @@ void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principa
 void generer_code_classes_predefinies(FILE* fichier);
 void generer_code_classes(FILE* fichier, liste_classes_t classes);
 void generer_code_constructeur(FILE* fichier, classe_t* classe);
+void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* classe);
 void generer_code_methodes(FILE* fichier, classe_t* classe);
 
 #endif

@@ -247,7 +247,11 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   /* Allocation de l'espace mémoire */
   fprintf(fichier, "-- Début code allocation classe %s\n", classe->nom);
     
-  fprintf(fichier, "%s_alloc: NOP\n", classe->nom);
+  fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques);
+  fprintf(fichier, "\tPUSHA %s_const\n", classe->nom);
+  fprintf(fichier, "\tCALL\n");
+  
+  fprintf(fichier, "\tRETURN\n");
   
   fprintf(fichier, "-- Fin code allocation classe %s\n", classe->nom);
   
@@ -258,7 +262,23 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   
   fprintf(fichier, "%s_const: NOP\n", classe->nom);
   
+  /* Appel aux constructeurs des classes parentes */
+  generer_code_appel_constructeur_classes_parentes(fichier, classe);
+  
+  fprintf(fichier, "\tRETURN\n");
+  
   fprintf(fichier, "-- Fin code constructeur %s()\n", classe->nom);
+}
+
+void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* classe)
+{
+  if (classe->classe_mere != NIL(classe_t))
+  {
+    generer_code_appel_constructeur_classes_parentes(fichier, classe->classe_mere);
+    fprintf(fichier, "-- Appel du constructeur de la classe %s()\n", classe->classe_mere->nom);
+    fprintf(fichier, "\tPUSHA %s_const\n", classe->classe_mere->nom);
+    fprintf(fichier, "\tCALL\n");
+  }
 }
 
 void generer_code_methodes(FILE* fichier, classe_t* classe)
@@ -272,6 +292,8 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
     fprintf(fichier, ")\n");
     
     fprintf(fichier, "%s_%s: NOP\n", classe->nom, methode->nom);
+    
+    fprintf(fichier, "\tRETURN\n");
     
     fprintf(fichier, "-- Fin code %s::%s()\n", classe->nom, methode->nom);
     
