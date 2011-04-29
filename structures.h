@@ -197,6 +197,7 @@ liste_params_t ajouter_param_en_tete(liste_params_t liste_params, param_t* param
 param_t* chercher_param(liste_params_t liste_params, char* nom);
 liste_params_t nouvelle_liste_params(param_t* param);
 void liberer_liste_params(liste_params_t liste_params);
+void afficher_liste_params(FILE* fichier, liste_params_t liste_params);
 
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, arbre_t* bloc, char* type_retour);
 liste_methodes_t ajouter_methode(liste_methodes_t liste_methodes, methode_t* methode);

@@ -174,6 +174,21 @@ void liberer_liste_params(liste_params_t liste_params)
   }
 }
 
+void afficher_liste_params(FILE* fichier, liste_params_t liste_params)
+{
+  param_t* param = liste_params.tete;
+  
+  while (param != NIL(param_t))
+  {
+    fprintf(fichier, "%s: %s", param->nom, param->nom_type);
+    
+    if (param->suiv != NIL(param_t))
+      fprintf(fichier, ", ");
+    
+    param = param->suiv;
+  }
+}
+
 methode_t* nouvelle_methode(char* nom, type_methode_t type_methode, liste_params_t params, arbre_t* bloc, char* type_retour)
 {
   methode_t* methode = NEW(1, methode_t);

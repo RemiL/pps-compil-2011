@@ -53,7 +53,7 @@ void yyerror(char *s) {
 
 
 
-FILE *fd = NIL(FILE);
+FILE *fichier_code_genere = NIL(FILE);
 char *fname;
 
 /* appel:
@@ -63,11 +63,12 @@ char *fname;
  * si le programme contient des GET qui seront lus dynamiquement dans le
  * fichier de donnees (pas de lecture au clavier)
  */
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   int fi;
   int ret;
 
-  if (argc < 2) { 
+  if (argc < 3) { 
     fprintf(stderr, "Fichier programme manquant\n");
     exit(1);
   }
@@ -79,9 +80,9 @@ int main(int argc, char **argv) {
   /* redirige l'entree standard sur le fichier... */
   close(0); dup(fi); close(fi);
 
-  if (argc >= 3) { /* fichier dans lequel lire les valeurs pour GET */
+  if (argc >= 3) {
     fname = argv[2];
-    if ((fd = fopen(fname,  "r")) == NULL)
+    if ((fichier_code_genere = fopen(fname,  "w+")) == NULL)
       { perror(fname); exit(1); }
   }
 
@@ -98,6 +99,8 @@ int main(int argc, char **argv) {
   ret = yyparse();
   // Libération de la mémoire utilisé par flex
   yylex_destroy();
+  
+  fclose(fichier_code_genere);
   
   if (ret)
   {
