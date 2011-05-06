@@ -6,7 +6,7 @@
 /**
  * Calcule l'index des différentes variables, attributs et méthodes.
  */
-void calculer_index(liste_classes_t classes, arbre_t* prog_principal)
+int calculer_index(liste_classes_t classes, arbre_t* prog_principal)
 {
   /* Décalage courant par rapport au fond de pile */
   int decalage_bg = 0;
@@ -31,7 +31,7 @@ void calculer_index(liste_classes_t classes, arbre_t* prog_principal)
     classe = classe->suiv;
   }
   
-  calculer_index_variables_locales_arbre(prog_principal, 0);
+  return calculer_index_variables_locales_arbre(prog_principal, 0);
 }
 
 /**
@@ -177,7 +177,7 @@ int calculer_index_variables_locales(liste_vars_t variables, int index)
  * Lance la génération du code correspondant aux classes et au programme
  * principal fournis. Le code généré sera écrit dans le fichier fourni.
  */
-void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principal)
+void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principal, int nb_var_prog_principal)
 {
   fprintf(fichier, "-- On ne veut pas exécuter le code des fonctions donc\n"
                    "-- on saute à l'initialisation des tables des sauts\n"
@@ -189,7 +189,7 @@ void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principa
   
   generer_code_tables_sauts(fichier, classes);
   
-  generer_code_prog_principal(fichier, prog_principal);
+  generer_code_prog_principal(fichier, prog_principal, nb_var_prog_principal);
 }
 
 /**
@@ -380,10 +380,16 @@ void generer_code_table_sauts(FILE* fichier, classe_t* classe)
   fprintf(fichier, "-- Fin table des sauts de %s\n", classe->nom);
 }
 
-void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal)
+void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_var_prog_principal)
 {
   fprintf(fichier, "\n-- Programme principal\n"
                    "prog_principal: START\n");
+  
+  fprintf(fichier, "-- Allocation de l'espace mémoire pour les variables locales\n"
+                   "\tPUSHN %d\n", nb_var_prog_principal);
+  
+  fprintf(fichier, "-- Libération de l'espace mémoire des variables locales\n"
+                   "\tPOPN %d\n", nb_var_prog_principal);
   
   fprintf(fichier, "STOP\n");
 }
