@@ -31,7 +31,7 @@ void calculer_index(liste_classes_t classes, arbre_t* prog_principal)
     classe = classe->suiv;
   }
   
-  calculer_index_variables_locales_arbre(prog_principal, decalage_bg);
+  calculer_index_variables_locales_arbre(prog_principal, 0);
 }
 
 /**
