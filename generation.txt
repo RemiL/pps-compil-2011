@@ -1,0 +1,240 @@
+/**
+Entre ** et ** le code en pseudo-assembleur utile à la définition des blocs de code (bloc final et contenu de méthodes)
+?? les choses qui me laissent perplexes ou auxquelles je n'ai pas encore réfléchi
+PUSHSP et PUSHFP sont encore à différencier
+**/
+
+Affect : ID AFF ExprSansAffect
+**
+PUSHSP adresse(ID)
+code(ExprSansAffect)
+STORE 0
+**
+       | Selection AFF ExprSansAffect
+**
+PUSHSP adresse(Selection)
+code(ExprSansAffect)
+STORE 0
+**
+
+
+DeclA : VAR ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
+**
+??
+**
+      | VAL ID ':' ID_CLASS InitOpt
+**
+pareil
+**
+
+InitOpt : AFF ExprSansAffect
+**
+code(ExorSansAffect)
+STORE 0
+**
+
+Bloc : '{' LBlocExpr '}'
+**
+code(LBlocExpr)
+**
+     | '{' LDeclA IS LBlocExpr '}'
+**
+??
+**
+
+LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
+**
+code(LDeclA)
+code(DeclA)
+**
+       | DeclA
+**
+code(DeclA)
+**
+
+LBlocExpr : LBlocExpr ';' BlocExpr            // liste d'expression d'un bloc
+**
+code(LBlocExpr)
+code(BlocExpr)
+**
+          | BlocExpr     
+**
+code(BlocExpr)
+**
+
+BlocExpr : Expr
+**
+blablabla
+**
+         | Bloc
+**
+tout ça...
+**
+Expr : ExprSansAffect
+**
+spoilers !
+**
+     | Affect
+**
+hello sweetie
+**
+
+ExprSansAffect : IfThenElse
+**
+...
+**
+               | ID
+**
+PUSHSP ID
+**
+               | Selection
+**
+wrrrp wrrrp
+**
+               | CSTE
+**
+PUSHI ??
+**
+               | STRING
+**
+PUSHS ??
+**
+               | NOUVEAU ID_CLASS '(' LArgOpt ')'
+**
+//appeler le constructeur...
+??
+**
+               | EnvoiMsg     { $$ = $1; }
+**
+The angels have the phone box
+**
+               | ExprSansAffect '+' ExprSansAffect
+**
+code(ExprSansAffect)//empile la valeur
+code(ExprSansAffect)//empile la valeur
+ADD
+**
+               | ExprSansAffect '-' ExprSansAffect
+**
+code(ExprSansAffect1)//empile la valeur
+code(ExprSansAffect2)//empile la valeur
+SUB
+**
+               | ExprSansAffect '*' ExprSansAffect
+**
+code(ExprSansAffect)//empile la valeur
+code(ExprSansAffect)//empile la valeur
+MUL
+**
+               | ExprSansAffect '/' ExprSansAffect
+**
+code(ExprSansAffect1)//empile la valeur
+code(ExprSansAffect2)//empile la valeur
+DIV
+**
+               | '+' ExprSansAffect
+**
+code(ExprSansAffect)//empile la valeur
+ADD
+**
+               | '-' ExprSansAffect
+**
+code(ExprSansAffect)//empile la valeur
+SUB
+**
+               | ExprSansAffect REL ExprSansAffect
+**
+code(ExprSansAffect)//empile la valeur
+code(ExprSansAffect)//empile la valeur
+code(REL)
+**
+               | '(' Expr ')'
+**
+**
+
+/* Les expressions pouvant être placées devant l'opérateur de sélection */
+ExprSelec : '(' Expr ')'
+**
+**
+          | CSTE
+**
+PUSHN value(CSTE)
+**
+          | STRING
+**
+PUSHS value(STRING)
+**
+          | ID
+**
+PUSHSP adresse(ID)
+// ?? fait-il charger LOAD 0 pour avoir la valeur ? si oui comment faire la différence entre x == 1 et a == b (a et b des objets, donc comparaison d'adresses ?)
+**
+          | Selection
+**
+code(Selection)
+**
+          | EnvoiMsg
+**
+code(EnvoiMsg)
+**
+
+
+Selection : ExprSelec '.' ID
+**
+//charger l'adresse d'ExprSelec
+LOAD n //n = offset de ID dans l'objet
+**
+          | ID_CLASS '.' ID
+**
+PUSHSP adresse(ID_CLASS)
+LOAD n //n = offset de ID dans l'objet
+**
+
+/* Envoi d'un message simple ou appel à une fonction statique */
+EnvoiMsg : ExprSelec '.' ID '(' LArgOpt ')'
+**
+?? // probablement un CALL quelque part
+**
+         | ID_CLASS '.' ID '(' LArgOpt ')' 
+**
+idem
+**
+
+IfThenElse : IF Expr THEN BlocExpr ELSE BlocExpr 
+**
+code(Expr) // qui empile un 1 ou un 0
+e1 = newEtiquette()
+e2 = newEtiquette()
+?? //test switchy
+code(BlocExpr)
+JUMP e2 //saute le ELSE
+e1 :
+code(BlocExpr)
+e2 : NOP
+**
+
+LArg : LArg ',' Expr 
+**
+code(LArg)
+code(Expr)
+**
+     | Expr
+**
+code(Expr)
+**
+
+
+REL : RELOP 
+**
+//switchy lopy timey wimey : INF, INFEQ, SUP, SUPEQ, EQUAL, NOT
+**
+
+// liste d'arguments optionnelle
+LArgOpt : LArg
+**
+code(Larg)
+**
+        |      
+**
+NOP
+**
