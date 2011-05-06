@@ -182,6 +182,8 @@ void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principa
   generer_code_classes_predefinies(fichier);
   
   generer_code_classes(fichier, classes);
+  
+  generer_code_tables_sauts(fichier, classes);
 }
 
 /**
@@ -300,4 +302,69 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
     
     methode = methode->suiv;
   }
+}
+
+void generer_code_tables_sauts(FILE* fichier, liste_classes_t classes)
+{
+  classe_t* classe = classes.tete;
+  
+  fprintf(fichier, "-- Début initialisation des tables des sauts\n");
+  fprintf(fichier, "init_tables_saut: NOP\n");
+  
+  while (classe != NIL(classe_t))
+  {
+    /* Les types prédéfinis sont traités différement */
+    if (strcmp(classe->nom, "Entier") && strcmp(classe->nom, "Chaine"))
+      generer_code_table_sauts(fichier, classe);
+    
+    classe = classe->suiv;
+  }
+  
+  fprintf(fichier, "-- Fin initialisation des tables des sauts\n\n");
+  fprintf(fichier, "JUMP prog_principal\n");
+}
+
+void generer_code_table_sauts(FILE* fichier, classe_t* classe)
+{
+  /* Tableaux de chaines de caractères initialement
+   * toutes NULL.
+   * Indiquent le nom de la classe et de la méthode
+   * d'index considéré. */
+  char** nom_classe = NEW(classe->nb_methodes, char*);
+  char** nom_methode = NEW(classe->nb_methodes, char*);
+  classe_t* c;
+  methode_t* methode;
+  int i;
+  
+  fprintf(fichier, "\n-- Début table des sauts de %s\n", classe->nom);
+  
+  fprintf(fichier, "\tALLOC %d\n", classe->nb_methodes);
+  
+  c = classe;
+  while (c != NIL(classe_t))
+  {
+    methode = c->methodes.tete;
+    
+    while (methode != NIL(methode_t))
+    {
+      if (nom_classe[methode->index] == NULL)
+      {
+        nom_classe[methode->index] = c->nom;
+        nom_methode[methode->index] = methode->nom;
+      }
+      
+      methode = methode->suiv;
+    }
+    
+    c = c->classe_mere;
+  }
+  
+  for (i=0; i<classe->nb_methodes; i++)
+  {
+    fprintf(fichier, "\tDUPN 1\n");
+    fprintf(fichier, "\tPUSHA %s_%s\n", nom_classe[i], nom_methode[i]);
+    fprintf(fichier, "\tSTORE %d\n", i);
+  }
+  
+  fprintf(fichier, "-- Fin table des sauts de %s\n", classe->nom);
 }
