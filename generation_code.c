@@ -179,11 +179,17 @@ int calculer_index_variables_locales(liste_vars_t variables, int index)
  */
 void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principal)
 {
+  fprintf(fichier, "-- On ne veut pas exécuter le code des fonctions donc\n"
+                   "-- on saute à l'initialisation des tables des sauts\n"
+                   "JUMP init_tables_sauts\n");
+  
   generer_code_classes_predefinies(fichier);
   
   generer_code_classes(fichier, classes);
   
   generer_code_tables_sauts(fichier, classes);
+  
+  generer_code_prog_principal(fichier, prog_principal);
 }
 
 /**
@@ -194,18 +200,18 @@ void generer_code_classes_predefinies(FILE* fichier)
   /* Type Entier */
   fprintf(fichier, "-- Début code classe prédéfinie : Entier\n");
   
-  fprintf(fichier, "-- Début code Entier::imprimer()\n");
-  fprintf(fichier, "Entier_imprimer: NOP\n");
-  fprintf(fichier, "-- Fin code Entier::imprimer()\n");
+  fprintf(fichier, "-- Début code Entier::imprimer()\n"
+                   "Entier_imprimer: NOP\n"
+                   "-- Fin code Entier::imprimer()\n");
   
   fprintf(fichier, "-- Fin code classe prédéfinie : Entier\n\n");
   
   /* Type Chaine */
   fprintf(fichier, "-- Début code classe prédéfinie : Chaine\n");
   
-  fprintf(fichier, "-- Début code Chaine::imprimer()\n");
-  fprintf(fichier, "Chaine_imprimer: NOP\n");
-  fprintf(fichier, "-- Fin code Chaine::imprimer()\n");
+  fprintf(fichier, "-- Début code Chaine::imprimer()\n"
+                   "Chaine_imprimer: NOP\n"
+                   "-- Fin code Chaine::imprimer()\n");
   
   fprintf(fichier, "-- Fin code classe prédéfinie : Chaine\n\n");
 }
@@ -309,7 +315,7 @@ void generer_code_tables_sauts(FILE* fichier, liste_classes_t classes)
   classe_t* classe = classes.tete;
   
   fprintf(fichier, "-- Début initialisation des tables des sauts\n");
-  fprintf(fichier, "init_tables_saut: NOP\n");
+  fprintf(fichier, "init_tables_sauts: NOP\n");
   
   while (classe != NIL(classe_t))
   {
@@ -367,4 +373,12 @@ void generer_code_table_sauts(FILE* fichier, classe_t* classe)
   }
   
   fprintf(fichier, "-- Fin table des sauts de %s\n", classe->nom);
+}
+
+void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal)
+{
+  fprintf(fichier, "\n-- Programme principal\n"
+                   "prog_principal: START\n");
+  
+  fprintf(fichier, "STOP\n");
 }
