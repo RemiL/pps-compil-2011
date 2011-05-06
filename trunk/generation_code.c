@@ -256,7 +256,12 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   fprintf(fichier, "-- Début code allocation classe %s\n", classe->nom);
     
   fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques);
-  fprintf(fichier, "\tPUSHA %s_const\n", classe->nom);
+  fprintf(fichier, "-- Initialisation du champ correspondant à la table des sauts\n"
+                   "\tDUPN 1\n"
+                   "\tPUSHG %d\n"
+                   "\tSTORE 0\n", classe->decalage_table_sauts);
+  fprintf(fichier, "-- Appel au constructeur pour la suite des initialisations\n"
+                   "\tPUSHA %s_const\n", classe->nom);
   fprintf(fichier, "\tCALL\n");
   
   fprintf(fichier, "\tRETURN\n");
