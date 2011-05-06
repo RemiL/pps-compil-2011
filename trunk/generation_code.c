@@ -194,6 +194,9 @@ void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principa
 
 /**
  * Génère le code correspondant aux types fournis.
+ * Le paramètre de la fonction est le destinataire
+ * à savoir l'entier ou la chaine à imprimer, il
+ * est dépilé lors de l'appel.
  */
 void generer_code_classes_predefinies(FILE* fichier)
 {
@@ -201,7 +204,8 @@ void generer_code_classes_predefinies(FILE* fichier)
   fprintf(fichier, "-- Début code classe prédéfinie : Entier\n");
   
   fprintf(fichier, "-- Début code Entier::imprimer()\n"
-                   "Entier_imprimer: NOP\n"
+                   "Entier_imprimer: WRITEI\n"
+                   "\tRETURN\n"
                    "-- Fin code Entier::imprimer()\n");
   
   fprintf(fichier, "-- Fin code classe prédéfinie : Entier\n\n");
@@ -210,7 +214,8 @@ void generer_code_classes_predefinies(FILE* fichier)
   fprintf(fichier, "-- Début code classe prédéfinie : Chaine\n");
   
   fprintf(fichier, "-- Début code Chaine::imprimer()\n"
-                   "Chaine_imprimer: NOP\n"
+                   "Chaine_imprimer: WRITES\n"
+                   "\tRETURN\n"
                    "-- Fin code Chaine::imprimer()\n");
   
   fprintf(fichier, "-- Fin code classe prédéfinie : Chaine\n\n");
