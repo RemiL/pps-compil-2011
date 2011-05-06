@@ -78,12 +78,14 @@ extern FILE* fichier_code_genere;
 
 S : LDefClass Bloc
 {
+  int nb_var_prog_principal;
+  
   /* Vérifications contextuelles */
   est_valide_arbre_syntaxique($1, NIL(decl_vars_t), $2, NIL(classe_t), FAUX);
   
   /* Génération de code */
-  calculer_index($1, $2);
-  generer_code(fichier_code_genere, $1, $2);
+  nb_var_prog_principal = calculer_index($1, $2);
+  generer_code(fichier_code_genere, $1, $2, nb_var_prog_principal);
   
   liberer_liste_classes($1);
   liberer_arbre($2);
