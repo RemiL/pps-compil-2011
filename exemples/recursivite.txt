@@ -11,6 +11,7 @@ class Math() is {
     } else {
     	x := pow(x, n-1) * x;
     }
+    x /* valeur retournee */
   }
   
   def static factoriel(x : Entier) returns Entier is {
@@ -24,6 +25,7 @@ class Math() is {
     	} else {
     		x := factoriel(x-1) * x;
     	}
+    x /* valeur retournee */
   }
 }
 
