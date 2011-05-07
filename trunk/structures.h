@@ -138,6 +138,8 @@ struct classe_t
   liste_vars_t attributs;
   /* Nombre d'attributs non statiques (en incluant ceux des classes parentes) */
   int nb_attributs_non_statiques;
+  /* Nombre d'attributs statiques propres à la classe */
+  int nb_attributs_statiques;
   liste_methodes_t methodes;
   /* Nombre de methodes disponibles (en incluant celles des classes parentes) */
   int nb_methodes;
