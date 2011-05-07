@@ -15,18 +15,14 @@ int calculer_index(liste_classes_t classes, arbre_t* prog_principal)
   
   while (classe != NIL(classe_t))
   {
-    /* Les types prédéfinis sont traités différement */
-    if (strcmp(classe->nom, "Entier") && strcmp(classe->nom, "Chaine"))
-    {
-      classe->decalage_table_sauts = decalage_bg++;
-      
-      decalage_bg = calculer_index_attributs(classe, decalage_bg);
-      decalage_bg = calculer_index_methodes(classe, decalage_bg);
-      
-      /* Constructeur */
-      calculer_index_params(classe->constructeur);
-      calculer_index_variables_locales_arbre(classe->constructeur->bloc, 0);
-    }
+    classe->decalage_table_sauts = decalage_bg++;
+    
+    decalage_bg = calculer_index_attributs(classe, decalage_bg);
+    decalage_bg = calculer_index_methodes(classe, decalage_bg);
+    
+    /* Constructeur */
+    calculer_index_params(classe->constructeur);
+    calculer_index_variables_locales_arbre(classe->constructeur->bloc, 0);
     
     classe = classe->suiv;
   }
@@ -260,7 +256,7 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   /* Allocation de l'espace mémoire */
   fprintf(fichier, "-- Début code allocation classe %s\n", classe->nom);
     
-  fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques);
+  fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques + 1);
   fprintf(fichier, "-- Initialisation du champ correspondant à la table des sauts\n"
                    "\tDUPN 1\n"
                    "\tPUSHG %d\n"
@@ -329,9 +325,7 @@ void generer_code_tables_sauts(FILE* fichier, liste_classes_t classes)
   
   while (classe != NIL(classe_t))
   {
-    /* Les types prédéfinis sont traités différement */
-    if (strcmp(classe->nom, "Entier") && strcmp(classe->nom, "Chaine"))
-      generer_code_table_sauts(fichier, classe);
+    generer_code_table_sauts(fichier, classe);
     
     classe = classe->suiv;
   }
