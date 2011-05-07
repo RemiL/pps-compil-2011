@@ -20,7 +20,8 @@ STORE 0
 
 DeclA : VAR ID ':' ID_CLASS InitOpt   // déclaration d'un attribut 
 **
-??
+allouer(ID_CLASS) //empile l'adresse de ID
+code(InitOpt)
 **
       | VAL ID ':' ID_CLASS InitOpt
 **
@@ -39,7 +40,7 @@ code(LBlocExpr)
 **
      | '{' LDeclA IS LBlocExpr '}'
 **
-??
+les deux codes, ça devrait suffir
 **
 
 LDeclA : LDeclA ';' DeclA        // liste de déclaration d'attribut non statique
@@ -93,11 +94,11 @@ wrrrp wrrrp
 **
                | CSTE
 **
-PUSHI ??
+PUSHI valeur(CSTE)
 **
                | STRING
 **
-PUSHS ??
+PUSHS valeur(STRING)
 **
                | NOUVEAU ID_CLASS '(' LArgOpt ')'
 **
