@@ -578,12 +578,16 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
   fprintf(fichier, "-- Code partie droite de l'affectation\n");
   generer_code_arbre(fichier, arbre->droit.A);
   
+  fprintf(fichier, "-- Affectation\n");
   /* Différents cas selon le type de la variable de destination */
   switch (arbre->gauche.A->type_var)
   {
     case VARIABLE:
-      fprintf(fichier, "-- Affectation\n"
-                       "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
+      fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
+      break;
+      
+    case PARAM:
+      fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.param->index, arbre->gauche.A->info.param->nom);
       break;
     
     default:
