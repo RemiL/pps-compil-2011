@@ -1,0 +1,48 @@
+/**
+ * Divers trucs qui devraient fonctionner
+ */
+ 
+class Couleur(c : Chaine){
+	nom := c;
+} is {
+	var nom : Chaine;
+	
+	def imprimer() is {
+		nom.imprimer();
+	}
+}
+
+class Personne(n : Chaine, a : Entier := -1, y : Couleur := new Couleur("invisible")) {
+	nom := n;
+	age := a;
+	yeux := y;
+} is {
+
+	var nom : Chaine;
+	var yeux : Couleur;
+	var age : Entier;
+	
+  	def imprimer() is {
+	  	nom.imprimer();
+	  	" aux merveilleux yeux de cette couleur qu'on appelle ".imprimer();
+	  	yeux.imprimer();
+	  	" a maintenant ".imprimer();
+	  	age.imprimer();
+	  	" ans.\n".imprimer();  	
+  	}
+}
+
+{
+
+	var r := new Personne("Matt Smith", 28, new Couleur("bleu foncé"));
+	r.imprimer();
+
+	r.nom := "/d2Ex3\";
+	r.age := 915;
+	r.imprimer();
+	
+	r.yeux := new Couleur("vert");
+	r.age := 22;
+	r.nom := "Amy";
+	r.imprimer();
+}
