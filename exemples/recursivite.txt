@@ -1,0 +1,42 @@
+/**
+ * Pour vérifier que les recursivite fonctionne
+ */
+
+class Math() is {
+
+  def static pow(x : Entier, n : Entier) returns Entier is {
+    if n == 1
+    then {
+    	x := 1;
+    } else {
+    	x := pow(x, n-1) * x;
+    }
+  }
+  
+  def static factoriel(x : Entier) returns Entier is {
+  	if x < 2 
+  	then
+  	 	x := 1;
+  	else
+  	    if x == 2
+    	then {
+    		x := 2;
+    	} else {
+    		x := factoriel(x-1) * x;
+    	}
+  }
+}
+
+{
+  var t: Entier;
+  var m : Entier;
+  is
+  
+  t := 4;
+  m := Math.pow(t, 4);
+  (m - 20).imprimer();
+  
+  "\nFactoriel 7 = ".imprimer();
+  Math.factoriel(7).imprimer();
+
+}
