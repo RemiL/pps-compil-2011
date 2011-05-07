@@ -106,6 +106,11 @@ void calculer_index_params(methode_t* methode)
    * l'ordre utilisé lors de l'appel de la méthode. */
   int index = - methode->params.nb;
   
+  /* On place avant les paramètres, la valeur de retour
+   * et le destinataire de la méthode. */
+  methode->index_retour = index - 2;
+  methode->index_dest = index - 1;
+  
   param_t* param = methode->params.tete;
   
   while (param != NIL(param_t))
@@ -257,6 +262,9 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   fprintf(fichier, "-- Début code allocation classe %s\n", classe->nom);
     
   fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques + 1);
+  fprintf(fichier, "-- Initialisation de la valeur de retour\n"
+                   "\tDUPN 1\n"
+                   "\tSTOREL %d\n", classe->constructeur->index_retour);
   fprintf(fichier, "-- Initialisation du champ correspondant à la table des sauts\n"
                    "\tDUPN 1\n"
                    "\tPUSHG %d\n"
@@ -429,6 +437,14 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
       
       case Aff:
         generer_code_affectation(fichier, arbre);
+        break;
+      
+      case New:
+        fprintf(fichier, "-- Appel constructeur\n"
+                         "\tPUSHN 2 -- tableau activation\n"
+                         "\tPUSHA %s_alloc\n"
+                         "\tCALL\n"
+                         "\tPOPN 1", arbre->info.methode->nom);
         break;
       
       case Appel:
