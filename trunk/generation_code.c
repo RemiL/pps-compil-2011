@@ -421,6 +421,10 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         fprintf(fichier, "\tPUSHS %s\n", arbre->gauche.S);
         break;
       
+      case Id:
+        generer_code_identifiant(fichier, arbre);
+        break;
+      
       case Appel:
       case AppelStatique:
         generer_code_appel(fichier, arbre);
@@ -512,14 +516,27 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         eti_fin = generer_etiquette_ITE();
         fprintf(fichier, "-- Code condition\n");
         generer_code_arbre(fichier, arbre->gauche.A);
-        fprintf(fichier, "JZ ite%d -- si faux, on saute à else\n", eti_else);
+        fprintf(fichier, "\tJZ ite%d -- si faux, on saute à else\n", eti_else);
         fprintf(fichier, "-- Code then\n");
         generer_code_arbre(fichier, arbre->droit.A->gauche.A);
-        fprintf(fichier, "JUMP ite%d -- on saute le else\n", eti_fin);
+        fprintf(fichier, "\tJUMP ite%d -- on saute le else\n", eti_fin);
         fprintf(fichier, "ite%d: NOP -- Code else\n", eti_else);
         generer_code_arbre(fichier, arbre->droit.A->droit.A);
         fprintf(fichier, "ite%d: NOP -- Fin du if-then-else\n", eti_fin);
     }
+  }
+}
+
+void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
+{
+  switch (arbre->type_var)
+  {
+    case VARIABLE:
+      fprintf(fichier, "\tPUSHL %d -- variable locale %s\n", arbre->info.var->index, arbre->info.var->nom);
+      break;
+    
+    default:
+      break;
   }
 }
 
