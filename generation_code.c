@@ -104,12 +104,10 @@ void calculer_index_params(methode_t* methode)
   /* Les paramètres se trouvent juste avant fp, le décalage est
    * donc négatif. On place les paramètres dans la pile dans 
    * l'ordre utilisé lors de l'appel de la méthode. */
-  int index = - methode->params.nb;
+  int index = - methode->params.nb - 1;
   
-  /* On place avant les paramètres, la valeur de retour
-   * et le destinataire de la méthode. */
-  methode->index_retour = index - 2;
-  methode->index_dest = index - 1;
+  /* On place avant les paramètres, la valeur de retour */
+  methode->index_retour = index - 1;
   
   param_t* param = methode->params.tete;
   
@@ -119,6 +117,9 @@ void calculer_index_params(methode_t* methode)
     
     param = param->suiv;
   }
+  
+  /* On place après les paramètres, le destinataire */
+  methode->index_dest = index;
 }
 
 /**
@@ -205,7 +206,10 @@ void generer_code_classes_predefinies(FILE* fichier)
   fprintf(fichier, "-- Début code classe prédéfinie : Entier\n");
   
   fprintf(fichier, "-- Début code Entier::imprimer()\n"
-                   "Entier_imprimer: WRITEI\n"
+                   "Entier_imprimer: DUPN 1\n"
+                   "\tSTOREL -2\n"
+                   "\tDUPN 1\n"
+                   "\tWRITEI\n"
                    "\tRETURN\n"
                    "-- Fin code Entier::imprimer()\n");
   
@@ -215,7 +219,10 @@ void generer_code_classes_predefinies(FILE* fichier)
   fprintf(fichier, "-- Début code classe prédéfinie : Chaine\n");
   
   fprintf(fichier, "-- Début code Chaine::imprimer()\n"
-                   "Chaine_imprimer: WRITES\n"
+                   "Chaine_imprimer: DUPN 1\n"
+                   "\tSTOREL -2\n"
+                   "\tDUPN 1\n"
+                   "\tWRITES\n"
                    "\tRETURN\n"
                    "-- Fin code Chaine::imprimer()\n");
   
@@ -557,6 +564,10 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
       fprintf(fichier, "\tPUSHL %d -- variable locale %s\n", arbre->info.var->index, arbre->info.var->nom);
       break;
     
+    case PARAM:
+      fprintf(fichier, "\tPUSHL %d -- paramètre %s\n", arbre->info.param->index, arbre->info.param->nom);
+      break;
+    
     default:
       break;
   }
@@ -582,9 +593,23 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
 
 void generer_code_appel(FILE* fichier, arbre_t* arbre)
 {
+  arg_t* arg = arbre->droit.A->droit.args.tete;
+  
+  fprintf(fichier, "-- Espace mémoire pour le résultat\n"
+                   "\tPUSHN 1\n");
+  
+  while (arg != NIL(arg_t))
+  {
+    fprintf(fichier, "-- Argument\n");
+    generer_code_arbre(fichier, arg->expr);
+    
+    arg = arg->suiv;
+  }
+  
   fprintf(fichier, "-- Destinataire appel\n");
   generer_code_arbre(fichier, arbre->gauche.A);
-  fprintf(fichier, "-- Appel\n");
+  
+  fprintf(fichier, "-- Appel %s\n", arbre->info.methode->nom);
   /* Si le destinataire n'est pas une variable donc
    * soit une constante soit un nom de classe dans
    * le cas d'un appel statique. On peut s'intéresser
@@ -592,23 +617,24 @@ void generer_code_appel(FILE* fichier, arbre_t* arbre)
    * la classe du destinataire. */
   if (arbre->gauche.A->type_var == NON_VAR)
     fprintf(fichier, "\tPUSHG %d"
-                     " -- adresse de la TS en pile\n", arbre->gauche.A->info.type->decalage_table_sauts);
+                     " -- adresse de la TS en pile\n", arbre->gauche.A->type->decalage_table_sauts);
   /* Les objets de type prédéfinis ne possèdent
    * pas de champ pointant sur leur table des
    * sauts donc doivent être traités à part. */
-  else if (!strcmp(arbre->gauche.A->info.var->nom_type, "Entier") || !strcmp(arbre->gauche.A->info.var->nom_type, "Chaine"))
+  else if (!strcmp(arbre->gauche.A->type->nom, "Entier") || !strcmp(arbre->gauche.A->type->nom, "Chaine"))
     fprintf(fichier, "\tPUSHG %d"
-                     " -- adresse de la TS en pile\n", arbre->gauche.A->info.var->type->decalage_table_sauts);
+                     " -- adresse de la TS en pile\n", arbre->gauche.A->type->decalage_table_sauts);
   /* Sinon, l'appel doit prendre en compte le type
    * réel de l'objet et donc utiliser sa table des
    * sauts plutôt que celle de son type visible. */
   else
   {
-    fprintf(fichier, "\tDUPN 1 -- duplique l'addresse de l'objet\n"
+    fprintf(fichier, "\tDUPN 1 -- duplique l'adresse de l'objet\n"
                      "\tLOAD 0 -- champ 0 = adresse de la TS\n");
   }
   fprintf(fichier, "\tLOAD %d -- index de la méthode\n", arbre->info.methode->index);
   fprintf(fichier, "\tCALL\n");
+  fprintf(fichier, "\tPOPN %d -- nettoyage\n", arbre->info.methode->params.nb + 1);
 }
 
 /*

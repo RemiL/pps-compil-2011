@@ -47,7 +47,6 @@ typedef union
 /* Information sur un noeud */
 typedef union
 {
-  classe_t* type;
   var_t* var;
   param_t* param;
   methode_t* methode;
@@ -58,6 +57,7 @@ struct arbre
 {
   int num_ligne;          /* le numéro de la ligne correspondante */
   char op;                /* une etiquette : voir l'enumeration ci-dessus ou directement le caractère correspondant à l'opérateur. */
+  classe_t* type;         /* type correspondant au noeud */
   type_decl_t type_var;   /* type de la variable (attribut, variable locale ou paramètre) */
   info_t info;            /* information sur le noeud */
   noeud_t gauche, droit;  /* deux noeuds : internes ou feuilles */
