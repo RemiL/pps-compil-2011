@@ -1,0 +1,55 @@
+class Test() is {
+
+}
+
+{
+  "La réponse est ".imprimer();
+  (42+4).imprimer();
+  " \n".imprimer();
+  "\n petit calcul : 5-3 : ".imprimer();
+  (5-3).imprimer();
+  "\n petit calcul : 9/3 : ".imprimer();
+  (9/3).imprimer();
+  "\n petit calcul : 9/4 : ".imprimer();
+  (9/4).imprimer();
+  "\n petit calcul : 9*4 : ".imprimer();
+  (9*4).imprimer();
+  "\n petit calcul : 2+9+4 : ".imprimer();
+  (2+9+4).imprimer();
+  "\n petit calcul : 2+9*4 : ".imprimer();
+  (2+9*4).imprimer();
+  "\n petit calcul : 2*2+3+2*3+1*4*2+7/2 : ".imprimer();
+  (2*2+3+2*3+1*4*2+7/2).imprimer();
+  
+  
+  "\n\n\n comparaison : ".imprimer();
+  "\n  3 < 4 : ".imprimer();
+  (3 < 4 ).imprimer();
+  "\n  4 < 3 : ".imprimer();
+  (4 < 3 ).imprimer();
+  "\n  3 <= 4 : ".imprimer();
+  (3 <= 4 ).imprimer();
+  "\n  4 <= 3 : ".imprimer();
+  (4 <= 3 ).imprimer();
+  "\n  4 <= 4 : ".imprimer();
+  (4 <= 4 ).imprimer();
+  
+  
+  "\n  3 > 4 : ".imprimer();
+  (3 > 4 ).imprimer();
+  "\n  4 > 3 : ".imprimer();
+  (4 > 3 ).imprimer();
+  "\n  3 >= 4 : ".imprimer();
+  (3 >= 4 ).imprimer();
+  "\n  4 >= 3 : ".imprimer();
+  (4 >= 3 ).imprimer();
+  "\n  4 >= 4 : ".imprimer();
+  (4 >= 4 ).imprimer();
+  
+  
+  "\n  4 == 4 : ".imprimer();
+  (4  = 4 ).imprimer();
+  "\n  3 == 4 : ".imprimer();
+  (3  = 4 ).imprimer()
+  
+}
