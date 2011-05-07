@@ -6,13 +6,13 @@ class Math() is {
 
 	def static pow(x : Entier, n : Entier) returns Entier is {
 		if (n = 1)
-		then { x := 1 }   
+		then { x }
 		else { x := x * Math.pow(x, n-1) }
 	}
 	  
 	def static factoriel(x : Entier) returns Entier is {
 		if x < 2 
-		then {x := 1 }
+		then { x := 1 }
 		else {
 			if x = 2
 			then {
@@ -32,6 +32,6 @@ class Math() is {
   (m - 20).imprimer();
   
   "\nFactoriel 7 = ".imprimer();
-  Math.factoriel(7).imprimer()
-
+  Math.factoriel(7).imprimer();
+  "\n".imprimer()
 }

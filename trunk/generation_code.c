@@ -324,6 +324,7 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
     
     generer_code_arbre(fichier, methode->bloc);
     
+    fprintf(fichier, "\tSTOREL %d -- valeur de retour\n", methode->index_retour);
     fprintf(fichier, "\tPOPN %d\n", methode->nb_variables_locales);
     fprintf(fichier, "\tRETURN\n");
     
@@ -569,7 +570,7 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
       break;
     
     default:
-      break;
+      fprintf(fichier, "\tPUSHN 1 -- évite les décalages dans la pile\n");
   }
 }
 
@@ -578,7 +579,9 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
   fprintf(fichier, "-- Code partie droite de l'affectation\n");
   generer_code_arbre(fichier, arbre->droit.A);
   
-  fprintf(fichier, "-- Affectation\n");
+  fprintf(fichier, "-- Sauvegarde : l'affectation retourne la valeur de l'expression de droite\n"
+                   "\tDUPN 1\n"
+                   "-- Affectation\n");
   /* Différents cas selon le type de la variable de destination */
   switch (arbre->gauche.A->type_var)
   {
