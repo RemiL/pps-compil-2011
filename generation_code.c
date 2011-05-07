@@ -44,6 +44,8 @@ int calculer_index_attributs(classe_t* classe, int decalage_bg)
    * l'index 0 correspond au renvoie vers la table des sauts. */
   int index = 1;
   
+  classe->nb_attributs_statiques = - decalage_bg;
+  
   var_t* attribut = classe->attributs.tete;
   
   /* S'il y a des classes parentes, on laisse la place à leurs attributs. */
@@ -58,6 +60,7 @@ int calculer_index_attributs(classe_t* classe, int decalage_bg)
   }
   
   classe->nb_attributs_non_statiques = index - 1;
+  classe->nb_attributs_statiques += decalage_bg;
   
   return decalage_bg;
 }
@@ -189,7 +192,7 @@ void generer_code(FILE* fichier, liste_classes_t classes, arbre_t* prog_principa
   
   generer_code_classes(fichier, classes);
   
-  generer_code_tables_sauts(fichier, classes);
+  generer_code_tables_sauts_attributs_statiques(fichier, classes);
   
   generer_code_prog_principal(fichier, prog_principal, nb_var_prog_principal);
 }
@@ -334,16 +337,19 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
   }
 }
 
-void generer_code_tables_sauts(FILE* fichier, liste_classes_t classes)
+void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_t classes)
 {
   classe_t* classe = classes.tete;
   
-  fprintf(fichier, "-- Début initialisation des tables des sauts\n");
-  fprintf(fichier, "init_tables_sauts: NOP\n");
+  fprintf(fichier, "-- Début initialisation des tables des sauts\n"
+                   "init_tables_sauts: NOP\n");
   
   while (classe != NIL(classe_t))
   {
     generer_code_table_sauts(fichier, classe);
+    
+    fprintf(fichier, "-- Allocation attributs statiques\n"
+                     "\tPUSHN %d\n", classe->nb_attributs_statiques);
     
     classe = classe->suiv;
   }
