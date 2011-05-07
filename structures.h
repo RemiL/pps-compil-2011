@@ -160,7 +160,8 @@ typedef struct
 
 typedef enum
 {
-  ATTRIBUT = 1,
+  NON_VAR,
+  ATTRIBUT,
   VARIABLE,
   PARAM,
   THIS,
