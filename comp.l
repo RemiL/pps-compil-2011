@@ -99,7 +99,7 @@ char* traiteChaine(char *s)
 >=		{ yylval.C = GE; return(RELOP); }
 >		{ yylval.C = GT; return(RELOP); }
 \<		{ yylval.C = LT; return(RELOP); }
-\"{IntString}\" { yylval.S = traiteChaine(yytext); return STRING; }
+\"{IntString}\" { yylval.S = strdup(yytext); return STRING; }
 {Delim}+	{ /* l'option --yylineno permet de gerer directement le
                    * decompte des sauts de lignes via la variable yylineno.
                    * Il n'y a donc rien de special a faire.

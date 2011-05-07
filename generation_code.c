@@ -387,8 +387,36 @@ void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_
   fprintf(fichier, "-- Allocation de l'espace mémoire pour les variables locales\n"
                    "\tPUSHN %d\n", nb_var_prog_principal);
   
+  fprintf(fichier, "-- Début code programme principal\n");
+  generer_code_arbre(fichier, prog_principal);
+  fprintf(fichier, "-- Fin code programme principal\n");
+  
   fprintf(fichier, "-- Libération de l'espace mémoire des variables locales\n"
                    "\tPOPN %d\n", nb_var_prog_principal);
   
   fprintf(fichier, "STOP\n");
+}
+
+void generer_code_arbre(FILE* fichier, arbre_t* arbre)
+{
+  if (arbre != NIL(arbre_t))
+  {
+    switch (arbre->op)
+    {
+      case ';':
+        generer_code_arbre(fichier, arbre->gauche.A);
+      
+      case Bloc:
+        generer_code_arbre(fichier, arbre->droit.A);
+        break;
+      
+      case Cste:
+        fprintf(fichier, "\tPUSHI %d\n", arbre->gauche.E);
+        break;
+      
+      case Chaine:
+        fprintf(fichier, "\tPUSHS %s\n", arbre->gauche.S);
+        break;
+    }
+  }
 }
