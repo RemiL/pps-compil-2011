@@ -454,6 +454,55 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         generer_code_arbre(fichier, arbre->droit.A);
         fprintf(fichier, "\tDIV\n");
         break;
+      
+      case EQ:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tEQUAL\n");
+        break;
+      
+      case NEQ:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tEQUAL\n");
+        fprintf(fichier, "\tNOT\n");
+        break;
+      
+      case GT:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tSUP\n");
+        break;
+      
+      case GE:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tSUPEQ\n");
+        break;
+      
+      case LT:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tINF\n");
+        break;
+      
+      case LE:
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tINFEQ\n");
+        break;
     }
   }
 }
