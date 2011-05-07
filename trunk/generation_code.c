@@ -426,8 +426,12 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
     {
       case ';':
         generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "\tPOPN 1 -- nettoyage\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        break;
       
       case Bloc:
+        generer_code_valeurs_defaut_variables(fichier, arbre->gauche.vars);
         generer_code_arbre(fichier, arbre->droit.A);
         break;
       
@@ -557,6 +561,23 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
   }
 }
 
+void generer_code_valeurs_defaut_variables(FILE* fichier, liste_vars_t variables)
+{
+  var_t* var = variables.tete;
+  
+  while (var != NIL(var_t))
+  {
+    if (var->valeur_defaut != NIL(arbre_t))
+    {
+      fprintf(fichier, "-- Valeur par défaut de %s\n", var->nom);
+      generer_code_arbre(fichier, var->valeur_defaut);
+      fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", var->index, var->nom);
+    }
+    
+    var = var->suiv;
+  }
+}
+
 void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
 {
   switch (arbre->type_var)
@@ -600,17 +621,26 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
 
 void generer_code_appel(FILE* fichier, arbre_t* arbre)
 {
+  param_t* param = arbre->info.methode->params.tete;
   arg_t* arg = arbre->droit.A->droit.args.tete;
   
   fprintf(fichier, "-- Espace mémoire pour le résultat\n"
                    "\tPUSHN 1\n");
   
-  while (arg != NIL(arg_t))
+  while (param != NIL(param_t))
   {
     fprintf(fichier, "-- Argument\n");
-    generer_code_arbre(fichier, arg->expr);
     
-    arg = arg->suiv;
+    if (arg != NIL(arg_t))
+    {
+      generer_code_arbre(fichier, arg->expr);
+      
+      arg = arg->suiv;
+    }
+    else /* on a obligatoirement une valeur par défaut */
+      generer_code_arbre(fichier, param->valeur_defaut);
+    
+    param = param->suiv;
   }
   
   fprintf(fichier, "-- Destinataire appel\n");
