@@ -429,6 +429,31 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         fprintf(fichier, "-- Code opérande droite\n");
         generer_code_arbre(fichier, arbre->droit.A);
         fprintf(fichier, "\tADD\n");
+        break;
+      
+      case '-':
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tSUB\n");
+        break;
+      
+      case '*':
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tMUL\n");
+        break;
+      
+      case '/':
+        fprintf(fichier, "-- Code opérande gauche\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tDIV\n");
+        break;
     }
   }
 }
