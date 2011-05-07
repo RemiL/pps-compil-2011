@@ -307,6 +307,8 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
     
     fprintf(fichier, "%s_%s: PUSHN %d\n", classe->nom, methode->nom, methode->nb_variables_locales);
     
+    generer_code_arbre(fichier, methode->bloc);
+    
     fprintf(fichier, "\tPOPN %d\n", methode->nb_variables_locales);
     fprintf(fichier, "\tRETURN\n");
     
