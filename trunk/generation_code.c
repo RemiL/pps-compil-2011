@@ -399,6 +399,9 @@ void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_
 
 void generer_code_arbre(FILE* fichier, arbre_t* arbre)
 {
+  /* étiquettes pour le if-then-else */
+  int eti_else, eti_fin;
+  
   if (arbre != NIL(arbre_t))
   {
     switch (arbre->op)
@@ -503,6 +506,19 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         generer_code_arbre(fichier, arbre->droit.A);
         fprintf(fichier, "\tINFEQ\n");
         break;
+      
+      case ITE:
+        eti_else = generer_etiquette_ITE();
+        eti_fin = generer_etiquette_ITE();
+        fprintf(fichier, "-- Code condition\n");
+        generer_code_arbre(fichier, arbre->gauche.A);
+        fprintf(fichier, "JZ ite%d -- si faux, on saute à else\n", eti_else);
+        fprintf(fichier, "-- Code then\n");
+        generer_code_arbre(fichier, arbre->droit.A->gauche.A);
+        fprintf(fichier, "JUMP ite%d -- on saute le else\n", eti_fin);
+        fprintf(fichier, "ite%d: NOP -- Code else\n", eti_else);
+        generer_code_arbre(fichier, arbre->droit.A->droit.A);
+        fprintf(fichier, "ite%d: NOP -- Fin du if-then-else\n", eti_fin);
     }
   }
 }
@@ -530,4 +546,17 @@ void generer_code_appel(FILE* fichier, arbre_t* arbre)
   }
   fprintf(fichier, "\tLOAD %d -- index de la méthode\n", arbre->info.methode->index);
   fprintf(fichier, "\tCALL\n");
+}
+
+/*
+Génère un nombre entier tel que s'il est concaténé à la
+chaine "ite", le résultat est une étiquette unique.
+*/
+int generer_etiquette_ITE()
+{
+  /* On déclare la variable static de telle sorte à éviter
+   * une variable globale ou un passage par paramètre. */
+  static int prochaine_etiquette = 0;
+  /* On incrémente pour le prochain appel. */
+  return prochaine_etiquette++;
 }
