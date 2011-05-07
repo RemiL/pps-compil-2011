@@ -420,27 +420,40 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
       
       case Appel:
       case AppelStatique:
-        fprintf(fichier, "-- Destinataire appel\n");
+        generer_code_appel(fichier, arbre);
+        break;
+      
+      case '+':
+        fprintf(fichier, "-- Code opérande gauche\n");
         generer_code_arbre(fichier, arbre->gauche.A);
-        fprintf(fichier, "-- Appel\n");
-        /* Si le destinataire n'est pas une variable donc
-         * soit une constante soit un nom de classe dans
-         * le cas d'un appel statique. On peut s'intéresser
-         * directement à la table des sauts correspond à
-         * la classe du destinataire. */
-        if (arbre->gauche.A->type_var == NON_VAR)
-          fprintf(fichier, "\tPUSHG %d"
-                           " -- adresse de la TS en pile\n", arbre->gauche.A->info.type->decalage_table_sauts);
-        /* Sinon, l'appel doit prendre en compte le type
-         * réel de l'objet et donc utiliser sa table des
-         * sauts plutôt que celle de son type visible. */
-        else
-        {
-          fprintf(fichier, "\tDUPN 1 -- duplique l'addresse de l'objet\n"
-                           "\tLOAD 0 -- champ 0 = adresse de la TS\n");
-        }
-        fprintf(fichier, "\tLOAD %d -- index de la méthode\n", arbre->info.methode->index);
-        fprintf(fichier, "\tCALL\n");
+        fprintf(fichier, "-- Code opérande droite\n");
+        generer_code_arbre(fichier, arbre->droit.A);
+        fprintf(fichier, "\tADD\n");
     }
   }
+}
+
+void generer_code_appel(FILE* fichier, arbre_t* arbre)
+{
+  fprintf(fichier, "-- Destinataire appel\n");
+  generer_code_arbre(fichier, arbre->gauche.A);
+  fprintf(fichier, "-- Appel\n");
+  /* Si le destinataire n'est pas une variable donc
+   * soit une constante soit un nom de classe dans
+   * le cas d'un appel statique. On peut s'intéresser
+   * directement à la table des sauts correspond à
+   * la classe du destinataire. */
+  if (arbre->gauche.A->type_var == NON_VAR)
+    fprintf(fichier, "\tPUSHG %d"
+                     " -- adresse de la TS en pile\n", arbre->gauche.A->info.type->decalage_table_sauts);
+  /* Sinon, l'appel doit prendre en compte le type
+   * réel de l'objet et donc utiliser sa table des
+   * sauts plutôt que celle de son type visible. */
+  else
+  {
+    fprintf(fichier, "\tDUPN 1 -- duplique l'addresse de l'objet\n"
+                     "\tLOAD 0 -- champ 0 = adresse de la TS\n");
+  }
+  fprintf(fichier, "\tLOAD %d -- index de la méthode\n", arbre->info.methode->index);
+  fprintf(fichier, "\tCALL\n");
 }
