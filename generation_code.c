@@ -553,6 +553,12 @@ void generer_code_appel(FILE* fichier, arbre_t* arbre)
   if (arbre->gauche.A->type_var == NON_VAR)
     fprintf(fichier, "\tPUSHG %d"
                      " -- adresse de la TS en pile\n", arbre->gauche.A->info.type->decalage_table_sauts);
+  /* Les objets de type prédéfinis ne possèdent
+   * pas de champ pointant sur leur table des
+   * sauts donc doivent être traités à part. */
+  else if (!strcmp(arbre->gauche.A->info.var->nom_type, "Entier") || !strcmp(arbre->gauche.A->info.var->nom_type, "Chaine"))
+    fprintf(fichier, "\tPUSHG %d"
+                     " -- adresse de la TS en pile\n", arbre->gauche.A->info.var->type->decalage_table_sauts);
   /* Sinon, l'appel doit prendre en compte le type
    * réel de l'objet et donc utiliser sa table des
    * sauts plutôt que celle de son type visible. */
