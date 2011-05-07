@@ -425,6 +425,10 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         generer_code_identifiant(fichier, arbre);
         break;
       
+      case Aff:
+        generer_code_affectation(fichier, arbre);
+        break;
+      
       case Appel:
       case AppelStatique:
         generer_code_appel(fichier, arbre);
@@ -533,6 +537,24 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
   {
     case VARIABLE:
       fprintf(fichier, "\tPUSHL %d -- variable locale %s\n", arbre->info.var->index, arbre->info.var->nom);
+      break;
+    
+    default:
+      break;
+  }
+}
+
+void generer_code_affectation(FILE* fichier, arbre_t* arbre)
+{
+  fprintf(fichier, "-- Code partie droite de l'affectation\n");
+  generer_code_arbre(fichier, arbre->droit.A);
+  
+  /* Différents cas selon le type de la variable de destination */
+  switch (arbre->gauche.A->type_var)
+  {
+    case VARIABLE:
+      fprintf(fichier, "-- Affectation\n"
+                       "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
       break;
     
     default:
