@@ -98,6 +98,10 @@ struct methode_t
   int nb_variables_locales;
   /* Index dans la table des sauts */
   int index;
+  /* Index de la valeur de retour (par rapport à fp) */
+  int index_retour;
+  /* Index du destinataire (par rapport à fp) */
+  int index_dest;
 
   /* On utilise une liste chainée */
   methode_t* suiv;
