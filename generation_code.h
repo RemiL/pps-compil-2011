@@ -22,6 +22,7 @@ void generer_code_tables_sauts(FILE* fichier, liste_classes_t classes);
 void generer_code_table_sauts(FILE* fichier, classe_t* classe);
 void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_var_prog_principal);
 void generer_code_arbre(FILE* fichier, arbre_t* arbre);
+void generer_code_valeurs_defaut_variables(FILE* fichier, liste_vars_t variables);
 void generer_code_identifiant(FILE* fichier, arbre_t* arbre);
 void generer_code_affectation(FILE* fichier, arbre_t* arbre);
 void generer_code_appel(FILE* fichier, arbre_t* arbre);
