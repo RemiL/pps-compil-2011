@@ -453,6 +453,11 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         generer_code_identifiant(fichier, arbre);
         break;
       
+      case Selection:
+      case SelectionStatique:
+        generer_code_selection(fichier, arbre);
+        break;
+      
       case Aff:
         generer_code_affectation(fichier, arbre);
         break;
@@ -588,6 +593,11 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
 {
   switch (arbre->type_var)
   {
+    case ATTRIBUT: /* le premier élément avant fp est le destinataire de la méthode */
+      fprintf(fichier, "\tPUSHL -1 -- destinataire\n"
+                       "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
+      break;
+    
     case VARIABLE:
       fprintf(fichier, "\tPUSHL %d -- variable locale %s\n", arbre->info.var->index, arbre->info.var->nom);
       break;
@@ -596,9 +606,25 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
       fprintf(fichier, "\tPUSHL %d -- paramètre %s\n", arbre->info.param->index, arbre->info.param->nom);
       break;
     
-    default:
+    case THIS: /* le premier élément avant fp est le destinataire de la méthode */
+      fprintf(fichier, "\tPUSHL -1 -- this\n");
+      break;
+      
+    case SUPER: /* le premier élément avant fp est le destinataire de la méthode */
+      fprintf(fichier, "\tPUSHL -1 -- super\n");
+      break;
+    
+    default: /* Nom de classe pour appel statique */
       fprintf(fichier, "\tPUSHN 1 -- évite les décalages dans la pile\n");
   }
+}
+
+void generer_code_selection(FILE* fichier, arbre_t* arbre)
+{
+  fprintf(fichier, "-- Destinataire selection\n");
+  generer_code_arbre(fichier, arbre->gauche.A);
+  
+  fprintf(fichier, "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
 }
 
 void generer_code_affectation(FILE* fichier, arbre_t* arbre)

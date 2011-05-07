@@ -24,6 +24,7 @@ void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_
 void generer_code_arbre(FILE* fichier, arbre_t* arbre);
 void generer_code_valeurs_defaut_variables(FILE* fichier, liste_vars_t variables);
 void generer_code_identifiant(FILE* fichier, arbre_t* arbre);
+void generer_code_selection(FILE* fichier, arbre_t* arbre);
 void generer_code_affectation(FILE* fichier, arbre_t* arbre);
 void generer_code_appel(FILE* fichier, arbre_t* arbre);
 int generer_etiquette_ITE();
