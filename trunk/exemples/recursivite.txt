@@ -9,7 +9,7 @@ class Math() is {
 		then { x }
 		else { x := x * Math.pow(x, n-1) }
 	}
-	  
+	
 	def static factoriel(x : Entier) returns Entier is {
 		if x < 2 
 		then { x := 1 }
@@ -22,6 +22,10 @@ class Math() is {
 			}
 		}
 	}
+	
+	def static modulo(n: Entier, d:Entier) returns Entier is {
+		n - n / d
+	}
 }
 
 {
@@ -33,5 +37,8 @@ class Math() is {
   
   "\nFactoriel 7 = ".imprimer();
   Math.factoriel(7).imprimer();
+  
+  "\nFactoriel 7 modulo 4 = ".imprimer();
+  Math.modulo(Math.factoriel(7), t).imprimer();
   "\n".imprimer()
 }
