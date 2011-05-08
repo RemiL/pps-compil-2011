@@ -1,7 +1,25 @@
 /**
  * Divers trucs qui devraient fonctionner
  */
- 
+class Date(j: Entier := -1, m: Entier := -1, a: Entier := -1) {
+	this.j := j;
+	this.m := m;
+	this.a := a
+} is {
+	var j: Entier;
+	var m: Entier;
+	var a: Entier
+	
+	def imprimer() returns Date is {
+		j.imprimer(); "/".imprimer(); m.imprimer(); "/".imprimer(); a.imprimer();
+		this
+	}
+	
+	def egale(date: Date, ignoreAnnee: Entier) returns Entier is {
+		(j = date.j) * (m = date.m) * ((a = date.a) + ignoreAnnee)
+	}
+}
+
 class Couleur(c : Chaine){nom := c} is {
 	var nom : Chaine
 	
@@ -10,15 +28,17 @@ class Couleur(c : Chaine){nom := c} is {
 	}
 }
 
-class Personne(n : Chaine, a : Entier := -1, y : Couleur := new Couleur("invisible")) {
+class Personne(n : Chaine, a : Entier := -1, y : Couleur := new Couleur("invisible"), anniv: Date := new Date()) {
 	nom := n;
 	age := a;
-	yeux := y
+	yeux := y;
+	this.anniv := anniv
 } is {
 
 	var nom : Chaine;
 	var yeux : Couleur;
-	var age : Entier
+	var age : Entier;
+	var anniv: Date
 	
   	def imprimer() returns Chaine is{
 	  	nom.imprimer();
@@ -41,6 +61,13 @@ class Personne(n : Chaine, a : Entier := -1, y : Couleur := new Couleur("invisib
 		age := n
 	}
 
+	def setAnniv(d : Date) returns Date is {
+		anniv := d
+	}
+
+	def estAnniv(d : Date) returns Entier is {
+		anniv.egale(d, 1)
+	}
 }
 
 {
@@ -56,5 +83,13 @@ class Personne(n : Chaine, a : Entier := -1, y : Couleur := new Couleur("invisib
 	r.setYeux(new Couleur("vert"));
 	r.setAge(22);
 	r.setNom("Amy");
-	r.imprimer()
+	r.imprimer();
+	
+	r.setYeux(new Couleur("marron"));
+	r.setNom("Nath");
+	r.setAnniv(new Date(08, 05, 1989));
+	r.imprimer();
+	if (r.estAnniv(new Date(08, 05, 2011)))
+	then { "Bon anniversaire d'ailleurs !\n".imprimer() }
+	else { "C'est pas ton anniversaire tous les jours quand même !\n".imprimer() }
 }
