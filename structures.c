@@ -1,3 +1,10 @@
+/**
+ * Projet compilation - Polytech' Paris-Sud 4ième année
+ * Février - Mai 2011
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

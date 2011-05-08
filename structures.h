@@ -1,3 +1,10 @@
+/**
+ * Projet compilation - Polytech' Paris-Sud 4ième année
+ * Février - Mai 2011
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 

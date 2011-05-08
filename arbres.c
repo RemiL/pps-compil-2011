@@ -1,3 +1,10 @@
+/**
+ * Projet compilation - Polytech' Paris-Sud 4ième année
+ * Février - Mai 2011
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
 #include <stdio.h>
 
 #include "arbres.h"
@@ -167,70 +174,3 @@ void liberer_arbre(arbre_t* arbre)
     free(arbre);
   }
 }
-
-/* XXX : Pas utile pour le moment, puisqu'on construit un compilateur et non un
- *       interpréteur mais pourrait être peut-être  réutilisé pour autre chose ...
- * 
- * parcours recursif de l'arbre representant une expression. Les valeurs
- * des identificateurs situes aux feuilles de l'arbre sont a rechercher
- * dans la liste lv
- *
- * ATTENTION: tous les cas ne sont pas traites dans l'arbre !!!
-int evalue(arbre_t* arbre, PVAR lv) {
-  int g, d;
-
-  switch (arbre->op) {
-  case Id:
-    while (lv) {
-      if (! strcmp(lv->nom, arbre->gauche.S)) return(lv->val);
-      else lv = lv->suiv;
-    }
-    fprintf(stderr, "Variable non declaree: %s\n", arbre->gauche.S);
-    exit(3);
-  case Cste:
-    return(arbre->gauche.E);
-  case EQ:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g == d);
-  case NEQ:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g != d);
-  case GT:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g > d);
-  case GE:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g >= d);
-  case LT:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g < d);
-  case LE:
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g <= d);
-  case '+':
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g + d);
-  case '*':
-    g = evalue(arbre->gauche.A, lv);
-    d = evalue(arbre->droit.A, lv);
-    return (g * d);
-  case ITE: * if_then_else_ *
-     * le fils gauche represente la condition, le fils droit un arbre dont
-     * les deux fils correspondent respectivement aux parties then et else.
-     * Attention a n'evaluer que la partie necessaire !
-     *
-    if (evalue(arbre->gauche.A, lv)) 
-       return evalue(arbre->droit.A->gauche.A, lv);
-    else return evalue(arbre->droit.A->droit.A, lv);
-  default: fprintf(stderr, "Cas non prevu dans Evaluation: %c\n", arbre->op);
-    exit(4);
-  }
-}
-*/
