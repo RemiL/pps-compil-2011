@@ -275,12 +275,15 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   fprintf(fichier, "-- Initialisation de la valeur de retour\n"
                    "\tDUPN 1\n"
                    "\tSTOREL %d\n", classe->constructeur->index_retour);
+  fprintf(fichier, "-- Initialisation du destinataire\n"
+                   "\tSTOREL %d\n", classe->constructeur->index_dest);
   fprintf(fichier, "-- Initialisation du champ correspondant à la table des sauts\n"
                    "\tDUPN 1\n"
                    "\tPUSHG %d\n"
                    "\tSTORE 0\n", classe->decalage_table_sauts);
   fprintf(fichier, "-- Appel au constructeur pour la suite des initialisations\n"
-                   "\tPUSHA %s_const\n", classe->nom);
+                   "\tDUPN %d -- Tableau activation\n"
+                   "\tPUSHA %s_const\n", classe->constructeur->params.nb + 2, classe->nom);
   fprintf(fichier, "\tCALL\n");
   
   fprintf(fichier, "\tRETURN\n");
@@ -312,10 +315,33 @@ void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* c
 {
   if (classe->classe_mere != NIL(classe_t))
   {
+    param_t* param = classe->classe_mere->constructeur->params.tete;
+    arg_t* arg = classe->args_classe_mere.tete;
+    
     generer_code_appel_constructeur_classes_parentes(fichier, classe->classe_mere);
+    
     fprintf(fichier, "-- Appel du constructeur de la classe %s()\n", classe->classe_mere->nom);
-    fprintf(fichier, "\tPUSHA %s_const\n", classe->classe_mere->nom);
-    fprintf(fichier, "\tCALL\n");
+    
+    while (param != NIL(param_t))
+    {
+      fprintf(fichier, "-- Argument\n");
+      
+      if (arg != NIL(arg_t))
+      {
+        generer_code_arbre(fichier, arg->expr);
+        
+        arg = arg->suiv;
+      }
+      else /* on a obligatoirement une valeur par défaut */
+        generer_code_arbre(fichier, param->valeur_defaut);
+      
+      param = param->suiv;
+    }
+    
+    fprintf(fichier, "\tPUSHL -1 -- destinataire\n"
+                     "\tPUSHA %s_const\n", classe->classe_mere->nom);
+    fprintf(fichier, "\tCALL\n"
+                     "\tPOPN %d\n", classe->classe_mere->constructeur->params.nb + 1);
   }
 }
 
@@ -470,11 +496,7 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
         break;
       
       case New:
-        fprintf(fichier, "-- Appel constructeur\n"
-                         "\tPUSHN 2 -- tableau activation\n"
-                         "\tPUSHA %s_alloc\n"
-                         "\tCALL\n"
-                         "\tPOPN 1", arbre->info.methode->nom);
+        generer_code_appel_constructeur(fichier, arbre);
         break;
       
       case Appel:
@@ -690,6 +712,36 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
     default:
       break;
   }
+}
+
+void generer_code_appel_constructeur(FILE* fichier, arbre_t* arbre)
+{
+  param_t* param = arbre->info.methode->params.tete;
+  arg_t* arg = arbre->droit.args.tete;
+  
+  fprintf(fichier, "-- Appel constructeur\n"
+                   "\tPUSHN 1 -- espace mémoire pour le résultat\n");
+  
+  while (param != NIL(param_t))
+  {
+    fprintf(fichier, "-- Argument\n");
+    
+    if (arg != NIL(arg_t))
+    {
+      generer_code_arbre(fichier, arg->expr);
+      
+      arg = arg->suiv;
+    }
+    else /* on a obligatoirement une valeur par défaut */
+      generer_code_arbre(fichier, param->valeur_defaut);
+    
+    param = param->suiv;
+  }
+  
+  fprintf(fichier, "\tPUSHN 1\n"
+                   "\tPUSHA %s_alloc\n"
+                   "\tCALL\n"
+                   "\tPOPN %d\n", arbre->info.methode->nom, arbre->info.methode->params.nb + 1);
 }
 
 void generer_code_appel(FILE* fichier, arbre_t* arbre)
