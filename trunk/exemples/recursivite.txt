@@ -1,5 +1,5 @@
 /**
- * Pour vérifier que les recursivite fonctionne
+ * Pour vérifier que la recursivite fonctionne
  */
 
 class Math() is {
@@ -24,7 +24,7 @@ class Math() is {
 	}
 	
 	def static modulo(n: Entier, d:Entier) returns Entier is {
-		n - n / d
+		n - n / d * d
 	}
 }
 
