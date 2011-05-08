@@ -831,8 +831,11 @@ void generer_code_appel(FILE* fichier, arbre_t* arbre)
    * soit une constante soit un nom de classe dans
    * le cas d'un appel statique. On peut s'intéresser
    * directement à la table des sauts correspond à
-   * la classe du destinataire. */
-  if (arbre->gauche.A->type_var == NON_VAR)
+   * la classe du destinataire.
+   * C'est également le cas si le destinataire est
+   * super dans ce cas, on ne doit pas regardé le
+   * type réel de l'objet mais celui apparent. */
+  if (arbre->gauche.A->type_var == NON_VAR || arbre->gauche.A->type_var == SUPER)
     fprintf(fichier, "\tPUSHG %d"
                      " -- adresse de la TS en pile\n", arbre->gauche.A->type->decalage_table_sauts);
   /* Les objets de type prédéfinis ne possèdent
