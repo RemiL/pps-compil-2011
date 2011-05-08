@@ -1,0 +1,16 @@
+/**
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
+class TestImbricationBloc() {
+  t.x = 3;
+  t.y
+} is {
+  var x: Entier
+}
+
+{
+  var t: TestImbricationBloc
+  is
+  t := new TestImbricationBloc();
+}

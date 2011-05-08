@@ -1,5 +1,7 @@
 /**
  * Divers trucs qui devraient fonctionner
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 class Date(j: Entier := -1, m: Entier := -1, a: Entier := -1) {
 	this.j := j;

@@ -1,6 +1,7 @@
-/*
-  Vérifie que 2 classes de familles différentes ne peuvent se transférer de l'une à l'autre
-
+/**
+ * Vérifie que 2 classes de familles différentes ne peuvent se transformer de l'une en l'autre
+ *
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
 */
 
 

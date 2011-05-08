@@ -1,3 +1,6 @@
+/**
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
 class Test() is {
 
   def foo() returns Entier is {

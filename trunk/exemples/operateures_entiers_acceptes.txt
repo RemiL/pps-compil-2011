@@ -1,5 +1,5 @@
 /**
- * Pour vérifier que les blocs imbriqués sont bien gérés.
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
 class Test() is {

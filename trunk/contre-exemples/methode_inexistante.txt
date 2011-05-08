@@ -1,4 +1,7 @@
-class Test() is {
+/**
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasoloclass
+ */
+Test() is {
   var x: Entier
 
   def foo() returns Entier is {
