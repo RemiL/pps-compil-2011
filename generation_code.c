@@ -248,7 +248,7 @@ void generer_code_classes(FILE* fichier, liste_classes_t classes)
       fprintf(fichier, "-- Début code classe : %s\n", classe->nom);
       
       generer_code_constructeur(fichier, classe);
-      generer_code_valeurs_defaut_attributs(fichier, classe);
+      generer_code_valeurs_defaut_attributs_non_statiques(fichier, classe);
       generer_code_methodes(fichier, classe);
       
       fprintf(fichier, "-- Fin code classe : %s\n\n", classe->nom);
@@ -354,7 +354,7 @@ void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* c
   }
 }
 
-void generer_code_valeurs_defaut_attributs(FILE* fichier, classe_t* classe)
+void generer_code_valeurs_defaut_attributs_non_statiques(FILE* fichier, classe_t* classe)
 {
   var_t* attribut = classe->attributs.tete;
   
@@ -363,20 +363,15 @@ void generer_code_valeurs_defaut_attributs(FILE* fichier, classe_t* classe)
   
   while (attribut != NIL(var_t))
   {
-    if (attribut->valeur_defaut != NIL(arbre_t))
+    if (attribut->valeur_defaut != NIL(arbre_t) && !attribut->statique)
     {
       fprintf(fichier, "-- Valeur par défaut de %s\n", attribut->nom);
       generer_code_arbre(fichier, attribut->valeur_defaut);
       
-      if (!attribut->statique) /* attribut non statique */
-      {
-        /* le premier élément avant fp est le destinataire de la méthode */
-        fprintf(fichier, "\tPUSHL -1 -- destinataire = this implicite\n"
-                         "\tSWAP -- on veut avoir la valeur puis l'adresse\n"
-                         "\tSTORE %d\n", attribut->index);
-      }
-      else /* attribut statique indexé par rapport au fond de pile */
-        fprintf(fichier, "\tSTOREG %d -- champ statique\n", attribut->index);
+      /* le premier élément avant fp est le destinataire de la méthode */
+      fprintf(fichier, "\tPUSHL -1 -- destinataire = this implicite\n"
+                       "\tSWAP -- on veut avoir la valeur puis l'adresse\n"
+                       "\tSTORE %d\n", attribut->index);
     }
     
     attribut = attribut->suiv;
@@ -413,6 +408,7 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
 void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_t classes)
 {
   classe_t* classe = classes.tete;
+  var_t* attribut;
   
   fprintf(fichier, "-- Début initialisation des tables des sauts\n"
                    "init_tables_sauts: NOP\n");
@@ -421,8 +417,26 @@ void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_
   {
     generer_code_table_sauts(fichier, classe);
     
-    fprintf(fichier, "-- Allocation attributs statiques\n"
-                     "\tPUSHN %d\n", classe->nb_attributs_statiques);
+    fprintf(fichier, "-- Début allocation attributs statiques\n");
+    attribut = classe->attributs.tete;
+    
+    while (attribut != NIL(var_t))
+    {
+      if (attribut->statique)
+      {
+        if (attribut->valeur_defaut == NIL(arbre_t))
+          fprintf(fichier, "\tPUSHN 1 -- attribut statique %s\n", attribut->nom);
+        else
+        {
+          fprintf(fichier, "-- Attribut statique avec valeur par défaut %s\n", attribut->nom);
+          generer_code_arbre(fichier, attribut->valeur_defaut);
+        }
+      }
+      
+      attribut = attribut->suiv;
+    }
+    
+    fprintf(fichier, "-- Fin allocation attributs statiques\n");
     
     classe = classe->suiv;
   }

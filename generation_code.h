@@ -17,7 +17,7 @@ void generer_code_classes_predefinies(FILE* fichier);
 void generer_code_classes(FILE* fichier, liste_classes_t classes);
 void generer_code_constructeur(FILE* fichier, classe_t* classe);
 void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* classe);
-void generer_code_valeurs_defaut_attributs(FILE* fichier, classe_t* classe);
+void generer_code_valeurs_defaut_attributs_non_statiques(FILE* fichier, classe_t* classe);
 void generer_code_methodes(FILE* fichier, classe_t* classe);
 void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_t classes);
 void generer_code_table_sauts(FILE* fichier, classe_t* classe);
