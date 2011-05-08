@@ -604,7 +604,7 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
       if (!arbre->info.var->statique) /* attribut non statique */
       {
         /* le premier élément avant fp est le destinataire de la méthode */
-        fprintf(fichier, "\tPUSHL -1 -- destinataire = this\n"
+        fprintf(fichier, "\tPUSHL -1 -- destinataire = this implicite\n"
                          "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
       }
       else /* attribut statique indexé par rapport au fond de pile */
@@ -651,15 +651,38 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
   generer_code_arbre(fichier, arbre->droit.A);
   
   fprintf(fichier, "-- Sauvegarde : l'affectation retourne la valeur de l'expression de droite\n"
-                   "\tDUPN 1\n"
-                   "-- Affectation\n");
+                   "\tDUPN 1\n");
+  
+  /* Si on a un attribut non statique, on doit avoir un objet destinataire */
+  if (arbre->gauche.A->type_var == ATTRIBUT && !arbre->gauche.A->info.var->statique)
+  {
+    fprintf(fichier, "-- Destinataire affectation\n");
+    if (arbre->gauche.A->op == Selection)
+      generer_code_arbre(fichier, arbre->gauche.A->gauche.A);
+    else
+      fprintf(fichier, "\tPUSHL -1 -- this implicite\n");
+    /* On doit avoir d'abord la valeur avant le destinataire mais pour la
+     * sauvegarde l'inverse est beaucoup plus simple donc si on a un destinataire
+     * on échange le sommet et le sous-sommet pour avoir le bon ordre. */
+    fprintf(fichier, "\tSWAP -- on veut d'abord la valeur avant le destinataire\n");
+  }
+  
+  fprintf(fichier, "-- Affectation\n");
   /* Différents cas selon le type de la variable de destination */
   switch (arbre->gauche.A->type_var)
   {
+    case ATTRIBUT:
+      /* attribut non statique */
+      if (!arbre->gauche.A->info.var->statique)
+        fprintf(fichier, "\tSTORE %d -- champ %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
+      else /* attribut statique indexé par rapport au fond de pile */
+        fprintf(fichier, "\tSTOREG %d -- champ statique %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
+      break;
+    
     case VARIABLE:
       fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
       break;
-      
+    
     case PARAM:
       fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.param->index, arbre->gauche.A->info.param->nom);
       break;

@@ -578,6 +578,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           printf("L'attribut %s de la classe %s n'est pas statique (ligne : %d).\n", arbre->droit.S, type->nom, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
+        arbre->type_var = ATTRIBUT;
         arbre->type = arbre->info.var->type;
         return arbre->type;
       
