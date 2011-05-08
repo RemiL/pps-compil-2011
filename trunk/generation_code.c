@@ -297,6 +297,12 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   /* Appel aux constructeurs des classes parentes */
   generer_code_appel_constructeur_classes_parentes(fichier, classe);
   
+  if (classe->constructeur->bloc != NIL(arbre_t))
+  {
+    generer_code_arbre(fichier, classe->constructeur->bloc);
+    fprintf(fichier, "\tPOPN 1 -- nettoyage : pas de valeur de retour\n");
+  }
+  
   fprintf(fichier, "\tRETURN\n");
   
   fprintf(fichier, "-- Fin code constructeur %s()\n", classe->nom);
@@ -413,6 +419,7 @@ void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_
   
   fprintf(fichier, "-- Début code programme principal\n");
   generer_code_arbre(fichier, prog_principal);
+  fprintf(fichier, "\tPOPN 1 -- nettoyage : pas de valeur de retour\n");
   fprintf(fichier, "-- Fin code programme principal\n");
   
   fprintf(fichier, "-- Libération de l'espace mémoire des variables locales\n"
@@ -620,7 +627,7 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
       fprintf(fichier, "\tPUSHL -1 -- super\n");
       break;
     
-    default: /* Nom de classe pour appel statique */
+    default: /* Nom de classe lors des appels statiques */
       fprintf(fichier, "\tPUSHN 1 -- évite les décalages dans la pile\n");
   }
 }
