@@ -1,5 +1,7 @@
 /**
- * Pour vérifier que la recursivite fonctionne
+ * Crible d'Erathostène.
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
 class Crible(v: Entier := 2) {

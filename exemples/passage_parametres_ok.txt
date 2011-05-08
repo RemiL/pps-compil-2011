@@ -1,6 +1,8 @@
 /**
  * Pour vérifier que les appels de méthodes normales et constructeurs 
  * ne sont pas rejetés s'ils sont corrects
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
 class Test(xc: Entier) is {

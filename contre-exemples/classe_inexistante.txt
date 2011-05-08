@@ -1,0 +1,14 @@
+/**
+ * fait appel à une classe qui n'existe pas
+ *
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+class Couleur(cinit: Entier := 0) { c := 0 } is {
+  val c: Entier ;
+  val d : ClasseFantome
+  
+  def couleur() returns Chaine is {
+      "Gris"
+      }
+}
+

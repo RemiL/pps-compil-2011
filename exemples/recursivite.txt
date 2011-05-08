@@ -1,5 +1,7 @@
 /**
- * Pour vérifier que la recursivite fonctionne
+ * Pour vérifier que la récursivite fonctionne
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
 class Math() is {

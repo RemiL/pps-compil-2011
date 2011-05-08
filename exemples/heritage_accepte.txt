@@ -2,6 +2,8 @@
  * Pour vérifier qu'une fille arrive bien à récupérer 50 % des biens de sa mère après sa mort
  * (dans la condition où elle est la seule descendante et que la mère était veuve)
  * (la valeur de 50 % est valable en France mais peut prendre des valeurs différentes dans d'autres pays)
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
 class Maman(a : Entier)
