@@ -593,9 +593,15 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
 {
   switch (arbre->type_var)
   {
-    case ATTRIBUT: /* le premier élément avant fp est le destinataire de la méthode */
-      fprintf(fichier, "\tPUSHL -1 -- destinataire\n"
-                       "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
+    case ATTRIBUT:
+      if (!arbre->info.var->statique) /* attribut non statique */
+      {
+        /* le premier élément avant fp est le destinataire de la méthode */
+        fprintf(fichier, "\tPUSHL -1 -- destinataire = this\n"
+                         "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
+      }
+      else /* attribut statique indexé par rapport au fond de pile */
+        fprintf(fichier, "\tPUSHG %d -- champ statique %s\n", arbre->info.var->index, arbre->info.var->nom);
       break;
     
     case VARIABLE:
@@ -621,10 +627,15 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
 
 void generer_code_selection(FILE* fichier, arbre_t* arbre)
 {
-  fprintf(fichier, "-- Destinataire selection\n");
-  generer_code_arbre(fichier, arbre->gauche.A);
-  
-  fprintf(fichier, "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
+  if (!arbre->info.var->statique) /* attribut non statique */
+  {
+    fprintf(fichier, "-- Destinataire selection\n");
+    generer_code_arbre(fichier, arbre->gauche.A);
+    
+    fprintf(fichier, "\tLOAD %d -- champ %s\n", arbre->info.var->index, arbre->info.var->nom);
+  }
+  else /* attribut statique indexé par rapport au fond de pile */
+    fprintf(fichier, "\tPUSHG %d -- champ statique %s\n", arbre->info.var->index, arbre->info.var->nom);
 }
 
 void generer_code_affectation(FILE* fichier, arbre_t* arbre)
