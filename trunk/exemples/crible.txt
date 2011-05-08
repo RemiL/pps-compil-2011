@@ -1,0 +1,60 @@
+/**
+ * Pour vérifier que la recursivite fonctionne
+ */
+
+class Crible(v: Entier := 2) {
+  valeur := v
+} is {
+  var valeur: Entier;
+  var suiv: Crible;
+  var aSuiv: Entier := 0
+  
+  def ajouter(taille: Entier) returns Entier is {
+    suiv := new Crible(valeur+1);
+    aSuiv := 1;
+    if (taille > 1)
+    then { suiv.ajouter(taille-1) }
+    else { valeur }
+  }
+  
+  def static modulo(n: Entier, d:Entier) returns Entier is {
+    n - n / d * d
+  }
+  
+  def supprimerMultiples(v: Entier) returns Entier is {
+    var s:Entier
+    is
+    s := if (Crible.modulo(valeur, v) = 0)
+         then { valeur := -1; 1 }
+         else { 0 };
+    
+    if (aSuiv)
+    then { suiv.supprimerMultiples(v) + s }
+    else { s }
+  }
+  
+  def cribler() returns Entier is {
+    if (aSuiv)
+    then { if (valeur <> -1) then { suiv.supprimerMultiples(valeur) } else { 0 } + suiv.cribler() }
+    else { 0 }
+  }
+  
+  def imprimer() returns Crible is {
+    if (valeur <> -1)
+    then { valeur.imprimer(); "\n".imprimer() }
+    else { "" };
+    
+    if (aSuiv)
+    then { suiv.imprimer(); this }
+    else this
+  }
+}
+
+{
+  var c:Crible := new Crible()
+  is
+  c.ajouter(98);
+  (99 - c.cribler()).imprimer();
+  " nombres premiers entre 2 et 100 :\n".imprimer();
+  c.imprimer()
+}
