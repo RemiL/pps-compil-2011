@@ -222,7 +222,7 @@ void sont_valides_params(liste_classes_t decl, classe_t* classe, methode_t* meth
     
     if (param->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                  decl_generer_depuis_classe(classe),
-                                                                                                 param->valeur_defaut, classe, FAUX),
+                                                                                                 param->valeur_defaut, NIL(classe_t), FAUX),
                                                                      param->type))
     {
       printf("Classe %s : Type incohérent pour la valeur par défaut du paramètre %s de la méthode %s (ligne %d).\n", classe->nom, param->nom, methode->nom, param->valeur_defaut->num_ligne);
@@ -449,6 +449,12 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           else if (statique && arbre->type_var == ATTRIBUT && !var->statique)
           {
             printf("Impossible de faire référence à l'attribut non statique %s dans une méthode statique (ligne : %d).\n", var->nom, arbre->num_ligne);
+            exit(EXIT_FAILURE);
+          }
+          /* Pas top mais évite des problèmes avec les valeurs par défaut des paramètres */
+          else if (arbre->type_var == ATTRIBUT && !var->statique && type_this == NIL(classe_t))
+          {
+            printf("Impossible de faire référence à l'attribut non statique %s dans la valeur par défaut d'un paramètre (ligne : %d).\n", var->nom, arbre->num_ligne);
             exit(EXIT_FAILURE);
           }
           else
