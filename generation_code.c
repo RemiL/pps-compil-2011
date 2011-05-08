@@ -248,6 +248,7 @@ void generer_code_classes(FILE* fichier, liste_classes_t classes)
       fprintf(fichier, "-- Début code classe : %s\n", classe->nom);
       
       generer_code_constructeur(fichier, classe);
+      generer_code_valeurs_defaut_attributs(fichier, classe);
       generer_code_methodes(fichier, classe);
       
       fprintf(fichier, "-- Fin code classe : %s\n\n", classe->nom);
@@ -261,9 +262,9 @@ void generer_code_classes(FILE* fichier, liste_classes_t classes)
  * Génère le code du constructeur de la classe fournie.
  * Il est séparé en deux étiquettes pour plus de simpliciter
  * en cas d'héritage :
- * - <nom_classe>_alloc pour la partie d'allocation de la
+ * - <nom_classe>_Alloc pour la partie d'allocation de la
  *   mémoire.
- * - <nom_classe>_const pour la partie constructeur proprement
+ * - <nom_classe>_Const pour la partie constructeur proprement
  *   dite.
  */
 void generer_code_constructeur(FILE* fichier, classe_t* classe)
@@ -271,7 +272,7 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   /* Allocation de l'espace mémoire */
   fprintf(fichier, "-- Début code allocation classe %s\n", classe->nom);
     
-  fprintf(fichier, "%s_alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques + 1);
+  fprintf(fichier, "%s_Alloc: ALLOC %d\n", classe->nom, classe->nb_attributs_non_statiques + 1);
   fprintf(fichier, "-- Initialisation de la valeur de retour\n"
                    "\tDUPN 1\n"
                    "\tSTOREL %d\n", classe->constructeur->index_retour);
@@ -283,8 +284,9 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
                    "\tSTORE 0\n", classe->decalage_table_sauts);
   fprintf(fichier, "-- Appel au constructeur pour la suite des initialisations\n"
                    "\tDUPN %d -- Tableau activation\n"
-                   "\tPUSHA %s_const\n", classe->constructeur->params.nb + 2, classe->nom);
-  fprintf(fichier, "\tCALL\n");
+                   "\tPUSHA %s_Const\n", classe->constructeur->params.nb + 1, classe->nom);
+  fprintf(fichier, "\tCALL\n"
+                   "\tPOPN %d\n", classe->constructeur->params.nb + 1);
   
   fprintf(fichier, "\tRETURN\n");
   
@@ -295,7 +297,7 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
   afficher_liste_params(fichier, classe->constructeur->params);
   fprintf(fichier, ")\n");
   
-  fprintf(fichier, "%s_const: NOP\n", classe->nom);
+  fprintf(fichier, "%s_Const: NOP\n", classe->nom);
   
   /* Appel aux constructeurs des classes parentes */
   generer_code_appel_constructeur_classes_parentes(fichier, classe);
@@ -305,6 +307,13 @@ void generer_code_constructeur(FILE* fichier, classe_t* classe)
     generer_code_arbre(fichier, classe->constructeur->bloc);
     fprintf(fichier, "\tPOPN 1 -- nettoyage : pas de valeur de retour\n");
   }
+  
+  /* Initialisation des valeurs par défaut des attributs */
+  fprintf(fichier, "-- Initialisation valeurs par défaut attributs\n"
+                   "\tPUSHL -1 -- Destinataire\n"
+                   "\tPUSHA %s_Init\n", classe->nom);
+  fprintf(fichier, "\tCALL\n"
+                   "\tPOPN 1\n");
   
   fprintf(fichier, "\tRETURN\n");
   
@@ -339,10 +348,42 @@ void generer_code_appel_constructeur_classes_parentes(FILE* fichier, classe_t* c
     }
     
     fprintf(fichier, "\tPUSHL -1 -- destinataire\n"
-                     "\tPUSHA %s_const\n", classe->classe_mere->nom);
+                     "\tPUSHA %s_Const\n", classe->classe_mere->nom);
     fprintf(fichier, "\tCALL\n"
                      "\tPOPN %d\n", classe->classe_mere->constructeur->params.nb + 1);
   }
+}
+
+void generer_code_valeurs_defaut_attributs(FILE* fichier, classe_t* classe)
+{
+  var_t* attribut = classe->attributs.tete;
+  
+  fprintf(fichier, "-- Début initialisation des valeurs par défaut des attributs de %s\n"
+                   "%s_Init: NOP\n", classe->nom, classe->nom);
+  
+  while (attribut != NIL(var_t))
+  {
+    if (attribut->valeur_defaut != NIL(arbre_t))
+    {
+      fprintf(fichier, "-- Valeur par défaut de %s\n", attribut->nom);
+      generer_code_arbre(fichier, attribut->valeur_defaut);
+      
+      if (!attribut->statique) /* attribut non statique */
+      {
+        /* le premier élément avant fp est le destinataire de la méthode */
+        fprintf(fichier, "\tPUSHL -1 -- destinataire = this implicite\n"
+                         "\tSWAP -- on veut avoir la valeur puis l'adresse\n"
+                         "\tSTORE %d\n", attribut->index);
+      }
+      else /* attribut statique indexé par rapport au fond de pile */
+        fprintf(fichier, "\tSTOREG %d -- champ statique\n", attribut->index);
+    }
+    
+    attribut = attribut->suiv;
+  }
+  
+  fprintf(fichier, "\tRETURN\n"
+                   "-- Début initialisation des valeurs par défaut des attributs de %s\n", classe->nom);
 }
 
 void generer_code_methodes(FILE* fichier, classe_t* classe)
@@ -739,7 +780,7 @@ void generer_code_appel_constructeur(FILE* fichier, arbre_t* arbre)
   }
   
   fprintf(fichier, "\tPUSHN 1\n"
-                   "\tPUSHA %s_alloc\n"
+                   "\tPUSHA %s_Alloc\n"
                    "\tCALL\n"
                    "\tPOPN %d\n", arbre->info.methode->nom, arbre->info.methode->params.nb + 1);
 }
