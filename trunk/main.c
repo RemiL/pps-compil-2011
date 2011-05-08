@@ -1,64 +1,38 @@
+/**
+ * Projet compilation - Polytech' Paris-Sud 4ième année
+ * Février - Mai 2011
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include "main.h"
 
-
 extern int yyparse();
 extern void yylex_destroy();
 
-/* Principes de l'interprete:
- * 1. Pendant le traitement des declarations de la forme x := E, on construit
- * une liste de paires (variable, valeur) au fur et a mesure qu'on rencontre
- * une nouvelle declaration. Pour cela, lors de l'analyse syntaxique de E
- * on construit un arbre de syntaxe abstraite (en fait un arbre
- * operateur-operandes) pour E. La construction de l'arbre se fait dans les
- * actions semantiques (partie bison) par appels aux fonctions Make...
- * ci-apres en passant en parametre l'etiquette a utiliser et les arbres
- * representant les operandes.
- * Quand E est reconnue (i.e. quand on effectue la reduction pour le E le plus
- * externe de la construction courante), on dispose de la racine de l'arbre,
- * qu'on passe a la fonction Evalue, accompagnee de la liste courante des paires
- * (variable, valeur). On obtient une valeur en resultat, qu'on associe a la
- * variable x pour faire une nouvelle paire.
- * Une fois evalue l'arbre representant E, on n'en n'a plus besoin
- * et on l'oublie (formellement, on aurait du le desallouer !).
- * On ne cree donc jamais l'arbre syntaxique correspondant a tout le programme, 
- * mais seulement l'arbre d'une expression arithmetique.
- * Le 'contexte' de l'evaluation est resume par la liste des paires
- * variable/valeurs
- *
- * 2. Le traitement de l'expression finale est identique: construction de
- * l'arbre de l'expression puis evaluation dans le contexte des declarations
- * passees
- *
- * La fonction Evalue n'est qu'un grand switch qui teste l'etiquette du
- * noeud courant de l'arbre et fait l'operation demandee, en s'appelant
- * recursivement pour evaluer les operandes, si besoin.
- *
- * Remarque: les appels initiaux aux fonctions de ce fichier apparaissent donc
- * dans les actions semantiques associees aux regles de grammaire.
- */
- 
 extern int yylineno;
 
 /* yyerror:  fonction importee par Bison et a fournir explicitement. Elle
  * est appelee quand Bison detecte une erreur syntaxique.
  * Ici on se contente d'un message minimal.
  */
-void yyerror(char *s) {
+void yyerror(char *s)
+{
   printf("Ligne %d: %s\n", yylineno, s);
 }
 
 FILE *fichier_code_genere = NIL(FILE);
 
 /* appel:
- *   tp2 fichier-programme
+ *   comp fichier-programme-source
  * ou
- *   tp2 fichier-programme fichier-donnees
- * si le programme contient des GET qui seront lus dynamiquement dans le
- * fichier de donnees (pas de lecture au clavier)
+ *   comp fichier-programme-source fichier-à-générer
+ * Dans le premier cas, le fichier à générer sera nommé automatiquement
+ * à partir du nom du fichier source.
  */
 int main(int argc, char **argv)
 {
@@ -66,11 +40,13 @@ int main(int argc, char **argv)
   int ret;
   char *nom_fichier_code_genere;
   
-  if (argc < 2) { 
+  if (argc < 2)
+  { 
     fprintf(stderr, "Fichier programme manquant\n");
     exit(1);
   }
-  if ((fi = open(argv[1], O_RDONLY)) == -1) {
+  if ((fi = open(argv[1], O_RDONLY)) == -1)
+  {
     fprintf(stderr, "Je n'arrive pas a ouvrir: %s\n", argv[1]);
     exit(1);
   }
@@ -110,7 +86,7 @@ int main(int argc, char **argv)
    * a plus rien a faire.
    */
   ret = yyparse();
-  // Libération de la mémoire utilisé par flex
+  /* Libération de la mémoire utilisé par flex */
   yylex_destroy();
   
   fclose(fichier_code_genere);

@@ -1,10 +1,10 @@
-/* les tokens ici sont ceux qui doivent etre renvoyes par l'aanalyseur lexical
- * A adapter par chacun en fonction de ce qu'il a ecrit dans le TP1.
- *
- * Attention: BISON va ecraser le contenu de TP.h a partir de la description
- * de la ligne suivante. Donc c'est cette ligne qu'il faut mettre a jour, si elle
- * ne correspond pas a ce que vous avez fait, pas TP.h !
+/**
+ * Projet compilation - Polytech' Paris-Sud 4ième année
+ * Février - Mai 2011
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
+
 %token ID ID_CLASS CSTE AFF RELOP IF THEN ELSE STRING CLASS STATIC DEF RETURNS IS VAR VAL OVERRIDE EXTENDS NOUVEAU PREC_MIN PREC_UNAIRE
 
  /* indications de precedence et d'associativite. Les precedences sont
@@ -53,28 +53,6 @@ extern FILE* fichier_code_genere;
 %}
 
 %% 
-
- /* Principe de construction de l'interprete:
-  *
-  * On reconnnait une liste (eventuellement vide) de declarations de variables
-  * avec leur initialisation, puis le programme principal.
-  * Au fur et a mesure qu'on reconnait des declarations de variables, on
-  * construit une liste chainee avec les noms de variables et leur valeur.
-  * Pendant l'analyse d'une declaration x := expr  on construit un arbre de
-  * syntaxe abstraite qui represente l'expression. Pendant la construction
-  * de l'arbre, on verifie a chaque occurrence d'un identificateur que cet
-  * identificateur apparait bien dans la liste des variables deja declarees.
-  * Une fois que l'arbre representant 'expr' est construit, on le passe en
-  * parametre, avec la liste des variables deja declarees, a une fonction
-  * d'evaluation qui va appliquer les opérateurs, en cherchant les valeurs
-  * des variables dans la liste. Quand la valeur de l'expression est retournee
-  * on ajoute un nouvel element a la liste des variables...
-  *
-  * Les macros d'allocation NEW et de nullite (nil) sont definies dans main.h.
-  * Leur usage n'est bien sur pas obligatoire.
-  * Voir la definition des types VAR, PVAR, ARBRE, PARBRE dans main.h
-  *
-  */
 
 S : LDefClass Bloc
 {
