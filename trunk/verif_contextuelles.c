@@ -72,7 +72,7 @@ void sont_valides_attributs(liste_classes_t decl, classe_t* classe)
     /* On fait la vérification de la valeur par défaut immédiatement pour n'avoir le bon environnement */
     if (attribut->valeur_defaut != NIL(arbre_t) && !type_est_compatible(est_valide_arbre_syntaxique(ajouter_classe(decl, classe),
                                                                                                     decl_generer_depuis_classe(classe),
-                                                                                                    attribut->valeur_defaut, classe, FAUX),
+                                                                                                    attribut->valeur_defaut, classe, attribut->statique),
                                                                         attribut->type))
     {
       printf("Classe %s : Type incohérent pour la valeur par défaut de l'attribut %s (ligne %d).\n", classe->nom, attribut->nom, attribut->valeur_defaut->num_ligne);
@@ -455,7 +455,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
           }
           else if (statique && arbre->type_var == ATTRIBUT && !var->statique)
           {
-            printf("Impossible de faire référence à l'attribut non statique %s dans une méthode statique (ligne : %d).\n", var->nom, arbre->num_ligne);
+            printf("Impossible de faire référence à l'attribut non statique %s dans un contexte statique (ligne : %d).\n", var->nom, arbre->num_ligne);
             exit(EXIT_FAILURE);
           }
           /* Pas top mais évite des problèmes avec les valeurs par défaut des paramètres */
@@ -481,7 +481,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
             }
             else if (statique)
             {
-              printf("L'identificateur this ne peut pas être utilisé dans une méthode statique (ligne : %d).\n", arbre->num_ligne);
+              printf("L'identificateur this ne peut pas être utilisé dans un contexte statique (ligne : %d).\n", arbre->num_ligne);
               exit(EXIT_FAILURE);
             }
             
@@ -497,7 +497,7 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
             }
             else if (statique)
             {
-              printf("L'identificateur super ne peut pas être utilisé dans une méthode statique (ligne : %d).\n", arbre->num_ligne);
+              printf("L'identificateur super ne peut pas être utilisé dans un contexte statique (ligne : %d).\n", arbre->num_ligne);
               exit(EXIT_FAILURE);
             }
             
