@@ -597,11 +597,17 @@ classe_t* est_valide_arbre_syntaxique(liste_classes_t decl_classes, decl_vars_t*
       
       case New:
         type = chercher_classe(decl_classes, arbre->gauche.S);
-        if(type == NIL(classe_t))
+        if (type == NIL(classe_t))
         {
           printf("La classe %s n'a pas été déclarée (ligne : %d).\n", arbre->gauche.S, arbre->num_ligne);
           exit(EXIT_FAILURE);
         }
+        else if (!strcmp("Entier", type->nom) || !strcmp("Chaine", type->nom))
+        {
+          printf("La classe %s est un type prédéfini et ne peut pas être instanciée dynamiquement (ligne : %d).\n", type->nom, arbre->num_ligne);
+          exit(EXIT_FAILURE);
+        }
+        
         arbre->info.methode = type->constructeur;
         // On vérifie les paramètres du constructeur
         sont_valides_arguments(decl_classes, decl_vars, arbre->info.methode, arbre->droit.args, type_this);
