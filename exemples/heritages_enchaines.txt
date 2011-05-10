@@ -1,0 +1,138 @@
+/**
+ Cet exemple permet de vérifier que les héritages multiples se font correctement
+ */
+
+class Maman(a : Entier)
+{ age := if a>0 then a else 0 }
+
+ is {
+  
+  var age : Entier
+  
+   def afficherAge() returns Chaine is{
+    "\n J'ai ".imprimer();
+    age.imprimer();
+    " ans\n".imprimer()
+  }
+  
+  def afficher() returns Chaine is {
+    "\nmethode afficher de la classe Maman\n".imprimer();
+    this.afficherAge()
+  }
+  
+ 
+  
+  def static sabrer() returns Entier is{
+    "\nmethode sabrer de la classe Maman\n".imprimer();
+    30
+   }
+   
+}
+
+class Boolean(b: Entier)
+{ valeur := if b=1 then 1 else 0}
+ is {
+  var valeur : Entier
+
+  def getVal() returns Entier is {
+    valeur
+  }
+
+}
+
+class Fifille(a : Entier ) extends Maman(a) is {
+
+  def override afficher() returns Chaine is {
+    "\nmethode afficher de la classe Fifille, qui hérite de Maman\n".imprimer()
+  }
+
+  
+  def affichageSuperieur() returns Chaine is {
+    super.afficher()
+  }
+  
+  def affichageMaman() returns Chaine is {
+    super.afficher()
+  }
+  
+}
+
+class Bebe() extends Fifille(0) 
+{  presente := new Boolean (0) }
+
+is {
+
+  var presente : Boolean
+
+  def partir() returns Boolean is {
+    presente := new Boolean (0)
+  }
+  
+  def revenir() returns Boolean is {
+    presente := new Boolean (1)
+  }
+  
+   def estPresente() returns Chaine is {
+    if presente.getVal() then "je suis là\n".imprimer()
+      else "je suis partie pour le moment, merci de me laisser un message\n".imprimer()
+  }
+
+
+ 
+  def override afficher() returns Chaine is {
+    " \n Bonjour, je viens de naitre\n".imprimer();
+    this.estPresente()
+  }
+  
+  def affichageComplet() returns Chaine is {
+    this.afficher();
+    this.afficherAge();
+    "\n affichage de la méthode de la super-classe : \n".imprimer();
+    super.afficher()
+  
+  }
+  
+  def override affichageMaman() returns Chaine is {
+  
+    super.affichageMaman()
+  
+  }
+  
+  
+
+}
+
+
+{
+  var bebe: Bebe;
+  var mum : Maman
+  
+  is
+  "\n\n-----------------creation d'un bébé et affichage : ".imprimer();
+  bebe := new Bebe();
+  bebe.affichageComplet();  
+  
+  "\n\n-----------------appel de la méthode 'affichageSuperieur' qui est définie dans la superClasse Fifille, qui fait elle-même appel à sa super-classe Maman".imprimer();
+  bebe.affichageSuperieur();
+  
+  "\n\n-----------------même résultat en passant par un double super : ".imprimer();
+  bebe.affichageMaman();
+  
+  "\n\n-----------------création d'une Maman et affichage : ".imprimer();
+  mum := new Maman(50);
+  mum.afficher();
+  
+  "\n\n-----------------la maman est une référence sur un Bebe : affichage".imprimer();
+  mum := new Bebe();
+  mum.afficher();
+
+  
+  "\n\n----------------- mum et bebe pointent sur la même variable\n changement de l'était par l'une et affichage par l'autre-----------------".imprimer();
+  mum := bebe;
+  bebe.revenir();
+  mum.afficher();
+  
+  3
+}
+
+
