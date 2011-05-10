@@ -1,0 +1,26 @@
+/**
+ * Pour vérifier que les blocs imbriqués sont bien gérés.
+ * 
+ * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
+ */
+
+class TestImbricationBloc() is {
+  var x: Entier
+
+  def foo() returns Entier is {
+    x := 42;
+    {
+      var x: Entier
+      is x := 11
+    };
+    x := x + 1;
+    x.imprimer()
+  }
+}
+
+{
+  var t: TestImbricationBloc
+  is
+  t := new TestImbricationBloc();
+  t.foo()
+}
