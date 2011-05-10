@@ -55,6 +55,7 @@ class Crible(v: Entier := 2) {
 {
   var c:Crible := new Crible()
   is
+  "exemple - crible d'Erathostène  \n".imprimer();
   c.ajouter(98);
   (99 - c.cribler()).imprimer();
   " nombres premiers entre 2 et 100 :\n".imprimer();

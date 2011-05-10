@@ -131,6 +131,7 @@ is {
   mum := bebe;
   bebe.revenir();
   mum.afficher();
+  "Les héritages sur plusieurs niveaux sont correctement gérés".imprimer();
   
   3
 }

@@ -1,6 +1,9 @@
 /**
+  *Ceci est un fichier qui teste un grand nombre des différentes constructions permises par le langage
+ *
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
+ 
 class TestM(s:Chaine := "TestM !") {
   s.imprimer();
   "\n".imprimer()

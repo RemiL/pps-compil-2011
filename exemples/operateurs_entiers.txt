@@ -7,7 +7,7 @@ class Test() is {
 
 {
   "La réponse est ".imprimer();
-  (42+4).imprimer();
+  (38+4).imprimer();
   " \n".imprimer();
   "\n petit calcul : 5-3 : ".imprimer();
   (5-3).imprimer();
@@ -53,6 +53,13 @@ class Test() is {
   "\n  4 == 4 : ".imprimer();
   (4  = 4 ).imprimer();
   "\n  3 == 4 : ".imprimer();
-  (3  = 4 ).imprimer()
+  (3  = 4 ).imprimer();
   
+  "\n  3 <> 4 : ".imprimer();
+  (3  <> 4 ).imprimer();
+  "\n  4 <> 4 : ".imprimer();
+  (4  <> 4 ).imprimer();
+  
+  
+  "\n\ntous les opérateurs sur les entiers sont correctement gérés\n".imprimer()
 }
