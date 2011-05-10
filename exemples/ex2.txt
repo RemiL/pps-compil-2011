@@ -1,26 +1,45 @@
 /**
- * Pour vérifier que les blocs imbriqués sont bien gérés.
- * 
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
+class TestM(s:Chaine := "TestM !") {
+  s.imprimer();
+  "\n".imprimer()
+} is {
+  static val eol:Chaine := "\n";
+  var eol2:Chaine := eol
+}
 
-class TestImbricationBloc() is {
-  var x: Entier
-
-  def foo() returns Entier is {
-    x := 42;
-    {
-      var x: Entier
-      is x := 11
-    };
-    x := x + 1;
-    x.imprimer()
+class Test(s:Chaine := "Test !") extends TestM() {
+  this.w := 7;
+  w := this.w + w - 4;
+  z := 1;
+  this.z := z + this.z + 1334;
+  s.imprimer();
+  eol2.imprimer()
+} is {
+  var z:Entier;
+  static var w:Entier
+  
+  def test(s:Chaine, x:Entier, y:Entier := 1) returns Chaine is {
+    var i:Entier
+    is
+    this.w := w + 1;
+    this.w.imprimer();
+    eol.imprimer();
+    this.z := z + 1;
+    this.z.imprimer();
+    eol.imprimer();
+    s.imprimer();
+    x := x + 1 + y;
+    i := x + 3*10 + 5/2 - if (42 > 100) then 0 else 1;
+    i.imprimer();
+    eol
   }
 }
 
 {
-  var t: TestImbricationBloc
+  var t:Test
   is
-  t := new TestImbricationBloc();
-  t.foo()
+  t := new Test("Test !!!");
+  t.test("La réponse est ", 9).imprimer()
 }
