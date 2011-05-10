@@ -42,5 +42,7 @@ class Math() is {
   
   "\nFactoriel 7 modulo 4 = ".imprimer();
   Math.modulo(Math.factoriel(7), t).imprimer();
-  "\n".imprimer()
+  "\n".imprimer();
+  
+  "\n\n La récursivité s'effectue correctement\n".imprimer()
 }

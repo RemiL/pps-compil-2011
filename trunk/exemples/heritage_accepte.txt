@@ -52,6 +52,8 @@ class Fifille(a : Entier ) extends Maman(a) is {
   t := new Fifille(19);
   t.lukeJeSuisTaMere();
   Fifille.areYouMyMummy(new Maman(34) );
+  
+  "L'héritage est accepté ".imprimer();
  /*  t.manger();     doit bugguer */
   3
 }

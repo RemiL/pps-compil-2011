@@ -1,5 +1,6 @@
 /**
- * Divers trucs qui devraient fonctionner
+ * Ceci est un fichier qui teste un grand nombre des différentes constructions permises par le langage
+ * Dans le cadre d'un programme modélisant une personne
  * 
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */

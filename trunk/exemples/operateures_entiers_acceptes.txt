@@ -1,4 +1,5 @@
 /**
+ * Cet exemple vérifie que tous les opérateurs sur les entiers sont acceptés
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
@@ -32,5 +33,6 @@ class Test() is {
 {
   var t: Test
   is
-  t := new Test()
+  t := new Test();
+  "tous les opérateurs sur les entiers sont acceptés".imprimer()
 }

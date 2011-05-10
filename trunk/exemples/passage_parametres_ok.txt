@@ -21,7 +21,8 @@ class Test(xc: Entier) is {
 }
 
 class TestBis(xc: Entier := 42) is {
-  var x: Entier
+  var x: Entier;
+  static var stat : Entier
   
   def foo(z : Entier) returns Entier is {
     x := 42;
@@ -34,8 +35,8 @@ class TestBis(xc: Entier := 42) is {
   }
   
   def static meth(c : Chaine, z : Entier := 34) returns Entier is {
-    x := 42;
-    x := x + 1
+    stat := 42;
+    stat := stat + 1
   }
   
 }
@@ -51,7 +52,9 @@ class TestBis(xc: Entier := 42) is {
   m := new TestBis(3);
   m := new TestBis();
   m.kung(8);
-  TestBis.meth("bouh")
+  TestBis.meth("bouh");
+  
+  "\nLe passage de paramètres est correct\n".imprimer()
   
   
   

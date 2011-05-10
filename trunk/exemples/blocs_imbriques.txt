@@ -22,5 +22,7 @@ class TestImbricationBloc() is {
   var t: TestImbricationBloc
   is
   t := new TestImbricationBloc();
-  t.foo()
+  t.foo();
+  "les blocs imbriqués sont reconnus".imprimer()
+  
 }
