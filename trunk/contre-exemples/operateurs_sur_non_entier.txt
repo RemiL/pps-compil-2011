@@ -1,4 +1,5 @@
 /**
+ * exécute des opérateurs réservés aux entiers sur d'autres classes
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 
