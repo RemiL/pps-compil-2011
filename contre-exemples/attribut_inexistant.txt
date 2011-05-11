@@ -1,4 +1,6 @@
 /**
+ * Cet exemple manipule un attribut qui n'a pas été déclaré
+ * 
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 

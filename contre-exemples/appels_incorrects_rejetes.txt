@@ -1,4 +1,6 @@
 /**
+  
+  * Cet exemple ne donne pas le bon nombre d'arguments
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 

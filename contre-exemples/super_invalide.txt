@@ -1,4 +1,5 @@
 /**
+ * applique l'identificateur super pour une méthode non redéfinie
  * Rémi Lacroix, Aliénor Latour, Nathanaël Masri, Loic Ramboanasolo
  */
 class A() is {
