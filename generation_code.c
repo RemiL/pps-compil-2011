@@ -388,6 +388,10 @@ void generer_code_valeurs_defaut_attributs_non_statiques(FILE* fichier, classe_t
                    "-- Début initialisation des valeurs par défaut des attributs de %s\n", classe->nom);
 }
 
+/**
+ * Génère le code des méthodes, chaque méthode est étiquettée
+ * selon le motif suivante : <nomdeclasse>_<nomdeméthode>.
+ */
 void generer_code_methodes(FILE* fichier, classe_t* classe)
 {
   methode_t* methode = classe->methodes.tete;
@@ -412,6 +416,10 @@ void generer_code_methodes(FILE* fichier, classe_t* classe)
   }
 }
 
+/**
+ * Génère la section de code initialisant les tables des sauts.
+ * Elle est accessible par l'étiquette init_tables_sauts.
+ */
 void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_t classes)
 {
   classe_t* classe = classes.tete;
@@ -452,6 +460,10 @@ void generer_code_tables_sauts_attributs_statiques(FILE* fichier, liste_classes_
   fprintf(fichier, "JUMP prog_principal\n");
 }
 
+/**
+ * Génère le code correspondant à la table des sauts d'une classe
+ * et alloue également les attributs statiques.
+ */
 void generer_code_table_sauts(FILE* fichier, classe_t* classe)
 {
   /* Tableaux de chaines de caractères initialement
@@ -497,6 +509,11 @@ void generer_code_table_sauts(FILE* fichier, classe_t* classe)
   fprintf(fichier, "-- Fin table des sauts de %s\n", classe->nom);
 }
 
+/**
+ * Génère le code du programme principal accessible via l'étiquette
+ * prog_principal. En particulier, l'appel à START est généré dans
+ * cette fonction.
+ */
 void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_var_prog_principal)
 {
   fprintf(fichier, "\n-- Programme principal\n"
@@ -516,6 +533,9 @@ void generer_code_prog_principal(FILE* fichier, arbre_t* prog_principal, int nb_
   fprintf(fichier, "STOP\n");
 }
 
+/**
+ * Génère le code correspondant à un arbre syntaxique.
+ */
 void generer_code_arbre(FILE* fichier, arbre_t* arbre)
 {
   /* étiquettes pour le if-then-else */
@@ -527,6 +547,7 @@ void generer_code_arbre(FILE* fichier, arbre_t* arbre)
     {
       case ';':
         generer_code_arbre(fichier, arbre->gauche.A);
+        /* Seule la dernière valeur de retour est utile. */
         fprintf(fichier, "\tPOPN 1 -- nettoyage\n");
         generer_code_arbre(fichier, arbre->droit.A);
         break;
@@ -695,11 +716,11 @@ void generer_code_identifiant(FILE* fichier, arbre_t* arbre)
         fprintf(fichier, "\tPUSHG %d -- champ statique %s\n", arbre->info.var->index, arbre->info.var->nom);
       break;
     
-    case VARIABLE:
+    case VARIABLE: /* indexée par rapport à fp */
       fprintf(fichier, "\tPUSHL %d -- variable locale %s\n", arbre->info.var->index, arbre->info.var->nom);
       break;
     
-    case PARAM:
+    case PARAM: /* indexé négativement par rapport à fp */
       fprintf(fichier, "\tPUSHL %d -- paramètre %s\n", arbre->info.param->index, arbre->info.param->nom);
       break;
     
@@ -763,11 +784,11 @@ void generer_code_affectation(FILE* fichier, arbre_t* arbre)
         fprintf(fichier, "\tSTOREG %d -- champ statique %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
       break;
     
-    case VARIABLE:
+    case VARIABLE: /* indexée par rapport à fp */
       fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.var->index, arbre->gauche.A->info.var->nom);
       break;
     
-    case PARAM:
+    case PARAM: /* indexé négativement par rapport à fp */
       fprintf(fichier, "\tSTOREL %d -- variable locale %s\n", arbre->gauche.A->info.param->index, arbre->gauche.A->info.param->nom);
       break;
     
@@ -784,6 +805,7 @@ void generer_code_appel_constructeur(FILE* fichier, arbre_t* arbre)
   fprintf(fichier, "-- Appel constructeur\n"
                    "\tPUSHN 1 -- espace mémoire pour le résultat\n");
   
+  /* Préparation des arguments */
   while (param != NIL(param_t))
   {
     fprintf(fichier, "-- Argument\n");
@@ -814,6 +836,7 @@ void generer_code_appel(FILE* fichier, arbre_t* arbre)
   fprintf(fichier, "-- Espace mémoire pour le résultat\n"
                    "\tPUSHN 1\n");
   
+  /* Préparation des arguments */
   while (param != NIL(param_t))
   {
     fprintf(fichier, "-- Argument\n");
